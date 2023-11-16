@@ -1,2 +1,2 @@
-# kuzne
+# Kuzne
 Experimental kernel development
