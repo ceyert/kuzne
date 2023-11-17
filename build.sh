@@ -11,6 +11,7 @@ mkdir ./build/io
 mkdir ./build/disk
 mkdir ./build/fs
 mkdir ./build/string
+mkdir ./build/fs/fat
 
 mkdir ./mount_point
 
