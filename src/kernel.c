@@ -71,7 +71,7 @@ static struct paging_4gb_chunk* kernel_chunk = 0;
 void kernel_main()
 {
     terminal_initialize();
-    print("Hello world!\ntest");
+    print("Hello world!\ntest\n");
 
     // Initialize the heap
     kheap_init();
@@ -97,7 +97,13 @@ void kernel_main()
     // Enable the system interrupts
     enable_interrupts();
 
-    char buf[20];
-    strcpy(buf, "hello!");
+    int fd = fopen("0:/hello.txt", "r");
+    if (fd)
+    {
+        print("We opened hello.txt\n");
+    }else
+    {
+        print("not opened hello.txt\n");
+    }
     while(1) {}
 }
