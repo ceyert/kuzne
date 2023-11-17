@@ -7,10 +7,10 @@ all: ./bin/boot.bin ./bin/kernel.bin
 	dd if=./bin/boot.bin >> ./bin/os.bin
 	dd if=./bin/kernel.bin >> ./bin/os.bin
 	dd if=/dev/zero bs=1048576 count=16 >> ./bin/os.bin
-	sudo mount -t vfat ./bin/os.bin /mnt/d
+	sudo mount -t vfat ./bin/os.bin ./mount_point
 	# Copy a file over
-	sudo cp ./hello.txt /mnt/d
-	sudo umount /mnt/d
+	sudo cp ./hello.txt ./mount_point
+	sudo umount ./mount_point
 ./bin/kernel.bin: $(FILES)
 	i686-elf-ld -g -relocatable $(FILES) -o ./build/kernelfull.o
 	i686-elf-gcc $(FLAGS) -T ./src/linker.ld -o ./bin/kernel.bin -ffreestanding -O0 -nostdlib ./build/kernelfull.o
