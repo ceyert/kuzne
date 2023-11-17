@@ -12,6 +12,7 @@ mkdir ./build/disk
 mkdir ./build/fs
 mkdir ./build/string
 
+mkdir ./mount_point
 
 export PREFIX="$HOME/opt/cross"
 export TARGET=i686-elf
