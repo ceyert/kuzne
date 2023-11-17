@@ -5,6 +5,7 @@ mkdir ./build
 
 mkdir ./build/idt
 mkdir ./build/memory
+mkdir ./build/memory/heap
 mkdir ./build/io
 
 export PREFIX="$HOME/opt/cross"
