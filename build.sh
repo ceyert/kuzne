@@ -13,6 +13,7 @@ mkdir ./build/fs
 mkdir ./build/string
 mkdir ./build/fs/fat
 mkdir ./build/gdt
+mkdir ./build/task
 
 mkdir ./mount_point
 
