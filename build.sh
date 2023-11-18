@@ -15,6 +15,8 @@ mkdir ./build/fs/fat
 mkdir ./build/gdt
 mkdir ./build/task
 
+mkdir ./programs/blank/build
+
 mkdir ./mount_point
 
 export PREFIX="$HOME/opt/cross"
