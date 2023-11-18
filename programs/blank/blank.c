@@ -4,7 +4,14 @@
 #include "string.h"
 int main(int argc, char** argv)
 {
-    printf("hello from blank!");
+    for (int i = 0; i < argc; i++)
+    {
+        printf("%s\n", argv[i]);
+    }
+
+
+    char* ptr = (char*) 0x00;
+    *ptr = 0x50;
     
     while(1) 
     {
