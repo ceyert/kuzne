@@ -4,17 +4,13 @@
 #include "string.h"
 int main(int argc, char** argv)
 {
-    for (int i = 0; i < argc; i++)
+    while(1)
     {
-        printf("%s\n", argv[i]);
-    }
-
-
-    char* ptr = (char*) 0x00;
-    *ptr = 0x50;
-    
-    while(1) 
-    {
+        print(argv[0]);
+        for (int i = 0; i < 1000000; i++)
+        {
+            
+        }
     }
     return 0;
 }
