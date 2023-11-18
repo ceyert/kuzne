@@ -6,6 +6,7 @@
 #include "memory/memory.h"
 #include "string/string.h"
 #include "memory/paging/paging.h"
+#include "loader/formats/elfloader.h"
 #include "idt/idt.h"
 
 // The current task that is running
@@ -101,6 +102,18 @@ int task_free(struct task *task)
     // Finally free the task data
     kfree(task);
     return 0;
+}
+
+void task_next()
+{
+    struct task* next_task = task_get_next();
+    if (!next_task)
+    {
+        panic("No more tasks!\n");
+    }
+
+    task_switch(next_task);
+    task_return(&next_task->registers);
 }
 
 int task_switch(struct task *task)
@@ -208,6 +221,11 @@ int task_init(struct task *task, struct process *process)
     }
 
     task->registers.ip = PEACHOS_PROGRAM_VIRTUAL_ADDRESS;
+    if (process->filetype == PROCESS_FILETYPE_ELF)
+    {
+        task->registers.ip = elf_header(process->elf_file)->e_entry;
+    }
+
     task->registers.ss = USER_DATA_SEGMENT;
     task->registers.cs = USER_CODE_SEGMENT;
     task->registers.esp = PEACHOS_PROGRAM_VIRTUAL_STACK_ADDRESS_START;
@@ -232,4 +250,9 @@ void* task_get_stack_item(struct task* task, int index)
     kernel_page();
 
     return result;
+}
+
+void* task_virtual_address_to_physical(struct task* task, void* virtual_address)
+{
+    return paging_get_physical_address(task->page_directory->directory_entry, virtual_address);
 }

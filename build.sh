@@ -16,6 +16,8 @@ mkdir ./build/gdt
 mkdir ./build/task
 mkdir ./build/isr80h
 mkdir ./build/keyboard
+mkdir ./build/loader
+mkdir ./build/loader/formats
 
 mkdir ./programs/blank/build
 

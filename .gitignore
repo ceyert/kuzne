@@ -4,3 +4,5 @@ bin
 build
 mount_point
 programs/blank/build
+programs/stdlib/build
+programs/shell/build
