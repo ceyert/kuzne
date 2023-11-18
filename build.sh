@@ -12,6 +12,12 @@ mkdir ./build/disk
 mkdir ./build/fs
 mkdir ./build/string
 mkdir ./build/fs/fat
+mkdir ./build/gdt
+mkdir ./build/task
+mkdir ./build/isr80h
+mkdir ./build/keyboard
+
+mkdir ./programs/blank/build
 
 mkdir ./mount_point
 
