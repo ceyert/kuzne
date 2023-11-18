@@ -41,6 +41,76 @@ int process_switch(struct process* process)
     return 0;
 }
 
+static int process_find_free_allocation_index(struct process* process)
+{
+    int res = -ENOMEM;
+    for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++)
+    {
+        if (process->allocations[i] == 0)
+        {
+            res = i;
+            break;
+        }
+    }
+
+    return res;
+}
+
+void* process_malloc(struct process* process, size_t size)
+{
+    void* ptr = kzalloc(size);
+    if (!ptr)
+    {
+        return 0;
+    }
+
+    int index = process_find_free_allocation_index(process);
+    if (index < 0)
+    {
+        return 0;
+    }
+
+    process->allocations[index] = ptr;
+    return ptr;
+}
+
+static bool process_is_process_pointer(struct process* process, void* ptr)
+{
+    for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++)
+    {
+        if (process->allocations[i] == ptr)
+            return true;
+    }
+
+    return false;
+}
+
+static void process_allocation_unjoin(struct process* process, void* ptr)
+{
+    for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++)
+    {
+        if (process->allocations[i] == ptr)
+        {
+            process->allocations[i] = 0x00;
+        }
+    }
+}
+
+void process_free(struct process* process, void* ptr)
+{
+    // Not this processes pointer? Then we cant free it.
+    if (!process_is_process_pointer(process, ptr))
+    {
+        return;
+    }
+
+    // Unjoin the allocation
+    process_allocation_unjoin(process, ptr);
+
+    // We can now free the memory.
+    kfree(ptr);
+}
+
 static int process_load_binary(const char* filename, struct process* process)
 {
     int res = 0;
@@ -130,7 +200,7 @@ static int process_map_elf(struct process* process)
         {
             flags |= PAGING_IS_WRITEABLE;
         }
-        res = paging_map_to(process->task->page_directory, paging_align_to_lower_page((void*)phdr->p_vaddr), paging_align_to_lower_page(phdr_phys_address), paging_align_address(phdr_phys_address+phdr->p_filesz), flags);
+        res = paging_map_to(process->task->page_directory, paging_align_to_lower_page((void*)phdr->p_vaddr), paging_align_to_lower_page(phdr_phys_address), paging_align_address(phdr_phys_address+phdr->p_memsz), flags);
         if (ISERR(res))
         {
             break;
