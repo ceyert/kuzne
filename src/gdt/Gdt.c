@@ -1,5 +1,5 @@
 #include "Gdt.h"
-#include "terminal/Terminal.h"
+#include "vga/Vga.h"
 
 void encodeGdtEntry(uint8_t *target, struct GdtStructured source) {
     if ((source.limit > 65536) && ((source.limit & 0xFFF) != 0xFFF)) {

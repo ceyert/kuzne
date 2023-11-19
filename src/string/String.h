@@ -23,4 +23,10 @@ int strnlen_terminator(const char *str, int max, char terminator);
 
 char tolower(char s1);
 
+char *itoa(int i);
+
+char *itoa_hex(int i);
+
+char *ptr_to_hex(const unsigned long ptr);
+
 #endif

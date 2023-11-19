@@ -9,7 +9,7 @@
 #include "memory/paging/Paging.h"
 #include "loader/formats/Elfloader.h"
 #include "Kernel.h"
-#include "terminal/Terminal.h"
+#include "vga/Vga.h"
 
 // The current process that is running
 struct Process *current_process = 0;

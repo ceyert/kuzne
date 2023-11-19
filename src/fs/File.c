@@ -7,7 +7,7 @@
 #include "fat/Fat16.h"
 #include "Status.h"
 #include "Kernel.h"
-#include "terminal/Terminal.h"
+#include "vga/Vga.h"
 
 struct Filesystem *filesystems[PEACHOS_MAX_FILESYSTEMS];
 struct FileDescriptor *file_descriptors[PEACHOS_MAX_FILE_DESCRIPTORS];

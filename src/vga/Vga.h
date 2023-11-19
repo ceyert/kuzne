@@ -14,4 +14,8 @@ void terminal_writechar(char c, char colour);
 
 void panic(const char *msg);
 
+void log(const char *msg);
+
+void logAddress(const char *msg, const unsigned long addr);
+
 #endif

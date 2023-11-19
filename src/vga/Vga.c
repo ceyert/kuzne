@@ -1,4 +1,4 @@
-#include "Terminal.h"
+#include "Vga.h"
 #include <stddef.h>
 #include <stdint.h>
 #include "string/String.h"
@@ -73,4 +73,15 @@ void print(const char *str) {
 void panic(const char *msg) {
     print(msg);
     while (1) {}
+}
+
+void log(const char *msg) {
+    print(msg);
+    terminal_writechar('\n', 15);
+}
+
+void logAddress(const char *msg, const unsigned long addr) {
+    print(msg);
+    print(ptr_to_hex(addr));
+    terminal_writechar('\n', 15);
 }

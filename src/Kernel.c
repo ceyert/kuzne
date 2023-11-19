@@ -1,5 +1,5 @@
 #include "Kernel.h"
-#include "terminal/Terminal.h"
+#include "vga/Vga.h"
 #include "idt/Idt.h"
 #include "memory/heap/Kheap.h"
 #include "memory/paging/Paging.h"

@@ -1,5 +1,6 @@
 #include "Heap.h"
 #include "Kernel.h"
+#include "vga/Vga.h"
 #include "Status.h"
 #include "memory/Memory.h"
 #include <stdbool.h>
@@ -11,6 +12,7 @@ static int heap_validate_table(void *ptr, void *end, struct HeapTable *table) {
     size_t total_blocks = table_size / HEAP_BLOCK_SIZE;
     if (table->total != total_blocks) {
         res = -EINVARG;
+        log("Error: heap_validate_table");
         goto out;
     }
 
@@ -27,6 +29,7 @@ int heap_create(struct Heap *heap, void *heapBaseAddr, void *end, struct HeapTab
 
     if (!heap_validate_alignment(heapBaseAddr) || !heap_validate_alignment(end)) {
         res = -EINVARG;
+        log("Error: heap_create");
         goto out;
     }
 
@@ -36,6 +39,7 @@ int heap_create(struct Heap *heap, void *heapBaseAddr, void *end, struct HeapTab
 
     res = heap_validate_table(heapBaseAddr, end, table);
     if (res < 0) {
+        logAddress("heap_validate_table", res);
         goto out;
     }
 
@@ -83,6 +87,7 @@ int heap_get_start_block(struct Heap *heap, uint32_t total_blocks) {
     }
 
     if (bs == -1) {
+        log("no memory");
         return -ENOMEM;
     }
 

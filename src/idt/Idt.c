@@ -1,7 +1,7 @@
 #include "Idt.h"
 #include "Config.h"
 #include "Kernel.h"
-#include "terminal/Terminal.h"
+#include "vga/Vga.h"
 #include "memory/Memory.h"
 #include "task/Task.h"
 #include "task/Process.h"

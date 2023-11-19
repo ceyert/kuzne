@@ -1,4 +1,4 @@
-#include "terminal/Terminal.h"
+#include "vga/Vga.h"
 #include "Heap.h"
 #include "Config.h"
 #include "Kernel.h"
@@ -15,7 +15,7 @@ void kheap_init() {
     void *end = (void *) (HEAP_BASE_ADDRESS + TOTAL_HEAP_SIZE);
     int res = heap_create(&kernel_heap, (void *) (HEAP_BASE_ADDRESS), end, &kernel_heap_table);
     if (res < 0) {
-        print("Failed to create heap\n");
+        log("Error: kheap_init");
     }
 
 }
