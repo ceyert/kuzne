@@ -4,7 +4,8 @@
 #include "Pparser.h"
 #include <stdint.h>
 
-typedef unsigned int FILE_SEEK_MODE;
+typedef unsigned int file_seek_mode_t;
+
 enum {
     SEEK_SET,
     SEEK_CUR,
@@ -12,7 +13,8 @@ enum {
 };
 
 
-typedef unsigned int FILE_MODE;
+typedef unsigned int file_mode_t;
+
 enum {
     FILE_MODE_READ,
     FILE_MODE_WRITE,
@@ -24,11 +26,11 @@ enum {
     FILE_STAT_READ_ONLY = 0b00000001
 };
 
-typedef unsigned int FILE_STAT_FLAGS;
+typedef unsigned int file_stat_flags_t;
 
 struct Disk;
 
-typedef void *(*FS_OPEN_FUNCTION)(struct Disk *disk, struct PathPart *path, FILE_MODE mode);
+typedef void *(*FS_OPEN_FUNCTION)(struct Disk *disk, struct PathPart *path, file_mode_t mode);
 
 typedef int (*FS_READ_FUNCTION)(struct Disk *disk, void *
 
@@ -47,12 +49,12 @@ private);
 typedef int (*FS_SEEK_FUNCTION)(void *
 
 private,
-uint32_t offset, FILE_SEEK_MODE
+uint32_t offset, file_seek_mode_t
 seek_mode);
 
 
 struct FileStat {
-    FILE_STAT_FLAGS flags;
+    file_stat_flags_t flags;
     uint32_t filesize;
 };
 
@@ -91,7 +93,7 @@ extern void fs_init();
 
 extern int fopen(const char *filename, const char *mode_str);
 
-extern int fseek(int fd, int offset, FILE_SEEK_MODE whence);
+extern int fseek(int fd, int offset, file_seek_mode_t whence);
 
 extern int fread(void *ptr, uint32_t size, uint32_t nmemb, int fd);
 

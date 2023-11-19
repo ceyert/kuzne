@@ -92,8 +92,8 @@ struct Filesystem *fs_resolve(struct Disk *disk) {
     return fs;
 }
 
-FILE_MODE file_get_mode_by_string(const char *str) {
-    FILE_MODE mode = FILE_MODE_INVALID;
+file_mode_t file_get_mode_by_string(const char *str) {
+    file_mode_t mode = FILE_MODE_INVALID;
     if (strncmp(str, "r", 1) == 0) {
         mode = FILE_MODE_READ;
     } else if (strncmp(str, "w", 1) == 0) {
@@ -130,7 +130,7 @@ int fopen(const char *filename, const char *mode_str) {
         goto out;
     }
 
-    FILE_MODE mode = file_get_mode_by_string(mode_str);
+    file_mode_t mode = file_get_mode_by_string(mode_str);
     if (mode == FILE_MODE_INVALID) {
         res = -EINVARG;
         goto out;
@@ -189,7 +189,7 @@ int fclose(int fd) {
     return res;
 }
 
-int fseek(int fd, int offset, FILE_SEEK_MODE whence) {
+int fseek(int fd, int offset, file_seek_mode_t whence) {
     int res = 0;
     struct FileDescriptor *desc = file_get_descriptor(fd);
     if (!desc) {

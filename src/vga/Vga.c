@@ -34,8 +34,7 @@ void terminal_backspace() {
     terminal_col -= 1;
 }
 
-static void cleanScreen(int col, int row)
-{
+static void cleanScreen(int col, int row) {
     for (int y = row; y < VGA_ROW; y++) {
         for (int x = col; x < VGA_COL; x++) {
             terminal_putchar(x, y, ' ', 0);
