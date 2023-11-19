@@ -5,26 +5,28 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define HEAP_BLOCK_TABLE_ENTRY_TAKEN 0x01
-#define HEAP_BLOCK_TABLE_ENTRY_FREE 0x00
+typedef unsigned char heap_table_entry_t;
 
-#define HEAP_BLOCK_HAS_NEXT 0b10000000
-#define HEAP_BLOCK_IS_FIRST  0b01000000
+// Bit pipes of heap table entry
+#define HEAP_TABLE_ENTRY_TAKEN 0x01
+#define HEAP_TABLE_ENTRY_FREE 0x00
 
+// Bit Masks of heap table entry
+#define HEAP_TABLE_ENTRY_HAS_NEXT 0b10000000
+#define HEAP_TABLE_ENTRY_IS_FIRST 0b01000000
 
-typedef unsigned char HEAP_BLOCK_TABLE_ENTRY;
 
 struct HeapTable {
-    HEAP_BLOCK_TABLE_ENTRY *entries;
+    heap_table_entry_t *tableEntries;
     size_t total;
 };
 
 
 struct Heap {
-    struct HeapTable *table;
+    struct HeapTable *heapTable;
 
-    // Start address of the heap data pool
-    void *saddr;
+    // Base address of the heap!
+    void *heapBaseAddr;
 };
 
 int heap_create(struct Heap *heap, void *ptr, void *end, struct HeapTable *table);

@@ -67,7 +67,7 @@ void terminal_writechar(char c, char colour) {
 }
 
 void terminal_initialize() {
-    video_mem = (uint16_t * )(0xB8000);
+    video_mem = (uint16_t * )(VGA_BASE_ADDR);
     terminal_row = 0;
     terminal_col = 0;
     for (int y = 0; y < VGA_HEIGHT; y++) {
