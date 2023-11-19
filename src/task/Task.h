@@ -5,6 +5,7 @@
 #include "memory/paging/Paging.h"
 
 struct InterruptFrame;
+
 struct Registers {
     uint32_t edi;
     uint32_t esi;
@@ -23,6 +24,7 @@ struct Registers {
 
 
 struct Process;
+
 struct Task {
     /**
      * The page directory of the task

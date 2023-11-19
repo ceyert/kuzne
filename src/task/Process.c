@@ -15,14 +15,17 @@ struct Process *current_process = 0;
 
 static struct Process *processes[PEACHOS_MAX_PROCESSES] = {};
 
+// Initializes a process by setting all its fields to zero
 static void process_init(struct Process *process) {
     memset(process, 0, sizeof(struct Process));
 }
 
+// Returns the currently running process
 struct Process *process_current() {
     return current_process;
 }
 
+// Retrieves a process by its ID, or returns NULL if the ID is invalid or out of range
 struct Process *process_get(int process_id) {
     if (process_id < 0 || process_id >= PEACHOS_MAX_PROCESSES) {
         return NULL;
@@ -31,11 +34,13 @@ struct Process *process_get(int process_id) {
     return processes[process_id];
 }
 
+// Switches the current process to the specified process
 int process_switch(struct Process *process) {
     current_process = process;
     return 0;
 }
 
+// Finds a free allocation index for a new memory allocation within a process
 static int process_find_free_allocation_index(struct Process *process) {
     int res = -ENOMEM;
     for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
@@ -48,6 +53,7 @@ static int process_find_free_allocation_index(struct Process *process) {
     return res;
 }
 
+// Allocates memory of the specified size for a process, and maps it to the process's page directory
 void *process_malloc(struct Process *process, size_t size) {
     void *ptr = kzalloc(size);
     if (!ptr) {
@@ -76,6 +82,7 @@ void *process_malloc(struct Process *process, size_t size) {
     return 0;
 }
 
+// Checks if the given pointer is part of the process's memory allocations
 static bool process_is_process_pointer(struct Process *process, void *ptr) {
     for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
         if (process->allocations[i].ptr == ptr)
@@ -85,6 +92,7 @@ static bool process_is_process_pointer(struct Process *process, void *ptr) {
     return false;
 }
 
+// Removes a memory allocation from a process's list of allocations
 static void process_allocation_unjoin(struct Process *process, void *ptr) {
     for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
         if (process->allocations[i].ptr == ptr) {
@@ -94,6 +102,7 @@ static void process_allocation_unjoin(struct Process *process, void *ptr) {
     }
 }
 
+// Retrieves a process allocation by its address
 static struct ProcessAllocation *process_get_allocation_by_addr(struct Process *process, void *addr) {
     for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
         if (process->allocations[i].ptr == addr)
@@ -103,7 +112,7 @@ static struct ProcessAllocation *process_get_allocation_by_addr(struct Process *
     return 0;
 }
 
-
+// Terminates all memory allocations of a process
 int process_terminate_allocations(struct Process *process) {
     for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
         process_free(process, process->allocations[i].ptr);
@@ -112,16 +121,19 @@ int process_terminate_allocations(struct Process *process) {
     return 0;
 }
 
+// Frees the memory allocated for a process's binary data
 int process_free_binary_data(struct Process *process) {
     kfree(process->ptr);
     return 0;
 }
 
+// Frees the memory allocated for a process's ELF file data
 int process_free_elf_data(struct Process *process) {
     elf_close(process->elf_file);
     return 0;
 }
 
+// Frees the memory allocated for a process's program data, depending on its file type
 int process_free_program_data(struct Process *process) {
     int res = 0;
     switch (process->filetype) {
@@ -139,6 +151,7 @@ int process_free_program_data(struct Process *process) {
     return res;
 }
 
+// Switches to any available process. If no processes are available, triggers a panic
 void process_switch_to_any() {
     for (int i = 0; i < PEACHOS_MAX_PROCESSES; i++) {
         if (processes[i]) {
@@ -147,10 +160,10 @@ void process_switch_to_any() {
         }
     }
 
-
     panic("No processes to switch too\n");
 }
 
+// Removes a process from the process array and switches to another process if necessary
 static void process_unlink(struct Process *process) {
     processes[process->id] = 0x00;
 
@@ -159,6 +172,7 @@ static void process_unlink(struct Process *process) {
     }
 }
 
+// Terminates a process, freeing all its resources
 int process_terminate(struct Process *process) {
     int res = 0;
 
@@ -183,11 +197,13 @@ int process_terminate(struct Process *process) {
     return res;
 }
 
+// Retrieves the arguments passed to a process
 void process_get_arguments(struct Process *process, int *argc, char ***argv) {
     *argc = process->arguments.argc;
     *argv = process->arguments.argv;
 }
 
+// Counts the number of command arguments
 int process_count_command_arguments(struct CommandArgument *root_argument) {
     struct CommandArgument *current = root_argument;
     int i = 0;
@@ -199,7 +215,7 @@ int process_count_command_arguments(struct CommandArgument *root_argument) {
     return i;
 }
 
-
+// Injects command-line arguments into a process
 int process_inject_arguments(struct Process *process, struct CommandArgument *root_argument) {
     int res = 0;
     struct CommandArgument *current = root_argument;
@@ -236,6 +252,7 @@ int process_inject_arguments(struct Process *process, struct CommandArgument *ro
     return res;
 }
 
+// Frees a memory allocation associated with a process
 void process_free(struct Process *process, void *ptr) {
     // Unlink the pages from the process for the given address
     struct ProcessAllocation *allocation = process_get_allocation_by_addr(process, ptr);
@@ -257,6 +274,7 @@ void process_free(struct Process *process, void *ptr) {
     kfree(ptr);
 }
 
+// Loads a binary file into a process
 static int process_load_binary(const char *filename, struct Process *process) {
     void *program_data_ptr = 0x00;
     int res = 0;
@@ -297,6 +315,7 @@ static int process_load_binary(const char *filename, struct Process *process) {
     return res;
 }
 
+// Loads an ELF file into a process
 static int process_load_elf(const char *filename, struct Process *process) {
     int res = 0;
     struct ElfFile *elf_file = 0;
@@ -311,6 +330,7 @@ static int process_load_elf(const char *filename, struct Process *process) {
     return res;
 }
 
+// Loads either an ELF file or a binary file into a process
 static int process_load_data(const char *filename, struct Process *process) {
     int res = 0;
     res = process_load_elf(filename, process);
@@ -321,6 +341,7 @@ static int process_load_data(const char *filename, struct Process *process) {
     return res;
 }
 
+// Maps a binary file into the process's address space
 int process_map_binary(struct Process *process) {
     int res = 0;
     paging_map_to(process->task->page_directory, (void *) PEACHOS_PROGRAM_VIRTUAL_ADDRESS, process->ptr,
@@ -329,6 +350,7 @@ int process_map_binary(struct Process *process) {
     return res;
 }
 
+// Maps an ELF file into the process's address space
 static int process_map_elf(struct Process *process) {
     int res = 0;
 
@@ -352,6 +374,7 @@ static int process_map_elf(struct Process *process) {
     return res;
 }
 
+// Maps the memory of a process based on its file type
 int process_map_memory(struct Process *process) {
     int res = 0;
 
@@ -380,6 +403,7 @@ int process_map_memory(struct Process *process) {
     return res;
 }
 
+// Finds a free slot in the process array
 int process_get_free_slot() {
     for (int i = 0; i < PEACHOS_MAX_PROCESSES; i++) {
         if (processes[i] == 0)
@@ -389,6 +413,7 @@ int process_get_free_slot() {
     return -EISTKN;
 }
 
+// Loads a process from a file and allocates a slot for it
 int process_load(const char *filename, struct Process **process) {
     int res = 0;
     int process_slot = process_get_free_slot();
@@ -402,6 +427,7 @@ int process_load(const char *filename, struct Process **process) {
     return res;
 }
 
+// Loads a process and switches to it
 int process_load_switch(const char *filename, struct Process **process) {
     int res = process_load(filename, process);
     if (res == 0) {
@@ -411,6 +437,7 @@ int process_load_switch(const char *filename, struct Process **process) {
     return res;
 }
 
+// Loads a process for a specific slot in the process array
 int process_load_for_slot(const char *filename, struct Process **process, int process_slot) {
     int res = 0;
     struct Task *task = 0;
