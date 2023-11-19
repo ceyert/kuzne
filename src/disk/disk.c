@@ -4,7 +4,7 @@
 #include "status.h"
 #include "memory/memory.h"
 
-struct disk disk;
+struct Disk Disk;
 
 int disk_read_sector(int lba, int total, void *buf) {
     outb(0x1F6, (lba >> 24) | 0xE0);
@@ -33,22 +33,22 @@ int disk_read_sector(int lba, int total, void *buf) {
 }
 
 void disk_search_and_init() {
-    memset(&disk, 0, sizeof(disk));
-    disk.type = PEACHOS_DISK_TYPE_REAL;
-    disk.sector_size = PEACHOS_SECTOR_SIZE;
-    disk.id = 0;
-    disk.filesystem = fs_resolve(&disk);
+    memset(&Disk, 0, sizeof(Disk));
+    Disk.type = PEACHOS_DISK_TYPE_REAL;
+    Disk.sector_size = PEACHOS_SECTOR_SIZE;
+    Disk.id = 0;
+    Disk.filesystem = fs_resolve(&Disk);
 }
 
-struct disk *disk_get(int index) {
+struct Disk *disk_get(int index) {
     if (index != 0)
         return 0;
 
-    return &disk;
+    return &Disk;
 }
 
-int disk_read_block(struct disk *idisk, unsigned int lba, int total, void *buf) {
-    if (idisk != &disk) {
+int disk_read_block(struct Disk *idisk, unsigned int lba, int total, void *buf) {
+    if (idisk != &Disk) {
         return -EIO;
     }
 

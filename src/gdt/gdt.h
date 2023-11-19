@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-struct gdt {
+struct Gdt {
     uint16_t segment;
     uint16_t base_first;
     uint8_t base;
@@ -12,14 +12,14 @@ struct gdt {
     uint8_t base_24_31_bits;
 } __attribute__((packed));
 
-struct gdt_structured {
+struct GdtStructured {
     uint32_t base;
     uint32_t limit;
     uint8_t type;
 };
 
-void gdt_load(struct gdt *gdt, int size);
+void gdt_load(struct Gdt *gdt, int size);
 
-void gdt_structured_to_gdt(struct gdt *gdt, struct gdt_structured *structured_gdt, int total_entires);
+void gdt_structured_to_gdt(struct Gdt *gdt, struct GdtStructured *structured_gdt, int total_entires);
 
 #endif

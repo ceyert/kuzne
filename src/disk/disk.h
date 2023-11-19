@@ -9,14 +9,14 @@ typedef unsigned int PEACHOS_DISK_TYPE;
 // Represents a real physical hard disk
 #define PEACHOS_DISK_TYPE_REAL 0
 
-struct disk {
+struct Disk {
     PEACHOS_DISK_TYPE type;
     int sector_size;
 
     // The id of the disk
     int id;
 
-    struct filesystem *filesystem;
+    struct Filesystem *filesystem;
 
     // The private data of our filesystem
     void *fs_private;
@@ -24,8 +24,8 @@ struct disk {
 
 void disk_search_and_init();
 
-struct disk *disk_get(int index);
+struct Disk *disk_get(int index);
 
-int disk_read_block(struct disk *idisk, unsigned int lba, int total, void *buf);
+int disk_read_block(struct Disk *idisk, unsigned int lba, int total, void *buf);
 
 #endif

@@ -9,4 +9,8 @@ void free(void *ptr);
 
 char *itoa(int i);
 
+char *itoa_hex(int i);
+
+char *ptr_to_hex(const unsigned long ptr);
+
 #endif

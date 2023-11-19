@@ -1,18 +1,18 @@
 #ifndef PATHPARSER_H
 #define PATHPARSER_H
 
-struct path_root {
+struct PathRoot {
     int drive_no;
-    struct path_part *first;
+    struct PathPart *first;
 };
 
-struct path_part {
+struct PathPart {
     const char *part;
-    struct path_part *next;
+    struct PathPart *next;
 };
 
-struct path_root *pathparser_parse(const char *path, const char *current_directory_path);
+struct PathRoot *pathparser_parse(const char *path, const char *current_directory_path);
 
-void pathparser_free(struct path_root *root);
+void pathparser_free(struct PathRoot *root);
 
 #endif

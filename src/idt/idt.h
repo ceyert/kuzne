@@ -3,14 +3,14 @@
 
 #include <stdint.h>
 
-struct interrupt_frame;
+struct InterruptFrame;
 
-typedef void *(*ISR80H_COMMAND)(struct interrupt_frame *frame);
+typedef void *(*ISR80H_COMMAND)(struct InterruptFrame *frame);
 
 typedef void(*INTERRUPT_CALLBACK_FUNCTION)();
 
 
-struct idt_desc {
+struct IdtDesc {
     uint16_t offset_1; // Offset bits 0 - 15
     uint16_t selector; // Selector thats in our GDT
     uint8_t zero; // Does nothing, unused set to zero
@@ -18,12 +18,12 @@ struct idt_desc {
     uint16_t offset_2; // Offset bits 16-31
 } __attribute__((packed));
 
-struct idtr_desc {
+struct IdtrDesc {
     uint16_t limit; // Size of descriptor table -1
     uint32_t base; // Base address of the start of the interrupt descriptor table
 } __attribute__((packed));
 
-struct interrupt_frame {
+struct InterruptFrame {
     uint32_t edi;
     uint32_t esi;
     uint32_t ebp;

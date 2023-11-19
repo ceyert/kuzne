@@ -11,19 +11,19 @@
 #include "kernel.h"
 
 // The current process that is running
-struct process *current_process = 0;
+struct Process *current_process = 0;
 
-static struct process *processes[PEACHOS_MAX_PROCESSES] = {};
+static struct Process *processes[PEACHOS_MAX_PROCESSES] = {};
 
-static void process_init(struct process *process) {
-    memset(process, 0, sizeof(struct process));
+static void process_init(struct Process *process) {
+    memset(process, 0, sizeof(struct Process));
 }
 
-struct process *process_current() {
+struct Process *process_current() {
     return current_process;
 }
 
-struct process *process_get(int process_id) {
+struct Process *process_get(int process_id) {
     if (process_id < 0 || process_id >= PEACHOS_MAX_PROCESSES) {
         return NULL;
     }
@@ -31,12 +31,12 @@ struct process *process_get(int process_id) {
     return processes[process_id];
 }
 
-int process_switch(struct process *process) {
+int process_switch(struct Process *process) {
     current_process = process;
     return 0;
 }
 
-static int process_find_free_allocation_index(struct process *process) {
+static int process_find_free_allocation_index(struct Process *process) {
     int res = -ENOMEM;
     for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
         if (process->allocations[i].ptr == 0) {
@@ -48,7 +48,7 @@ static int process_find_free_allocation_index(struct process *process) {
     return res;
 }
 
-void *process_malloc(struct process *process, size_t size) {
+void *process_malloc(struct Process *process, size_t size) {
     void *ptr = kzalloc(size);
     if (!ptr) {
         goto out_err;
@@ -76,7 +76,7 @@ void *process_malloc(struct process *process, size_t size) {
     return 0;
 }
 
-static bool process_is_process_pointer(struct process *process, void *ptr) {
+static bool process_is_process_pointer(struct Process *process, void *ptr) {
     for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
         if (process->allocations[i].ptr == ptr)
             return true;
@@ -85,7 +85,7 @@ static bool process_is_process_pointer(struct process *process, void *ptr) {
     return false;
 }
 
-static void process_allocation_unjoin(struct process *process, void *ptr) {
+static void process_allocation_unjoin(struct Process *process, void *ptr) {
     for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
         if (process->allocations[i].ptr == ptr) {
             process->allocations[i].ptr = 0x00;
@@ -94,7 +94,7 @@ static void process_allocation_unjoin(struct process *process, void *ptr) {
     }
 }
 
-static struct process_allocation *process_get_allocation_by_addr(struct process *process, void *addr) {
+static struct ProcessAllocation *process_get_allocation_by_addr(struct Process *process, void *addr) {
     for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
         if (process->allocations[i].ptr == addr)
             return &process->allocations[i];
@@ -104,7 +104,7 @@ static struct process_allocation *process_get_allocation_by_addr(struct process 
 }
 
 
-int process_terminate_allocations(struct process *process) {
+int process_terminate_allocations(struct Process *process) {
     for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
         process_free(process, process->allocations[i].ptr);
     }
@@ -112,17 +112,17 @@ int process_terminate_allocations(struct process *process) {
     return 0;
 }
 
-int process_free_binary_data(struct process *process) {
+int process_free_binary_data(struct Process *process) {
     kfree(process->ptr);
     return 0;
 }
 
-int process_free_elf_data(struct process *process) {
+int process_free_elf_data(struct Process *process) {
     elf_close(process->elf_file);
     return 0;
 }
 
-int process_free_program_data(struct process *process) {
+int process_free_program_data(struct Process *process) {
     int res = 0;
     switch (process->filetype) {
         case PROCESS_FILETYPE_BINARY:
@@ -151,7 +151,7 @@ void process_switch_to_any() {
     panic("No processes to switch too\n");
 }
 
-static void process_unlink(struct process *process) {
+static void process_unlink(struct Process *process) {
     processes[process->id] = 0x00;
 
     if (current_process == process) {
@@ -159,7 +159,7 @@ static void process_unlink(struct process *process) {
     }
 }
 
-int process_terminate(struct process *process) {
+int process_terminate(struct Process *process) {
     int res = 0;
 
     res = process_terminate_allocations(process);
@@ -183,13 +183,13 @@ int process_terminate(struct process *process) {
     return res;
 }
 
-void process_get_arguments(struct process *process, int *argc, char ***argv) {
+void process_get_arguments(struct Process *process, int *argc, char ***argv) {
     *argc = process->arguments.argc;
     *argv = process->arguments.argv;
 }
 
-int process_count_command_arguments(struct command_argument *root_argument) {
-    struct command_argument *current = root_argument;
+int process_count_command_arguments(struct CommandArgument *root_argument) {
+    struct CommandArgument *current = root_argument;
     int i = 0;
     while (current) {
         i++;
@@ -200,9 +200,9 @@ int process_count_command_arguments(struct command_argument *root_argument) {
 }
 
 
-int process_inject_arguments(struct process *process, struct command_argument *root_argument) {
+int process_inject_arguments(struct Process *process, struct CommandArgument *root_argument) {
     int res = 0;
-    struct command_argument *current = root_argument;
+    struct CommandArgument *current = root_argument;
     int i = 0;
     int argc = process_count_command_arguments(root_argument);
     if (argc == 0) {
@@ -236,9 +236,9 @@ int process_inject_arguments(struct process *process, struct command_argument *r
     return res;
 }
 
-void process_free(struct process *process, void *ptr) {
+void process_free(struct Process *process, void *ptr) {
     // Unlink the pages from the process for the given address
-    struct process_allocation *allocation = process_get_allocation_by_addr(process, ptr);
+    struct ProcessAllocation *allocation = process_get_allocation_by_addr(process, ptr);
     if (!allocation) {
         // Oops its not our pointer.
         return;
@@ -257,7 +257,7 @@ void process_free(struct process *process, void *ptr) {
     kfree(ptr);
 }
 
-static int process_load_binary(const char *filename, struct process *process) {
+static int process_load_binary(const char *filename, struct Process *process) {
     void *program_data_ptr = 0x00;
     int res = 0;
     int fd = fopen(filename, "r");
@@ -266,7 +266,7 @@ static int process_load_binary(const char *filename, struct process *process) {
         goto out;
     }
 
-    struct file_stat stat;
+    struct FileStat stat;
     res = fstat(fd, &stat);
     if (res != PEACHOS_ALL_OK) {
         goto out;
@@ -297,9 +297,9 @@ static int process_load_binary(const char *filename, struct process *process) {
     return res;
 }
 
-static int process_load_elf(const char *filename, struct process *process) {
+static int process_load_elf(const char *filename, struct Process *process) {
     int res = 0;
-    struct elf_file *elf_file = 0;
+    struct ElfFile *elf_file = 0;
     res = elf_load(filename, &elf_file);
     if (ISERR(res)) {
         goto out;
@@ -311,7 +311,7 @@ static int process_load_elf(const char *filename, struct process *process) {
     return res;
 }
 
-static int process_load_data(const char *filename, struct process *process) {
+static int process_load_data(const char *filename, struct Process *process) {
     int res = 0;
     res = process_load_elf(filename, process);
     if (res == -EINFORMAT) {
@@ -321,7 +321,7 @@ static int process_load_data(const char *filename, struct process *process) {
     return res;
 }
 
-int process_map_binary(struct process *process) {
+int process_map_binary(struct Process *process) {
     int res = 0;
     paging_map_to(process->task->page_directory, (void *) PEACHOS_PROGRAM_VIRTUAL_ADDRESS, process->ptr,
                   paging_align_address(process->ptr + process->size),
@@ -329,14 +329,14 @@ int process_map_binary(struct process *process) {
     return res;
 }
 
-static int process_map_elf(struct process *process) {
+static int process_map_elf(struct Process *process) {
     int res = 0;
 
-    struct elf_file *elf_file = process->elf_file;
-    struct elf_header *header = elf_header(elf_file);
-    struct elf32_phdr *phdrs = elf_pheader(header);
+    struct ElfFile *elf_file = process->elf_file;
+    struct ElfHeader *header = elf_header(elf_file);
+    struct Elf32Phdr *phdrs = elf_pheader(header);
     for (int i = 0; i < header->e_phnum; i++) {
-        struct elf32_phdr *phdr = &phdrs[i];
+        struct Elf32Phdr *phdr = &phdrs[i];
         void *phdr_phys_address = elf_phdr_phys_address(elf_file, phdr);
         int flags = PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL;
         if (phdr->p_flags & PF_W) {
@@ -352,7 +352,7 @@ static int process_map_elf(struct process *process) {
     return res;
 }
 
-int process_map_memory(struct process *process) {
+int process_map_memory(struct Process *process) {
     int res = 0;
 
     switch (process->filetype) {
@@ -389,7 +389,7 @@ int process_get_free_slot() {
     return -EISTKN;
 }
 
-int process_load(const char *filename, struct process **process) {
+int process_load(const char *filename, struct Process **process) {
     int res = 0;
     int process_slot = process_get_free_slot();
     if (process_slot < 0) {
@@ -402,7 +402,7 @@ int process_load(const char *filename, struct process **process) {
     return res;
 }
 
-int process_load_switch(const char *filename, struct process **process) {
+int process_load_switch(const char *filename, struct Process **process) {
     int res = process_load(filename, process);
     if (res == 0) {
         process_switch(*process);
@@ -411,10 +411,10 @@ int process_load_switch(const char *filename, struct process **process) {
     return res;
 }
 
-int process_load_for_slot(const char *filename, struct process **process, int process_slot) {
+int process_load_for_slot(const char *filename, struct Process **process, int process_slot) {
     int res = 0;
-    struct task *task = 0;
-    struct process *_process;
+    struct Task *task = 0;
+    struct Process *_process;
     void *program_stack_ptr = 0;
 
     if (process_get(process_slot) != 0) {
@@ -422,7 +422,7 @@ int process_load_for_slot(const char *filename, struct process **process, int pr
         goto out;
     }
 
-    _process = kzalloc(sizeof(struct process));
+    _process = kzalloc(sizeof(struct Process));
     if (!_process) {
         res = -ENOMEM;
         goto out;

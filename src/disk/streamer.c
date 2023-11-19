@@ -4,24 +4,24 @@
 
 #include <stdbool.h>
 
-struct disk_stream *diskstreamer_new(int disk_id) {
-    struct disk *disk = disk_get(disk_id);
+struct DiskStream *diskstreamer_new(int disk_id) {
+    struct Disk *disk = disk_get(disk_id);
     if (!disk) {
         return 0;
     }
 
-    struct disk_stream *streamer = kzalloc(sizeof(struct disk_stream));
+    struct DiskStream *streamer = kzalloc(sizeof(struct DiskStream));
     streamer->pos = 0;
     streamer->disk = disk;
     return streamer;
 }
 
-int diskstreamer_seek(struct disk_stream *stream, int pos) {
+int diskstreamer_seek(struct DiskStream *stream, int pos) {
     stream->pos = pos;
     return 0;
 }
 
-int diskstreamer_read(struct disk_stream *stream, void *out, int total) {
+int diskstreamer_read(struct DiskStream *stream, void *out, int total) {
     int sector = stream->pos / PEACHOS_SECTOR_SIZE;
     int offset = stream->pos % PEACHOS_SECTOR_SIZE;
     int total_to_read = total;
@@ -51,6 +51,6 @@ int diskstreamer_read(struct disk_stream *stream, void *out, int total) {
     return res;
 }
 
-void diskstreamer_close(struct disk_stream *stream) {
+void diskstreamer_close(struct DiskStream *stream) {
     kfree(stream);
 }

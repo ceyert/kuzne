@@ -7,8 +7,8 @@
 #include "io/io.h"
 #include "status.h"
 
-struct idt_desc idt_descriptors[PEACHOS_TOTAL_INTERRUPTS];
-struct idtr_desc idtr_descriptor;
+struct IdtDesc idt_descriptors[PEACHOS_TOTAL_INTERRUPTS];
+struct IdtrDesc idtr_descriptor;
 
 extern void *interrupt_pointer_table[PEACHOS_TOTAL_INTERRUPTS];
 
@@ -16,7 +16,7 @@ static INTERRUPT_CALLBACK_FUNCTION interrupt_callbacks[PEACHOS_TOTAL_INTERRUPTS]
 
 static ISR80H_COMMAND isr80h_commands[PEACHOS_MAX_ISR80H_COMMANDS];
 
-extern void idt_load(struct idtr_desc *ptr);
+extern void idt_load(struct IdtrDesc *ptr);
 
 extern void int21h();
 
@@ -28,7 +28,7 @@ void no_interrupt_handler() {
     outb(0x20, 0x20);
 }
 
-void interrupt_handler(int interrupt, struct interrupt_frame *frame) {
+void interrupt_handler(int interrupt, struct InterruptFrame *frame) {
     kernel_page();
     if (interrupt_callbacks[interrupt] != 0) {
         task_current_save_state(frame);
@@ -44,7 +44,7 @@ void idt_zero() {
 }
 
 void idt_set(int interrupt_no, void *address) {
-    struct idt_desc *desc = &idt_descriptors[interrupt_no];
+    struct IdtDesc *desc = &idt_descriptors[interrupt_no];
     desc->offset_1 = (uint32_t) address & 0x0000ffff;
     desc->selector = KERNEL_CODE_SELECTOR;
     desc->zero = 0x00;
@@ -109,7 +109,7 @@ void isr80h_register_command(int command_id, ISR80H_COMMAND command) {
     isr80h_commands[command_id] = command;
 }
 
-void *isr80h_handle_command(int command, struct interrupt_frame *frame) {
+void *isr80h_handle_command(int command, struct InterruptFrame *frame) {
     void *result = 0;
 
     if (command < 0 || command >= PEACHOS_MAX_ISR80H_COMMANDS) {
@@ -126,7 +126,7 @@ void *isr80h_handle_command(int command, struct interrupt_frame *frame) {
     return result;
 }
 
-void *isr80h_handler(int command, struct interrupt_frame *frame) {
+void *isr80h_handler(int command, struct InterruptFrame *frame) {
     void *res = 0;
     kernel_page();
     task_current_save_state(frame);

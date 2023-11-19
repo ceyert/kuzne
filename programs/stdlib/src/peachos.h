@@ -5,12 +5,12 @@
 #include <stdbool.h>
 
 
-struct command_argument {
+struct CommandArgument {
     char argument[512];
-    struct command_argument *next;
+    struct CommandArgument *next;
 };
 
-struct process_arguments {
+struct ProcessArguments {
     int argc;
     char **argv;
 };
@@ -32,11 +32,11 @@ void peachos_terminal_readline(char *out, int max, bool output_while_typing);
 
 void peachos_process_load_start(const char *filename);
 
-struct command_argument *peachos_parse_command(const char *command, int max);
+struct CommandArgument *peachos_parse_command(const char *command, int max);
 
-void peachos_process_get_arguments(struct process_arguments *arguments);
+void peachos_process_get_arguments(struct ProcessArguments *arguments);
 
-int peachos_system(struct command_argument *arguments);
+int peachos_system(struct CommandArgument *arguments);
 
 int peachos_system_run(const char *command);
 

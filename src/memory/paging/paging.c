@@ -6,7 +6,7 @@ void paging_load_directory(uint32_t *directory);
 
 static uint32_t *current_directory = 0;
 
-struct paging_4gb_chunk *paging_new_4gb(uint8_t flags) {
+struct Paging4GbChunk *paging_new_4gb(uint8_t flags) {
     uint32_t *directory = kzalloc(sizeof(uint32_t) * PAGING_TOTAL_ENTRIES_PER_TABLE);
     int offset = 0;
     for (int i = 0; i < PAGING_TOTAL_ENTRIES_PER_TABLE; i++) {
@@ -18,17 +18,17 @@ struct paging_4gb_chunk *paging_new_4gb(uint8_t flags) {
         directory[i] = (uint32_t) entry | flags | PAGING_IS_WRITEABLE;
     }
 
-    struct paging_4gb_chunk *chunk_4gb = kzalloc(sizeof(struct paging_4gb_chunk));
+    struct Paging4GbChunk *chunk_4gb = kzalloc(sizeof(struct Paging4GbChunk));
     chunk_4gb->directory_entry = directory;
     return chunk_4gb;
 }
 
-void paging_switch(struct paging_4gb_chunk *directory) {
+void paging_switch(struct Paging4GbChunk *directory) {
     paging_load_directory(directory->directory_entry);
     current_directory = directory->directory_entry;
 }
 
-void paging_free_4gb(struct paging_4gb_chunk *chunk) {
+void paging_free_4gb(struct Paging4GbChunk *chunk) {
     for (int i = 0; i < 1024; i++) {
         uint32_t entry = chunk->directory_entry[i];
         uint32_t *table = (uint32_t * )(entry & 0xfffff000);
@@ -39,7 +39,7 @@ void paging_free_4gb(struct paging_4gb_chunk *chunk) {
     kfree(chunk);
 }
 
-uint32_t *paging_4gb_chunk_get_directory(struct paging_4gb_chunk *chunk) {
+uint32_t *paging_4gb_chunk_get_directory(struct Paging4GbChunk *chunk) {
     return chunk->directory_entry;
 }
 
@@ -75,7 +75,7 @@ void *paging_align_to_lower_page(void *addr) {
     return (void *) _addr;
 }
 
-int paging_map(struct paging_4gb_chunk *directory, void *virt, void *phys, int flags) {
+int paging_map(struct Paging4GbChunk *directory, void *virt, void *phys, int flags) {
     if (((unsigned int) virt % PAGING_PAGE_SIZE) || ((unsigned int) phys % PAGING_PAGE_SIZE)) {
         return -EINVARG;
     }
@@ -83,7 +83,7 @@ int paging_map(struct paging_4gb_chunk *directory, void *virt, void *phys, int f
     return paging_set(directory->directory_entry, virt, (uint32_t) phys | flags);
 }
 
-int paging_map_range(struct paging_4gb_chunk *directory, void *virt, void *phys, int count, int flags) {
+int paging_map_range(struct Paging4GbChunk *directory, void *virt, void *phys, int count, int flags) {
     int res = 0;
     for (int i = 0; i < count; i++) {
         res = paging_map(directory, virt, phys, flags);
@@ -96,7 +96,7 @@ int paging_map_range(struct paging_4gb_chunk *directory, void *virt, void *phys,
     return res;
 }
 
-int paging_map_to(struct paging_4gb_chunk *directory, void *virt, void *phys, void *phys_end, int flags) {
+int paging_map_to(struct Paging4GbChunk *directory, void *virt, void *phys, void *phys_end, int flags) {
     int res = 0;
     if ((uint32_t) virt % PAGING_PAGE_SIZE) {
         res = -EINVARG;

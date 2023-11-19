@@ -14,23 +14,23 @@
 
 typedef unsigned char HEAP_BLOCK_TABLE_ENTRY;
 
-struct heap_table {
+struct HeapTable {
     HEAP_BLOCK_TABLE_ENTRY *entries;
     size_t total;
 };
 
 
-struct heap {
-    struct heap_table *table;
+struct Heap {
+    struct HeapTable *table;
 
     // Start address of the heap data pool
     void *saddr;
 };
 
-int heap_create(struct heap *heap, void *ptr, void *end, struct heap_table *table);
+int heap_create(struct Heap *heap, void *ptr, void *end, struct HeapTable *table);
 
-void *heap_malloc(struct heap *heap, size_t size);
+void *heap_malloc(struct Heap *heap, size_t size);
 
-void heap_free(struct heap *heap, void *ptr);
+void heap_free(struct Heap *heap, void *ptr);
 
 #endif

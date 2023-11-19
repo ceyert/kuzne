@@ -4,8 +4,8 @@
 #include "config.h"
 #include "memory/paging/paging.h"
 
-struct interrupt_frame;
-struct registers {
+struct InterruptFrame;
+struct Registers {
     uint32_t edi;
     uint32_t esi;
     uint32_t ebp;
@@ -22,59 +22,59 @@ struct registers {
 };
 
 
-struct process;
-struct task {
+struct Process;
+struct Task {
     /**
      * The page directory of the task
      */
-    struct paging_4gb_chunk *page_directory;
+    struct Paging4GbChunk *page_directory;
 
     // The registers of the task when the task is not running
-    struct registers registers;
+    struct Registers registers;
 
     // The process of the task
-    struct process *process;
+    struct Process *process;
 
     // The next task in the linked list
-    struct task *next;
+    struct Task *next;
 
     // Previous task in the linked list
-    struct task *prev;
+    struct Task *prev;
 };
 
-struct task *task_new(struct process *process);
+struct Task *task_new(struct Process *process);
 
-struct task *task_current();
+struct Task *task_current();
 
-struct task *task_get_next();
+struct Task *task_get_next();
 
-int task_free(struct task *task);
+int task_free(struct Task *task);
 
-int task_switch(struct task *task);
+int task_switch(struct Task *task);
 
 int task_page();
 
-int task_page_task(struct task *task);
+int task_page_task(struct Task *task);
 
 void task_run_first_ever_task();
 
-void task_return(struct registers *regs);
+void task_return(struct Registers *regs);
 
-void restore_general_purpose_registers(struct registers *regs);
+void restore_general_purpose_registers(struct Registers *regs);
 
 void user_registers();
 
-void task_current_save_state(struct interrupt_frame *frame);
+void task_current_save_state(struct InterruptFrame *frame);
 
-int copy_string_from_task(struct task *task, void * virtual,
+int copy_string_from_task(struct Task *task, void * virtual,
 
 void *phys,
 int max
 );
 
-void *task_get_stack_item(struct task *task, int index);
+void *task_get_stack_item(struct Task *task, int index);
 
-void *task_virtual_address_to_physical(struct task *task, void *virtual_address);
+void *task_virtual_address_to_physical(struct Task *task, void *virtual_address);
 
 void task_next();
 

@@ -1,8 +1,8 @@
 #include "peachos.h"
 #include "string.h"
 
-struct command_argument *peachos_parse_command(const char *command, int max) {
-    struct command_argument *root_command = 0;
+struct CommandArgument *peachos_parse_command(const char *command, int max) {
+    struct CommandArgument *root_command = 0;
     char scommand[1025];
     if (max >= (int) sizeof(scommand)) {
         return 0;
@@ -15,7 +15,7 @@ struct command_argument *peachos_parse_command(const char *command, int max) {
         goto out;
     }
 
-    root_command = peachos_malloc(sizeof(struct command_argument));
+    root_command = peachos_malloc(sizeof(struct CommandArgument));
     if (!root_command) {
         goto out;
     }
@@ -24,10 +24,10 @@ struct command_argument *peachos_parse_command(const char *command, int max) {
     root_command->next = 0;
 
 
-    struct command_argument *current = root_command;
+    struct CommandArgument *current = root_command;
     token = strtok(NULL, " ");
     while (token != 0) {
-        struct command_argument *new_command = peachos_malloc(sizeof(struct command_argument));
+        struct CommandArgument *new_command = peachos_malloc(sizeof(struct CommandArgument));
         if (!new_command) {
             break;
         }
@@ -82,7 +82,7 @@ void peachos_terminal_readline(char *out, int max, bool output_while_typing) {
 int peachos_system_run(const char *command) {
     char buf[1024];
     strncpy(buf, command, sizeof(buf));
-    struct command_argument *root_command_argument = peachos_parse_command(buf, sizeof(buf));
+    struct CommandArgument *root_command_argument = peachos_parse_command(buf, sizeof(buf));
     if (!root_command_argument) {
         return -1;
     }

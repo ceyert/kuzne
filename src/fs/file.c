@@ -8,10 +8,10 @@
 #include "status.h"
 #include "kernel.h"
 
-struct filesystem *filesystems[PEACHOS_MAX_FILESYSTEMS];
-struct file_descriptor *file_descriptors[PEACHOS_MAX_FILE_DESCRIPTORS];
+struct Filesystem *filesystems[PEACHOS_MAX_FILESYSTEMS];
+struct FileDescriptor *file_descriptors[PEACHOS_MAX_FILE_DESCRIPTORS];
 
-static struct filesystem **fs_get_free_filesystem() {
+static struct Filesystem **fs_get_free_filesystem() {
     int i = 0;
     for (i = 0; i < PEACHOS_MAX_FILESYSTEMS; i++) {
         if (filesystems[i] == 0) {
@@ -22,8 +22,8 @@ static struct filesystem **fs_get_free_filesystem() {
     return 0;
 }
 
-void fs_insert_filesystem(struct filesystem *filesystem) {
-    struct filesystem **fs;
+void fs_insert_filesystem(struct Filesystem *filesystem) {
+    struct Filesystem **fs;
     fs = fs_get_free_filesystem();
     if (!fs) {
         print("Problem inserting filesystem");
@@ -47,16 +47,16 @@ void fs_init() {
     fs_load();
 }
 
-static void file_free_descriptor(struct file_descriptor *desc) {
+static void file_free_descriptor(struct FileDescriptor *desc) {
     file_descriptors[desc->index - 1] = 0x00;
     kfree(desc);
 }
 
-static int file_new_descriptor(struct file_descriptor **desc_out) {
+static int file_new_descriptor(struct FileDescriptor **desc_out) {
     int res = -ENOMEM;
     for (int i = 0; i < PEACHOS_MAX_FILE_DESCRIPTORS; i++) {
         if (file_descriptors[i] == 0) {
-            struct file_descriptor *desc = kzalloc(sizeof(struct file_descriptor));
+            struct FileDescriptor *desc = kzalloc(sizeof(struct FileDescriptor));
             // Descriptors start at 1
             desc->index = i + 1;
             file_descriptors[i] = desc;
@@ -69,7 +69,7 @@ static int file_new_descriptor(struct file_descriptor **desc_out) {
     return res;
 }
 
-static struct file_descriptor *file_get_descriptor(int fd) {
+static struct FileDescriptor *file_get_descriptor(int fd) {
     if (fd <= 0 || fd >= PEACHOS_MAX_FILE_DESCRIPTORS) {
         return 0;
     }
@@ -79,8 +79,8 @@ static struct file_descriptor *file_get_descriptor(int fd) {
     return file_descriptors[index];
 }
 
-struct filesystem *fs_resolve(struct disk *disk) {
-    struct filesystem *fs = 0;
+struct Filesystem *fs_resolve(struct Disk *disk) {
+    struct Filesystem *fs = 0;
     for (int i = 0; i < PEACHOS_MAX_FILESYSTEMS; i++) {
         if (filesystems[i] != 0 && filesystems[i]->resolve(disk) == 0) {
             fs = filesystems[i];
@@ -105,7 +105,7 @@ FILE_MODE file_get_mode_by_string(const char *str) {
 
 int fopen(const char *filename, const char *mode_str) {
     int res = 0;
-    struct path_root *root_path = pathparser_parse(filename, NULL);
+    struct PathRoot *root_path = pathparser_parse(filename, NULL);
     if (!root_path) {
         res = -EINVARG;
         goto out;
@@ -118,7 +118,7 @@ int fopen(const char *filename, const char *mode_str) {
     }
 
     // Ensure the disk we are reading from exists
-    struct disk *disk = disk_get(root_path->drive_no);
+    struct Disk *disk = disk_get(root_path->drive_no);
     if (!disk) {
         res = -EIO;
         goto out;
@@ -141,7 +141,7 @@ int fopen(const char *filename, const char *mode_str) {
         goto out;
     }
 
-    struct file_descriptor *desc = 0;
+    struct FileDescriptor *desc = 0;
     res = file_new_descriptor(&desc);
     if (res < 0) {
         goto out;
@@ -159,9 +159,9 @@ int fopen(const char *filename, const char *mode_str) {
     return res;
 }
 
-int fstat(int fd, struct file_stat *stat) {
+int fstat(int fd, struct FileStat *stat) {
     int res = 0;
-    struct file_descriptor *desc = file_get_descriptor(fd);
+    struct FileDescriptor *desc = file_get_descriptor(fd);
     if (!desc) {
         res = -EIO;
         goto out;
@@ -174,7 +174,7 @@ int fstat(int fd, struct file_stat *stat) {
 
 int fclose(int fd) {
     int res = 0;
-    struct file_descriptor *desc = file_get_descriptor(fd);
+    struct FileDescriptor *desc = file_get_descriptor(fd);
     if (!desc) {
         res = -EIO;
         goto out;
@@ -190,7 +190,7 @@ int fclose(int fd) {
 
 int fseek(int fd, int offset, FILE_SEEK_MODE whence) {
     int res = 0;
-    struct file_descriptor *desc = file_get_descriptor(fd);
+    struct FileDescriptor *desc = file_get_descriptor(fd);
     if (!desc) {
         res = -EIO;
         goto out;
@@ -208,7 +208,7 @@ int fread(void *ptr, uint32_t size, uint32_t nmemb, int fd) {
         goto out;
     }
 
-    struct file_descriptor *desc = file_get_descriptor(fd);
+    struct FileDescriptor *desc = file_get_descriptor(fd);
     if (!desc) {
         res = -EINVARG;
         goto out;

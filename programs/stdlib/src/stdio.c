@@ -11,10 +11,13 @@ int putchar(int c) {
 int printf(const char *fmt, ...) {
     va_list ap;
     const char *p;
+
     char *sval;
     int ival;
+    unsigned long pval;
 
     va_start(ap, fmt);
+
     for (p = fmt; *p; p++) {
         if (*p != '%') {
             putchar(*p);
@@ -26,6 +29,18 @@ int printf(const char *fmt, ...) {
                 ival = va_arg(ap,
                 int);
                 print(itoa(ival));
+                break;
+
+            case 'p':
+                pval = va_arg(ap,
+                unsigned long);
+                print(ptr_to_hex(pval));
+                break;
+
+            case 'x':
+                ival = va_arg(ap,
+                int);
+                print(itoa_hex(ival));
                 break;
 
             case 's':

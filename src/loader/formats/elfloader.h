@@ -7,7 +7,7 @@
 #include "elf.h"
 #include "config.h"
 
-struct elf_file {
+struct ElfFile {
     char filename[PEACHOS_MAX_PATH];
 
     int in_memory_size;
@@ -40,30 +40,30 @@ struct elf_file {
 
 };
 
-int elf_load(const char *filename, struct elf_file **file_out);
+int elf_load(const char *filename, struct ElfFile **file_out);
 
-void elf_close(struct elf_file *file);
+void elf_close(struct ElfFile *file);
 
-void *elf_virtual_base(struct elf_file *file);
+void *elf_virtual_base(struct ElfFile *file);
 
-void *elf_virtual_end(struct elf_file *file);
+void *elf_virtual_end(struct ElfFile *file);
 
-void *elf_phys_base(struct elf_file *file);
+void *elf_phys_base(struct ElfFile *file);
 
-void *elf_phys_end(struct elf_file *file);
+void *elf_phys_end(struct ElfFile *file);
 
-struct elf_header *elf_header(struct elf_file *file);
+struct ElfHeader *elf_header(struct ElfFile *file);
 
-struct elf32_shdr *elf_sheader(struct elf_header *header);
+struct Elf32Shdr *elf_sheader(struct ElfHeader *header);
 
-void *elf_memory(struct elf_file *file);
+void *elf_memory(struct ElfFile *file);
 
-struct elf32_phdr *elf_pheader(struct elf_header *header);
+struct Elf32Phdr *elf_pheader(struct ElfHeader *header);
 
-struct elf32_phdr *elf_program_header(struct elf_header *header, int index);
+struct Elf32Phdr *elf_program_header(struct ElfHeader *header, int index);
 
-struct elf32_shdr *elf_section(struct elf_header *header, int index);
+struct Elf32Shdr *elf_section(struct ElfHeader *header, int index);
 
-void *elf_phdr_phys_address(struct elf_file *file, struct elf32_phdr *phdr);
+void *elf_phdr_phys_address(struct ElfFile *file, struct Elf32Phdr *phdr);
 
 #endif

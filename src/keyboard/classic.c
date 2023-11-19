@@ -27,7 +27,7 @@ static uint8_t keyboard_scan_set_one[] = {
         '6', '+', '1', '2', '3', '0', '.'
 };
 
-struct keyboard classic_keyboard = {
+struct Keyboard classic_keyboard = {
         .name = {"Classic"},
         .init = classic_keyboard_init
 };
@@ -85,6 +85,6 @@ void classic_keyboard_handle_interrupt() {
 
 }
 
-struct keyboard *classic_init() {
+struct Keyboard *classic_init() {
     return &classic_keyboard;
 }

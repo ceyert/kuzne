@@ -12,39 +12,39 @@
 
 typedef unsigned char PROCESS_FILETYPE;
 
-struct process_allocation {
+struct ProcessAllocation {
     void *ptr;
     size_t size;
 };
 
-struct command_argument {
+struct CommandArgument {
     char argument[512];
-    struct command_argument *next;
+    struct CommandArgument *next;
 };
 
-struct process_arguments {
+struct ProcessArguments {
     int argc;
     char **argv;
 };
 
-struct process {
+struct Process {
     // The process id
     uint16_t id;
 
     char filename[PEACHOS_MAX_PATH];
 
     // The main process task
-    struct task *task;
+    struct Task *task;
 
     // The memory (malloc) allocations of the process
-    struct process_allocation allocations[PEACHOS_MAX_PROGRAM_ALLOCATIONS];
+    struct ProcessAllocation allocations[PEACHOS_MAX_PROGRAM_ALLOCATIONS];
 
     PROCESS_FILETYPE filetype;
 
     union {
         // The physical pointer to the process memory.
         void *ptr;
-        struct elf_file *elf_file;
+        struct ElfFile *elf_file;
     };
 
 
@@ -54,36 +54,36 @@ struct process {
     // The size of the data pointed to by "ptr"
     uint32_t size;
 
-    struct keyboard_buffer {
+    struct KeyboardBuffer {
         char buffer[PEACHOS_KEYBOARD_BUFFER_SIZE];
         int tail;
         int head;
     } keyboard;
 
     // The arguments of the process.
-    struct process_arguments arguments;
+    struct ProcessArguments arguments;
 };
 
-int process_switch(struct process *process);
+int process_switch(struct Process *process);
 
-int process_load_switch(const char *filename, struct process **process);
+int process_load_switch(const char *filename, struct Process **process);
 
-int process_load(const char *filename, struct process **process);
+int process_load(const char *filename, struct Process **process);
 
-int process_load_for_slot(const char *filename, struct process **process, int process_slot);
+int process_load_for_slot(const char *filename, struct Process **process, int process_slot);
 
-struct process *process_current();
+struct Process *process_current();
 
-struct process *process_get(int process_id);
+struct Process *process_get(int process_id);
 
-void *process_malloc(struct process *process, size_t size);
+void *process_malloc(struct Process *process, size_t size);
 
-void process_free(struct process *process, void *ptr);
+void process_free(struct Process *process, void *ptr);
 
-void process_get_arguments(struct process *process, int *argc, char ***argv);
+void process_get_arguments(struct Process *process, int *argc, char ***argv);
 
-int process_inject_arguments(struct process *process, struct command_argument *root_argument);
+int process_inject_arguments(struct Process *process, struct CommandArgument *root_argument);
 
-int process_terminate(struct process *process);
+int process_terminate(struct Process *process);
 
 #endif

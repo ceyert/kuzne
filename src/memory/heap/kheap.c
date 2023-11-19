@@ -4,8 +4,8 @@
 #include "kernel.h"
 #include "memory/memory.h"
 
-struct heap kernel_heap;
-struct heap_table kernel_heap_table;
+struct Heap kernel_heap;
+struct HeapTable kernel_heap_table;
 
 void kheap_init() {
     int total_table_entries = PEACHOS_HEAP_SIZE_BYTES / PEACHOS_HEAP_BLOCK_SIZE;
