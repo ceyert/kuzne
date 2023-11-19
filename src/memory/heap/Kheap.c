@@ -1,4 +1,4 @@
-#include "Kheap.h"
+#include "terminal/Terminal.h"
 #include "Heap.h"
 #include "Config.h"
 #include "Kernel.h"

@@ -8,9 +8,6 @@
 #define PEACHOS_TOTAL_INTERRUPTS 512
 
 
-#define VGA_BASE_ADDR 0xB8000
-
-
 //---------------------------------Block Heap-----------------------------------------
 
 /*

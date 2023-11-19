@@ -1,6 +1,6 @@
 #include "Heap.h"
 #include "Kernel.h"
-#include "status.h"
+#include "Status.h"
 #include "memory/Memory.h"
 #include <stdbool.h>
 

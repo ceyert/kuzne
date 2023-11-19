@@ -1,6 +1,7 @@
 #include "Task.h"
 #include "Kernel.h"
-#include "status.h"
+#include "terminal/Terminal.h"
+#include "Status.h"
 #include "Process.h"
 #include "memory/heap/Kheap.h"
 #include "memory/Memory.h"

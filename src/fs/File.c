@@ -5,8 +5,9 @@
 #include "string/String.h"
 #include "disk/Disk.h"
 #include "fat/Fat16.h"
-#include "status.h"
+#include "Status.h"
 #include "Kernel.h"
+#include "terminal/Terminal.h"
 
 struct Filesystem *filesystems[PEACHOS_MAX_FILESYSTEMS];
 struct FileDescriptor *file_descriptors[PEACHOS_MAX_FILE_DESCRIPTORS];

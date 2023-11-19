@@ -3,7 +3,7 @@
 #include "string/String.h"
 #include "memory/heap/Kheap.h"
 #include "memory/Memory.h"
-#include "status.h"
+#include "Status.h"
 
 static int pathparser_path_valid_format(const char *filename) {
     int len = strnlen(filename, PEACHOS_MAX_PATH);

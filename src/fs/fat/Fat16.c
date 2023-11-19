@@ -4,7 +4,7 @@
 #include "disk/Streamer.h"
 #include "memory/heap/Kheap.h"
 #include "memory/Memory.h"
-#include "status.h"
+#include "Status.h"
 #include "Kernel.h"
 #include <stdint.h>
 

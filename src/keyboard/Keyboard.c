@@ -1,5 +1,5 @@
 #include "Keyboard.h"
-#include "status.h"
+#include "Status.h"
 #include "Kernel.h"
 #include "task/Process.h"
 #include "task/Task.h"
