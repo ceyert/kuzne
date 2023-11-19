@@ -2,8 +2,8 @@
 #define TASKSWITCHSEGMENT_H
 
 #include <stdint.h>
-struct tss
-{
+
+struct tss {
     uint32_t link;
     uint32_t esp0; // Kernel stack pointer
     uint32_t ss0; // Kernel stack segment
@@ -32,4 +32,5 @@ struct tss
 } __attribute__((packed));
 
 void tss_load(int tss_segment);
+
 #endif

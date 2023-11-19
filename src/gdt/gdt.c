@@ -1,16 +1,13 @@
 #include "gdt.h"
 #include "kernel.h"
 
-void encodeGdtEntry(uint8_t* target, struct gdt_structured source)
-{
-    if ((source.limit > 65536) && ((source.limit & 0xFFF) != 0xFFF))
-    {
+void encodeGdtEntry(uint8_t *target, struct gdt_structured source) {
+    if ((source.limit > 65536) && ((source.limit & 0xFFF) != 0xFFF)) {
         panic("encodeGdtEntry: Invalid argument\n");
     }
 
     target[6] = 0x40;
-    if (source.limit > 65536)
-    {
+    if (source.limit > 65536) {
         source.limit = source.limit >> 12;
         target[6] = 0xC0;
     }
@@ -31,10 +28,8 @@ void encodeGdtEntry(uint8_t* target, struct gdt_structured source)
 
 }
 
-void gdt_structured_to_gdt(struct gdt* gdt, struct gdt_structured* structured_gdt, int total_entires)
-{
-    for (int i = 0; i < total_entires; i++)
-    {
-        encodeGdtEntry((uint8_t*)&gdt[i], structured_gdt[i]);
+void gdt_structured_to_gdt(struct gdt *gdt, struct gdt_structured *structured_gdt, int total_entires) {
+    for (int i = 0; i < total_entires; i++) {
+        encodeGdtEntry((uint8_t * ) & gdt[i], structured_gdt[i]);
     }
 }
