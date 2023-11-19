@@ -8,12 +8,12 @@ struct DiskStream {
     struct Disk *disk;
 };
 
-struct DiskStream *diskstreamer_new(int disk_id);
+extern struct DiskStream *diskstreamer_new(int disk_id);
 
-int diskstreamer_seek(struct DiskStream *stream, int pos);
+extern int diskstreamer_seek(struct DiskStream *stream, int pos);
 
-int diskstreamer_read(struct DiskStream *stream, void *out, int total);
+extern int diskstreamer_read(struct DiskStream *stream, void *out, int total);
 
-void diskstreamer_close(struct DiskStream *stream);
+extern void diskstreamer_close(struct DiskStream *stream);
 
 #endif

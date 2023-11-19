@@ -87,20 +87,20 @@ private;
 };
 
 
-void fs_init();
+extern void fs_init();
 
-int fopen(const char *filename, const char *mode_str);
+extern int fopen(const char *filename, const char *mode_str);
 
-int fseek(int fd, int offset, FILE_SEEK_MODE whence);
+extern int fseek(int fd, int offset, FILE_SEEK_MODE whence);
 
-int fread(void *ptr, uint32_t size, uint32_t nmemb, int fd);
+extern int fread(void *ptr, uint32_t size, uint32_t nmemb, int fd);
 
-int fstat(int fd, struct FileStat *stat);
+extern int fstat(int fd, struct FileStat *stat);
 
-int fclose(int fd);
+extern int fclose(int fd);
 
-void fs_insert_filesystem(struct Filesystem *filesystem);
+extern void fs_insert_filesystem(struct Filesystem *filesystem);
 
-struct Filesystem *fs_resolve(struct Disk *disk);
+extern struct Filesystem *fs_resolve(struct Disk *disk);
 
 #endif

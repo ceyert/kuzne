@@ -11,8 +11,8 @@ struct PathPart {
     struct PathPart *next;
 };
 
-struct PathRoot *pathparser_parse(const char *path, const char *current_directory_path);
+extern struct PathRoot *pathparser_parse(const char *path, const char *current_directory_path);
 
-void pathparser_free(struct PathRoot *root);
+extern void pathparser_free(struct PathRoot *root);
 
 #endif

@@ -18,8 +18,8 @@ struct GdtStructured {
     uint8_t type;
 };
 
-void gdt_load(struct Gdt *gdt, int size);
+extern void gdt_load(struct Gdt *gdt, int size);
 
-void gdt_structured_to_gdt(struct Gdt *gdt, struct GdtStructured *structured_gdt, int total_entires);
+extern void gdt_structured_to_gdt(struct Gdt *gdt, struct GdtStructured *structured_gdt, int total_entires);
 
 #endif

@@ -3,6 +3,6 @@
 
 #include "File.h"
 
-struct Filesystem *fat16_init();
+extern struct Filesystem *fat16_init();
 
 #endif

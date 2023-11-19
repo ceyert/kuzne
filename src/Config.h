@@ -38,8 +38,10 @@ Heap Base Address (0x01000000)          ........
 #define TOTAL_HEAP_SIZE 104857600
 
 // Each heap block is 4096 bytes. For example: malloc(5000), => 8192 bytes allocated (2 blocks)
-// Total 25600 blocks (104857600/4096)
 #define HEAP_BLOCK_SIZE 4096
+
+// Total 25600 blocks (104857600/4096)
+#define TOTAL_BLOCKS TOTAL_HEAP_SIZE / HEAP_BLOCK_SIZE;
 
 //---------------------------------Block Heap-----------------------------------------
 

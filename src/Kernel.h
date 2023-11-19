@@ -3,11 +3,11 @@
 
 #define PEACHOS_MAX_PATH 108
 
-void kernel_main();
+extern void kernel_main();
 
-void kernel_page();
+extern void kernel_page();
 
-void kernel_registers();
+extern void kernel_registers();
 
 #define ERROR(value) (void*)(value)
 #define ERROR_I(value) (int)(value)

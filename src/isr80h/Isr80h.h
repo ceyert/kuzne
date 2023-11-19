@@ -14,6 +14,6 @@ enum SystemCommands {
     SYSTEM_COMMAND9_EXIT
 };
 
-void isr80h_register_commands();
+extern void isr80h_register_commands();
 
 #endif

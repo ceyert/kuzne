@@ -22,10 +22,10 @@ struct Disk {
     void *fs_private;
 };
 
-void disk_search_and_init();
+extern void disk_search_and_init();
 
-struct Disk *disk_get(int index);
+extern struct Disk *disk_get(int index);
 
-int disk_read_block(struct Disk *idisk, unsigned int lba, int total, void *buf);
+extern int disk_read_block(struct Disk *idisk, unsigned int lba, int total, void *buf);
 
 #endif

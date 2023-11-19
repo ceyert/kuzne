@@ -118,8 +118,8 @@ struct Elf32Sym {
     elf32_half st_shndx;
 } __attribute__((packed));
 
-void *elf_get_entry_ptr(struct ElfHeader *elf_header);
+extern void *elf_get_entry_ptr(struct ElfHeader *elf_header);
 
-uint32_t elf_get_entry(struct ElfHeader *elf_header);
+extern uint32_t elf_get_entry(struct ElfHeader *elf_header);
 
 #endif

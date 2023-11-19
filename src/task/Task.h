@@ -44,40 +44,40 @@ struct Task {
     struct Task *prev;
 };
 
-struct Task *task_new(struct Process *process);
+extern struct Task *task_new(struct Process *process);
 
-struct Task *task_current();
+extern struct Task *task_current();
 
-struct Task *task_get_next();
+extern struct Task *task_get_next();
 
-int task_free(struct Task *task);
+extern int task_free(struct Task *task);
 
-int task_switch(struct Task *task);
+extern int task_switch(struct Task *task);
 
-int task_page();
+extern int task_page();
 
-int task_page_task(struct Task *task);
+extern int task_page_task(struct Task *task);
 
-void task_run_first_ever_task();
+extern void task_run_first_ever_task();
 
-void task_return(struct Registers *regs);
+extern void task_return(struct Registers *regs);
 
-void restore_general_purpose_registers(struct Registers *regs);
+extern void restore_general_purpose_registers(struct Registers *regs);
 
-void user_registers();
+extern void user_registers();
 
-void task_current_save_state(struct InterruptFrame *frame);
+extern void task_current_save_state(struct InterruptFrame *frame);
 
-int copy_string_from_task(struct Task *task, void * virtual,
+extern int copy_string_from_task(struct Task *task, void * virtual,
 
 void *phys,
 int max
 );
 
-void *task_get_stack_item(struct Task *task, int index);
+extern void *task_get_stack_item(struct Task *task, int index);
 
-void *task_virtual_address_to_physical(struct Task *task, void *virtual_address);
+extern void *task_virtual_address_to_physical(struct Task *task, void *virtual_address);
 
-void task_next();
+extern void task_next();
 
 #endif

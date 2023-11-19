@@ -19,18 +19,18 @@ struct Keyboard {
     struct Keyboard *next;
 };
 
-void keyboard_init();
+extern void keyboard_init();
 
-void keyboard_backspace(struct Process *process);
+extern void keyboard_backspace(struct Process *process);
 
-void keyboard_push(char c);
+extern void keyboard_push(char c);
 
-char keyboard_pop();
+extern char keyboard_pop();
 
-int keyboard_insert(struct Keyboard *keyboard);
+extern int keyboard_insert(struct Keyboard *keyboard);
 
-void keyboard_set_capslock(struct Keyboard *keyboard, KEYBOARD_CAPS_LOCK_STATE state);
+extern void keyboard_set_capslock(struct Keyboard *keyboard, KEYBOARD_CAPS_LOCK_STATE state);
 
-KEYBOARD_CAPS_LOCK_STATE keyboard_get_capslock(struct Keyboard *keyboard);
+extern KEYBOARD_CAPS_LOCK_STATE keyboard_get_capslock(struct Keyboard *keyboard);
 
 #endif

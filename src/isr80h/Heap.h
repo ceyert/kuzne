@@ -3,8 +3,8 @@
 
 struct InterruptFrame;
 
-void *isr80h_command4_malloc(struct InterruptFrame *frame);
+extern void *isr80h_command4_malloc(struct InterruptFrame *frame);
 
-void *isr80h_command5_free(struct InterruptFrame *frame);
+extern void *isr80h_command5_free(struct InterruptFrame *frame);
 
 #endif
