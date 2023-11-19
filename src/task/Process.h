@@ -64,26 +64,26 @@ struct Process {
     struct ProcessArguments arguments;
 };
 
-int process_switch(struct Process *process);
+extern int process_switch(struct Process *process);
 
-int process_load_switch(const char *filename, struct Process **process);
+extern int process_load_switch(const char *filename, struct Process **process);
 
-int process_load(const char *filename, struct Process **process);
+extern int process_load(const char *filename, struct Process **process);
 
-int process_load_for_slot(const char *filename, struct Process **process, int process_slot);
+extern int process_load_for_slot(const char *filename, struct Process **process, int process_slot);
 
-struct Process *process_current();
+extern struct Process *process_current();
 
-struct Process *process_get(int process_id);
+extern struct Process *process_get(int process_id);
 
-void *process_malloc(struct Process *process, size_t size);
+extern void *process_malloc(struct Process *process, size_t size);
 
-void process_free(struct Process *process, void *ptr);
+extern void process_free(struct Process *process, void *ptr);
 
-void process_get_arguments(struct Process *process, int *argc, char ***argv);
+extern void process_get_arguments(struct Process *process, int *argc, char ***argv);
 
-int process_inject_arguments(struct Process *process, struct CommandArgument *root_argument);
+extern int process_inject_arguments(struct Process *process, struct CommandArgument *root_argument);
 
-int process_terminate(struct Process *process);
+extern int process_terminate(struct Process *process);
 
 #endif

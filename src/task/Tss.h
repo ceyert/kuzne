@@ -31,6 +31,6 @@ struct Tss {
     uint32_t iopb;
 } __attribute__((packed));
 
-void tss_load(int tss_segment);
+extern void tss_load(int tss_segment);
 
 #endif

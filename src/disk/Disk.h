@@ -3,14 +3,14 @@
 
 #include "fs/File.h"
 
-typedef unsigned int PEACHOS_DISK_TYPE;
+typedef unsigned int disk_t;
 
 
 // Represents a real physical hard disk
 #define PEACHOS_DISK_TYPE_REAL 0
 
 struct Disk {
-    PEACHOS_DISK_TYPE type;
+    disk_t type;
     int sector_size;
 
     // The id of the disk
@@ -22,10 +22,10 @@ struct Disk {
     void *fs_private;
 };
 
-void disk_search_and_init();
+extern void disk_search_and_init();
 
-struct Disk *disk_get(int index);
+extern struct Disk *disk_get(int index);
 
-int disk_read_block(struct Disk *idisk, unsigned int lba, int total, void *buf);
+extern int disk_read_block(struct Disk *idisk, unsigned int lba, int total, void *buf);
 
 #endif

@@ -8,6 +8,6 @@
 #define ISR_KEYBOARD_INTERRUPT 0x21
 #define KEYBOARD_INPUT_PORT 0x60
 
-struct Keyboard *classic_init();
+extern struct Keyboard *classic_init();
 
 #endif

@@ -1,7 +1,7 @@
 #include "Io.h"
 #include "task/Task.h"
 #include "keyboard/Keyboard.h"
-#include "terminal/Terminal.h"
+#include "vga/Vga.h"
 
 void *isr80h_command1_print(struct InterruptFrame *frame) {
     void *user_space_msg_buffer = task_get_stack_item(task_current(), 0);

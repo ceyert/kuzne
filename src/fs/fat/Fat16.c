@@ -112,11 +112,11 @@ struct fat_private {
 
 int fat16_resolve(struct Disk *disk);
 
-void *fat16_open(struct Disk *disk, struct PathPart *path, FILE_MODE mode);
+void *fat16_open(struct Disk *disk, struct PathPart *path, file_mode_t mode);
 
 int fat16_read(struct Disk *disk, void *descriptor, uint32_t size, uint32_t nmemb, char *out_ptr);
 
-int fat16_seek(void *private, uint32_t offset, FILE_SEEK_MODE seek_mode);
+int fat16_seek(void *private, uint32_t offset, file_seek_mode_t seek_mode);
 
 int fat16_stat(struct Disk *disk, void *private, struct FileStat *stat);
 
@@ -561,7 +561,7 @@ struct fat_item *fat16_get_directory_entry(struct Disk *disk, struct PathPart *p
     return current_item;
 }
 
-void *fat16_open(struct Disk *disk, struct PathPart *path, FILE_MODE mode) {
+void *fat16_open(struct Disk *disk, struct PathPart *path, file_mode_t mode) {
     struct fat_file_descriptor *descriptor = 0;
     int err_code = 0;
     if (mode != FILE_MODE_READ) {
@@ -642,7 +642,7 @@ int fat16_read(struct Disk *disk, void *descriptor, uint32_t size, uint32_t nmem
     return res;
 }
 
-int fat16_seek(void *private, uint32_t offset, FILE_SEEK_MODE seek_mode) {
+int fat16_seek(void *private, uint32_t offset, file_seek_mode_t seek_mode) {
     int res = 0;
     struct fat_file_descriptor *desc = private;
     struct fat_item *desc_item = desc->item;

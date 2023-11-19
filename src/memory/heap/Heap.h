@@ -29,10 +29,10 @@ struct Heap {
     void *heapBaseAddr;
 };
 
-int heap_create(struct Heap *heap, void *ptr, void *end, struct HeapTable *table);
+extern int heap_create(struct Heap *heap, void *ptr, void *end, struct HeapTable *table);
 
-void *heap_malloc(struct Heap *heap, size_t size);
+extern void *heap_malloc(struct Heap *heap, size_t size);
 
-void heap_free(struct Heap *heap, void *ptr);
+extern void heap_free(struct Heap *heap, void *ptr);
 
 #endif

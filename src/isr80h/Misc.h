@@ -3,6 +3,6 @@
 
 struct InterruptFrame;
 
-void *isr80h_command0_sum(struct InterruptFrame *frame);
+extern void *isr80h_command0_sum(struct InterruptFrame *frame);
 
 #endif

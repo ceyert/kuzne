@@ -1,6 +1,6 @@
 #include "Task.h"
 #include "Kernel.h"
-#include "terminal/Terminal.h"
+#include "vga/Vga.h"
 #include "Status.h"
 #include "Process.h"
 #include "memory/heap/Kheap.h"

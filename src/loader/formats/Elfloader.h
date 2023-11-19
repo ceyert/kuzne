@@ -40,30 +40,30 @@ struct ElfFile {
 
 };
 
-int elf_load(const char *filename, struct ElfFile **file_out);
+extern int elf_load(const char *filename, struct ElfFile **file_out);
 
-void elf_close(struct ElfFile *file);
+extern void elf_close(struct ElfFile *file);
 
-void *elf_virtual_base(struct ElfFile *file);
+extern void *elf_virtual_base(struct ElfFile *file);
 
-void *elf_virtual_end(struct ElfFile *file);
+extern void *elf_virtual_end(struct ElfFile *file);
 
-void *elf_phys_base(struct ElfFile *file);
+extern void *elf_phys_base(struct ElfFile *file);
 
-void *elf_phys_end(struct ElfFile *file);
+extern void *elf_phys_end(struct ElfFile *file);
 
-struct ElfHeader *elf_header(struct ElfFile *file);
+extern struct ElfHeader *elf_header(struct ElfFile *file);
 
-struct Elf32Shdr *elf_sheader(struct ElfHeader *header);
+extern struct Elf32Shdr *elf_sheader(struct ElfHeader *header);
 
-void *elf_memory(struct ElfFile *file);
+extern void *elf_memory(struct ElfFile *file);
 
-struct Elf32Phdr *elf_pheader(struct ElfHeader *header);
+extern struct Elf32Phdr *elf_pheader(struct ElfHeader *header);
 
-struct Elf32Phdr *elf_program_header(struct ElfHeader *header, int index);
+extern struct Elf32Phdr *elf_program_header(struct ElfHeader *header, int index);
 
-struct Elf32Shdr *elf_section(struct ElfHeader *header, int index);
+extern struct Elf32Shdr *elf_section(struct ElfHeader *header, int index);
 
-void *elf_phdr_phys_address(struct ElfFile *file, struct Elf32Phdr *phdr);
+extern void *elf_phdr_phys_address(struct ElfFile *file, struct Elf32Phdr *phdr);
 
 #endif
