@@ -2,7 +2,7 @@
 #include "task/Task.h"
 #include "task/Process.h"
 #include "string/String.h"
-#include "status.h"
+#include "Status.h"
 #include "Config.h"
 #include "Kernel.h"
 

@@ -18,6 +18,7 @@ mkdir ./build/isr80h
 mkdir ./build/keyboard
 mkdir ./build/loader
 mkdir ./build/loader/formats
+mkdir ./build/terminal
 
 mkdir ./programs/blank/build
 

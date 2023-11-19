@@ -7,11 +7,43 @@
 
 #define PEACHOS_TOTAL_INTERRUPTS 512
 
-// 100MB heap size
-#define PEACHOS_HEAP_SIZE_BYTES 104857600
-#define PEACHOS_HEAP_BLOCK_SIZE 4096
-#define PEACHOS_HEAP_ADDRESS 0x01000000
-#define PEACHOS_HEAP_TABLE_ADDRESS 0x00007E00
+
+//---------------------------------Block Heap-----------------------------------------
+
+/*
+Heap Table Base Address (0x00007E00)    .......
+                                        .  1  .  Entry 1 (8 bits)
+                                        .......
+                                        .  1  .  Entry 2 (8 bits)
+                                        .......
+
+
+Heap Base Address (0x01000000)          ........
+                                        . 4096 . Block 1 base address
+                                        ........
+                                        . 4096 . Block 2 base address
+                                        ........
+                                        . 4096 . Block 3 base address
+                                        ........
+*/
+
+//  480.5 KiB avaiable (https://wiki.osdev.org/Memory_Map_(x86))
+#define HEAP_TABLE_BASE_ADDRESS 0x00007E00
+
+// Free to use RAM (https://wiki.osdev.org/Memory_Map_(x86))
+#define HEAP_BASE_ADDRESS 0x01000000
+
+// 1024 bytes * 1024 = 1048576 (1MB), => 1048576 * 100 = 104857600 (100 MB)
+// 100MB available!
+#define TOTAL_HEAP_SIZE 104857600
+
+// Each heap block is 4096 bytes. For example: malloc(5000), => 8192 bytes allocated (2 blocks)
+// Total 25600 blocks (104857600/4096)
+#define HEAP_BLOCK_SIZE 4096
+
+//---------------------------------Block Heap-----------------------------------------
+
+
 
 #define PEACHOS_SECTOR_SIZE 512
 

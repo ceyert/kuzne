@@ -1,11 +1,12 @@
 #include "Idt.h"
 #include "Config.h"
 #include "Kernel.h"
+#include "terminal/Terminal.h"
 #include "memory/Memory.h"
 #include "task/Task.h"
 #include "task/Process.h"
 #include "io/Io.h"
-#include "status.h"
+#include "Status.h"
 
 struct IdtDesc idt_descriptors[PEACHOS_TOTAL_INTERRUPTS];
 struct IdtrDesc idtr_descriptor;

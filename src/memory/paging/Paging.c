@@ -1,6 +1,6 @@
 #include "Paging.h"
 #include "memory/heap/Kheap.h"
-#include "status.h"
+#include "Status.h"
 
 void paging_load_directory(uint32_t *directory);
 

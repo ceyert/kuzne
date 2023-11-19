@@ -1,4 +1,4 @@
-#include "Kheap.h"
+#include "terminal/Terminal.h"
 #include "Heap.h"
 #include "Config.h"
 #include "Kernel.h"
@@ -8,12 +8,12 @@ struct Heap kernel_heap;
 struct HeapTable kernel_heap_table;
 
 void kheap_init() {
-    int total_table_entries = PEACHOS_HEAP_SIZE_BYTES / PEACHOS_HEAP_BLOCK_SIZE;
-    kernel_heap_table.entries = (HEAP_BLOCK_TABLE_ENTRY *) (PEACHOS_HEAP_TABLE_ADDRESS);
+    int total_table_entries = TOTAL_HEAP_SIZE / HEAP_BLOCK_SIZE;
+    kernel_heap_table.tableEntries = (heap_table_entry_t *) (HEAP_TABLE_BASE_ADDRESS);
     kernel_heap_table.total = total_table_entries;
 
-    void *end = (void *) (PEACHOS_HEAP_ADDRESS + PEACHOS_HEAP_SIZE_BYTES);
-    int res = heap_create(&kernel_heap, (void *) (PEACHOS_HEAP_ADDRESS), end, &kernel_heap_table);
+    void *end = (void *) (HEAP_BASE_ADDRESS + TOTAL_HEAP_SIZE);
+    int res = heap_create(&kernel_heap, (void *) (HEAP_BASE_ADDRESS), end, &kernel_heap_table);
     if (res < 0) {
         print("Failed to create heap\n");
     }

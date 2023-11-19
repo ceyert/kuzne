@@ -1,6 +1,6 @@
 #include "Elfloader.h"
 #include "fs/File.h"
-#include "status.h"
+#include "Status.h"
 #include <stdbool.h>
 #include "memory/Memory.h"
 #include "memory/heap/Kheap.h"

@@ -1,6 +1,6 @@
 #include "Process.h"
 #include "Config.h"
-#include "status.h"
+#include "Status.h"
 #include "task/Task.h"
 #include "memory/Memory.h"
 #include "string/String.h"
@@ -9,6 +9,7 @@
 #include "memory/paging/Paging.h"
 #include "loader/formats/Elfloader.h"
 #include "Kernel.h"
+#include "terminal/Terminal.h"
 
 // The current process that is running
 struct Process *current_process = 0;
