@@ -119,7 +119,7 @@ int fopen(const char *filename, const char *mode_str) {
     }
 
     // Ensure the disk we are reading from exists
-    struct Disk *disk = disk_get(root_path->drive_no);
+    struct Disk *disk = disk_get(root_path->driveNo);
     if (!disk) {
         res = -EIO;
         goto out;

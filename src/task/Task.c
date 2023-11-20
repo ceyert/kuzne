@@ -209,8 +209,8 @@ int task_init(struct Task *task, struct Process *process) {
     }
 
     task->registers.ip = PROGRAM_VIRTUAL_ADDRESS;
-    if (process->filetype == PROCESS_FILETYPE_ELF) {
-        task->registers.ip = elf_header(process->elf_file)->e_entry;
+    if (process->fileType == PROCESS_FILETYPE_ELF) {
+        task->registers.ip = elf_header(process->elfFile)->e_entry;
     }
 
     task->registers.ss = USER_DATA_SEGMENT;

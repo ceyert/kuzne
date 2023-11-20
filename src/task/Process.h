@@ -29,7 +29,7 @@ struct ProcessArguments {
 
 struct Process {
     // The process id
-    uint16_t id;
+    uint16_t processId;
 
     char filename[MAX_PATH_SIZE];
 
@@ -39,12 +39,12 @@ struct Process {
     // The memory (malloc) allocations of the process
     struct ProcessAllocation allocations[MAX_PROGRAM_ALLOCATIONS];
 
-    process_filetype_t filetype;
+    process_filetype_t fileType;
 
     union {
         // The physical pointer to the process memory.
         void *processBaseAddr;
-        struct ElfFile *elf_file;
+        struct ElfFile *elfFile;
     };
 
 

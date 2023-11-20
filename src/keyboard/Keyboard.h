@@ -15,7 +15,7 @@ struct Keyboard {
     KEYBOARD_INIT_FUNCTION init;
     char name[20];
 
-    caps_lock_t capslock_state;
+    caps_lock_t capslockState;
 
     struct Keyboard *next;
 };

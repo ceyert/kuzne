@@ -35,7 +35,7 @@ int disk_read_sector(int lba, int total, void *buf) {
 void disk_search_and_init() {
     memset(&Disk, 0, sizeof(Disk));
     Disk.type = REAL_HARD_DISK_TYPE;
-    Disk.sector_size = SECTOR_SIZE;
+    Disk.sectorSize = SECTOR_SIZE;
     Disk.diskId = 0;
     Disk.filesystem = fs_resolve(&Disk);
 }
