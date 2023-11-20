@@ -26,7 +26,7 @@ static bool elf_valid_encoding(struct ElfHeader *header) {
 }
 
 static bool elf_is_executable(struct ElfHeader *header) {
-    return header->e_type == ET_EXEC && header->e_entry >= PEACHOS_PROGRAM_VIRTUAL_ADDRESS;
+    return header->e_type == ET_EXEC && header->e_entry >= PROGRAM_VIRTUAL_ADDRESS;
 }
 
 static bool elf_has_program_header(struct ElfHeader *header) {

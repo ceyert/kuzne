@@ -34,9 +34,9 @@ int disk_read_sector(int lba, int total, void *buf) {
 
 void disk_search_and_init() {
     memset(&Disk, 0, sizeof(Disk));
-    Disk.type = PEACHOS_DISK_TYPE_REAL;
-    Disk.sector_size = PEACHOS_SECTOR_SIZE;
-    Disk.id = 0;
+    Disk.type = REAL_HARD_DISK_TYPE;
+    Disk.sector_size = SECTOR_SIZE;
+    Disk.diskId = 0;
     Disk.filesystem = fs_resolve(&Disk);
 }
 

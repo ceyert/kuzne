@@ -10,7 +10,7 @@ static int heap_validate_table(void *ptr, void *end, struct HeapTable *table) {
 
     size_t table_size = (size_t)(end - ptr);
     size_t total_blocks = table_size / HEAP_BLOCK_SIZE;
-    if (table->total != total_blocks) {
+    if (table->totalEntries != total_blocks) {
         res = -EINVARG;
         log("Error: heap_validate_table");
         goto out;
@@ -43,7 +43,7 @@ int heap_create(struct Heap *heap, void *heapBaseAddr, void *end, struct HeapTab
         goto out;
     }
 
-    size_t table_size = sizeof(heap_table_entry_t) * table->total;
+    size_t table_size = sizeof(heap_table_entry_t) * table->totalEntries;
     memset(table->tableEntries, HEAP_TABLE_ENTRY_FREE, table_size);
 
     out:
@@ -69,7 +69,7 @@ int heap_get_start_block(struct Heap *heap, uint32_t total_blocks) {
     int bc = 0;
     int bs = -1;
 
-    for (size_t i = 0; i < table->total; i++) {
+    for (size_t i = 0; i < table->totalEntries; i++) {
         if (heap_get_entry_type(table->tableEntries[i]) != HEAP_TABLE_ENTRY_FREE) {
             bc = 0;
             bs = -1;
@@ -135,7 +135,7 @@ void *heap_malloc_blocks(struct Heap *heap, uint32_t total_blocks) {
 
 void heap_mark_blocks_free(struct Heap *heap, int starting_block) {
     struct HeapTable *table = heap->heapTable;
-    for (int i = starting_block; i < (int) table->total; i++) {
+    for (int i = starting_block; i < (int) table->totalEntries; i++) {
         heap_table_entry_t entry = table->tableEntries[i];
         table->tableEntries[i] = HEAP_TABLE_ENTRY_FREE;
         if (!(entry & HEAP_TABLE_ENTRY_HAS_NEXT)) {

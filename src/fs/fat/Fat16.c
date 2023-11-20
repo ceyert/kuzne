@@ -140,11 +140,11 @@ struct Filesystem *fat16_init() {
 static void fat16_init_private(struct Disk *disk, struct fat_private *private) {
     memset(private, 0, sizeof(struct fat_private));
     private
-            ->cluster_read_stream = diskstreamer_new(disk->id);
+            ->cluster_read_stream = diskstreamer_new(disk->diskId);
     private
-            ->fat_read_stream = diskstreamer_new(disk->id);
+            ->fat_read_stream = diskstreamer_new(disk->diskId);
     private
-            ->directory_stream = diskstreamer_new(disk->id);
+            ->directory_stream = diskstreamer_new(disk->diskId);
 }
 
 int fat16_sector_to_absolute(struct Disk *disk, int sector) {
@@ -247,7 +247,7 @@ int fat16_resolve(struct Disk *disk) {
     disk->fs_private = fat_private;
     disk->filesystem = &fat16_fs;
 
-    struct DiskStream *stream = diskstreamer_new(disk->id);
+    struct DiskStream *stream = diskstreamer_new(disk->diskId);
     if (!stream) {
         res = -ENOMEM;
         goto out;

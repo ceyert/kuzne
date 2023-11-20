@@ -71,7 +71,7 @@ void classic_keyboard_handle_interrupt() {
     }
 
     if (scancode == CLASSIC_KEYBOARD_CAPSLOCK) {
-        KEYBOARD_CAPS_LOCK_STATE old_state = keyboard_get_capslock(&classic_keyboard);
+        caps_lock_t old_state = keyboard_get_capslock(&classic_keyboard);
         keyboard_set_capslock(&classic_keyboard,
                               old_state == KEYBOARD_CAPS_LOCK_ON ? KEYBOARD_CAPS_LOCK_OFF : KEYBOARD_CAPS_LOCK_ON);
     }

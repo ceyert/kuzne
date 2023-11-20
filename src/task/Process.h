@@ -10,7 +10,7 @@
 #define PROCESS_FILETYPE_ELF 0
 #define PROCESS_FILETYPE_BINARY 1
 
-typedef unsigned char PROCESS_FILETYPE;
+typedef unsigned char process_filetype_t;
 
 struct ProcessAllocation {
     void *ptr;
@@ -31,37 +31,37 @@ struct Process {
     // The process id
     uint16_t id;
 
-    char filename[PEACHOS_MAX_PATH];
+    char filename[MAX_PATH_SIZE];
 
     // The main process task
     struct Task *task;
 
     // The memory (malloc) allocations of the process
-    struct ProcessAllocation allocations[PEACHOS_MAX_PROGRAM_ALLOCATIONS];
+    struct ProcessAllocation allocations[MAX_PROGRAM_ALLOCATIONS];
 
-    PROCESS_FILETYPE filetype;
+    process_filetype_t filetype;
 
     union {
         // The physical pointer to the process memory.
-        void *ptr;
+        void *processBaseAddr;
         struct ElfFile *elf_file;
     };
 
 
     // The physical pointer to the stack memory
-    void *stack;
+    void *stackPtr;
 
     // The size of the data pointed to by "ptr"
     uint32_t size;
 
     struct KeyboardBuffer {
-        char buffer[PEACHOS_KEYBOARD_BUFFER_SIZE];
+        char buffer[KEYBOARD_BUFFER_SIZE];
         int tail;
         int head;
     } keyboard;
 
     // The arguments of the process.
-    struct ProcessArguments arguments;
+    struct ProcessArguments processArguments;
 };
 
 extern int process_switch(struct Process *process);

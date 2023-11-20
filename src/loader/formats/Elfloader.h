@@ -8,7 +8,7 @@
 #include "Config.h"
 
 struct ElfFile {
-    char filename[PEACHOS_MAX_PATH];
+    char filename[MAX_PATH_SIZE];
 
     int in_memory_size;
 
