@@ -9,12 +9,12 @@
 #include "Kernel.h"
 #include "vga/Vga.h"
 
-struct Filesystem *filesystems[PEACHOS_MAX_FILESYSTEMS];
-struct FileDescriptor *file_descriptors[PEACHOS_MAX_FILE_DESCRIPTORS];
+struct Filesystem *filesystems[MAX_FILESYSTEMS];
+struct FileDescriptor *file_descriptors[MAX_FILE_DESCRIPTORS];
 
 static struct Filesystem **fs_get_free_filesystem() {
     int i = 0;
-    for (i = 0; i < PEACHOS_MAX_FILESYSTEMS; i++) {
+    for (i = 0; i < MAX_FILESYSTEMS; i++) {
         if (filesystems[i] == 0) {
             return &filesystems[i];
         }
@@ -55,7 +55,7 @@ static void file_free_descriptor(struct FileDescriptor *desc) {
 
 static int file_new_descriptor(struct FileDescriptor **desc_out) {
     int res = -ENOMEM;
-    for (int i = 0; i < PEACHOS_MAX_FILE_DESCRIPTORS; i++) {
+    for (int i = 0; i < MAX_FILE_DESCRIPTORS; i++) {
         if (file_descriptors[i] == 0) {
             struct FileDescriptor *desc = kzalloc(sizeof(struct FileDescriptor));
             // Descriptors start at 1
@@ -71,7 +71,7 @@ static int file_new_descriptor(struct FileDescriptor **desc_out) {
 }
 
 static struct FileDescriptor *file_get_descriptor(int fd) {
-    if (fd <= 0 || fd >= PEACHOS_MAX_FILE_DESCRIPTORS) {
+    if (fd <= 0 || fd >= MAX_FILE_DESCRIPTORS) {
         return 0;
     }
 
@@ -82,7 +82,7 @@ static struct FileDescriptor *file_get_descriptor(int fd) {
 
 struct Filesystem *fs_resolve(struct Disk *disk) {
     struct Filesystem *fs = 0;
-    for (int i = 0; i < PEACHOS_MAX_FILESYSTEMS; i++) {
+    for (int i = 0; i < MAX_FILESYSTEMS; i++) {
         if (filesystems[i] != 0 && filesystems[i]->resolve(disk) == 0) {
             fs = filesystems[i];
             break;

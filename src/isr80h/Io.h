@@ -1,6 +1,7 @@
 #ifndef ISR80H_IO_H
 #define ISR80H_IO_H
 
+// storage symbol decleration
 struct InterruptFrame;
 
 extern void *isr80h_command1_print(struct InterruptFrame *frame);

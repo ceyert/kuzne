@@ -6,14 +6,16 @@
 
 typedef unsigned int file_seek_mode_t;
 
+typedef unsigned int file_mode_t;
+
+typedef unsigned int file_stat_flags_t;
+
 enum {
     SEEK_SET,
     SEEK_CUR,
     SEEK_END
 };
 
-
-typedef unsigned int file_mode_t;
 
 enum {
     FILE_MODE_READ,
@@ -25,8 +27,6 @@ enum {
 enum {
     FILE_STAT_READ_ONLY = 0b00000001
 };
-
-typedef unsigned int file_stat_flags_t;
 
 struct Disk;
 
@@ -78,6 +78,7 @@ struct Filesystem {
 struct FileDescriptor {
     // The descriptor index
     int index;
+
     struct Filesystem *filesystem;
 
     // Private data for internal file descriptor

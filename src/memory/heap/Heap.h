@@ -18,7 +18,7 @@ typedef unsigned char heap_table_entry_t;
 
 struct HeapTable {
     heap_table_entry_t *tableEntries;
-    size_t total;
+    size_t totalEntries;
 };
 
 

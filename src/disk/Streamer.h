@@ -4,7 +4,7 @@
 #include "Disk.h"
 
 struct DiskStream {
-    int pos;
+    int position;
     struct Disk *disk;
 };
 

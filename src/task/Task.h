@@ -4,6 +4,7 @@
 #include "Config.h"
 #include "memory/paging/Paging.h"
 
+// storage symbol decleration
 struct InterruptFrame;
 
 struct Registers {

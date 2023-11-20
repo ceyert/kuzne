@@ -28,9 +28,9 @@ void kernel_page() {
 
 struct Tss Tss;
 
-struct Gdt gdt_real[PEACHOS_TOTAL_GDT_SEGMENTS];
+struct Gdt gdt_real[TOTAL_GDT_SEGMENTS];
 
-struct GdtStructured gdt_structured[PEACHOS_TOTAL_GDT_SEGMENTS] = {
+struct GdtStructured gdt_structured[TOTAL_GDT_SEGMENTS] = {
         {.base = 0x00, .limit = 0x00, .type = 0x00},                // NULL Segment
         {.base = 0x00, .limit = 0xffffffff, .type = 0x9a},           // Kernel code segment
         {.base = 0x00, .limit = 0xffffffff, .type = 0x92},            // Kernel data segment
@@ -45,7 +45,7 @@ void kernel_main() {
 
     memset(gdt_real, 0x00, sizeof(gdt_real));
 
-    gdt_structured_to_gdt(gdt_real, gdt_structured, PEACHOS_TOTAL_GDT_SEGMENTS);
+    gdt_structured_to_gdt(gdt_real, gdt_structured, TOTAL_GDT_SEGMENTS);
 
     // Load the gdt
     gdt_load(gdt_real, sizeof(gdt_real));

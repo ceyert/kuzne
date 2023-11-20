@@ -17,12 +17,15 @@ struct Task *current_task = 0;
 struct Task *task_tail = 0;
 struct Task *task_head = 0;
 
+// Function to initialize a task with a given process
 int task_init(struct Task *task, struct Process *process);
 
+// Function to retrieve the currently running task
 struct Task *task_current() {
     return current_task;
 }
 
+// Function to create a new task for a given process
 struct Task *task_new(struct Process *process) {
     int res = 0;
     struct Task *task = kzalloc(sizeof(struct Task));
@@ -56,6 +59,7 @@ struct Task *task_new(struct Process *process) {
     return task;
 }
 
+// Function to get the next task in the linked list
 struct Task *task_get_next() {
     if (!current_task->next) {
         return task_head;
@@ -64,6 +68,7 @@ struct Task *task_get_next() {
     return current_task->next;
 }
 
+// Internal function to remove a task from the task list
 static void task_list_remove(struct Task *task) {
     if (task->prev) {
         task->prev->next = task->next;
@@ -82,6 +87,7 @@ static void task_list_remove(struct Task *task) {
     }
 }
 
+// Function to free resources associated with a task
 int task_free(struct Task *task) {
     paging_free_4gb(task->page_directory);
     task_list_remove(task);
@@ -91,6 +97,7 @@ int task_free(struct Task *task) {
     return 0;
 }
 
+// Function to switch to the next task
 void task_next() {
     struct Task *next_task = task_get_next();
     if (!next_task) {
@@ -101,12 +108,14 @@ void task_next() {
     task_return(&next_task->registers);
 }
 
+// Function to switch the current task to a specified task
 int task_switch(struct Task *task) {
     current_task = task;
     paging_switch(task->page_directory);
     return 0;
 }
 
+// Function to save the state of a task, typically used before switching tasks
 void task_save_state(struct Task *task, struct InterruptFrame *frame) {
     task->registers.ip = frame->ip;
     task->registers.cs = frame->cs;
@@ -122,6 +131,7 @@ void task_save_state(struct Task *task, struct InterruptFrame *frame) {
     task->registers.esi = frame->esi;
 }
 
+// Function to copy a string from one task to another, handling virtual to physical address mapping
 int copy_string_from_task(struct Task *task, void *virtual, void *phys, int max) {
     if (max >= PAGING_PAGE_SIZE) {
         return -EINVARG;
@@ -155,6 +165,7 @@ int copy_string_from_task(struct Task *task, void *virtual, void *phys, int max)
     return res;
 }
 
+// Function to save the state of the current task
 void task_current_save_state(struct InterruptFrame *frame) {
     if (!task_current()) {
         panic("No current task to save\n");
@@ -164,18 +175,21 @@ void task_current_save_state(struct InterruptFrame *frame) {
     task_save_state(task, frame);
 }
 
+// Function to switch the page directory to the current task's page directory
 int task_page() {
     user_registers();
     task_switch(current_task);
     return 0;
 }
 
+// Function to switch the page directory to a specified task's page directory
 int task_page_task(struct Task *task) {
     user_registers();
     paging_switch(task->page_directory);
     return 0;
 }
 
+// Function to start the first ever task in the system
 void task_run_first_ever_task() {
     if (!current_task) {
         panic("task_run_first_ever_task(): No current task exists!\n");
@@ -185,28 +199,30 @@ void task_run_first_ever_task() {
     task_return(&task_head->registers);
 }
 
+// Function to initialize a task, setting up its page directory and registers
 int task_init(struct Task *task, struct Process *process) {
     memset(task, 0, sizeof(struct Task));
-    // Map the entire 4GB address space to its self
+    // Map new 4GB address space
     task->page_directory = paging_new_4gb(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     if (!task->page_directory) {
         return -EIO;
     }
 
-    task->registers.ip = PEACHOS_PROGRAM_VIRTUAL_ADDRESS;
+    task->registers.ip = PROGRAM_VIRTUAL_ADDRESS;
     if (process->filetype == PROCESS_FILETYPE_ELF) {
         task->registers.ip = elf_header(process->elf_file)->e_entry;
     }
 
     task->registers.ss = USER_DATA_SEGMENT;
     task->registers.cs = USER_CODE_SEGMENT;
-    task->registers.esp = PEACHOS_PROGRAM_VIRTUAL_STACK_ADDRESS_START;
+    task->registers.esp = PROGRAM_STACK_VIRTUAL_ADDRESS_START;
 
     task->process = process;
 
     return 0;
 }
 
+// Function to get a specific item from a task's stack
 void *task_get_stack_item(struct Task *task, int index) {
     void *result = 0;
 
@@ -223,6 +239,7 @@ void *task_get_stack_item(struct Task *task, int index) {
     return result;
 }
 
+// Function to convert a virtual address in a task's address space to a physical address
 void *task_virtual_address_to_physical(struct Task *task, void *virtual_address) {
     return paging_get_physical_address(task->page_directory->directory_entry, virtual_address);
 }

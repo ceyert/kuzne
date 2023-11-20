@@ -1,6 +1,7 @@
 #ifndef ISR80H_PROCESS_H
 #define ISR80H_PROCESS_H
 
+// storage symbol decleration
 struct InterruptFrame;
 
 extern void *isr80h_command6_process_load_start(struct InterruptFrame *frame);

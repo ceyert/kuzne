@@ -14,7 +14,7 @@
 // The current process that is running
 struct Process *current_process = 0;
 
-static struct Process *processes[PEACHOS_MAX_PROCESSES] = {};
+static struct Process *processes[MAX_PROCESSES] = {};
 
 // Initializes a process by setting all its fields to zero
 static void process_init(struct Process *process) {
@@ -28,7 +28,7 @@ struct Process *process_current() {
 
 // Retrieves a process by its ID, or returns NULL if the ID is invalid or out of range
 struct Process *process_get(int process_id) {
-    if (process_id < 0 || process_id >= PEACHOS_MAX_PROCESSES) {
+    if (process_id < 0 || process_id >= MAX_PROCESSES) {
         return NULL;
     }
 
@@ -44,7 +44,7 @@ int process_switch(struct Process *process) {
 // Finds a free allocation index for a new memory allocation within a process
 static int process_find_free_allocation_index(struct Process *process) {
     int res = -ENOMEM;
-    for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+    for (int i = 0; i < MAX_PROGRAM_ALLOCATIONS; i++) {
         if (process->allocations[i].ptr == 0) {
             res = i;
             break;
@@ -85,7 +85,7 @@ void *process_malloc(struct Process *process, size_t size) {
 
 // Checks if the given pointer is part of the process's memory allocations
 static bool process_is_process_pointer(struct Process *process, void *ptr) {
-    for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+    for (int i = 0; i < MAX_PROGRAM_ALLOCATIONS; i++) {
         if (process->allocations[i].ptr == ptr)
             return true;
     }
@@ -95,7 +95,7 @@ static bool process_is_process_pointer(struct Process *process, void *ptr) {
 
 // Removes a memory allocation from a process's list of allocations
 static void process_allocation_unjoin(struct Process *process, void *ptr) {
-    for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+    for (int i = 0; i < MAX_PROGRAM_ALLOCATIONS; i++) {
         if (process->allocations[i].ptr == ptr) {
             process->allocations[i].ptr = 0x00;
             process->allocations[i].size = 0;
@@ -105,7 +105,7 @@ static void process_allocation_unjoin(struct Process *process, void *ptr) {
 
 // Retrieves a process allocation by its address
 static struct ProcessAllocation *process_get_allocation_by_addr(struct Process *process, void *addr) {
-    for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+    for (int i = 0; i < MAX_PROGRAM_ALLOCATIONS; i++) {
         if (process->allocations[i].ptr == addr)
             return &process->allocations[i];
     }
@@ -115,7 +115,7 @@ static struct ProcessAllocation *process_get_allocation_by_addr(struct Process *
 
 // Terminates all memory allocations of a process
 int process_terminate_allocations(struct Process *process) {
-    for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+    for (int i = 0; i < MAX_PROGRAM_ALLOCATIONS; i++) {
         process_free(process, process->allocations[i].ptr);
     }
 
@@ -124,7 +124,7 @@ int process_terminate_allocations(struct Process *process) {
 
 // Frees the memory allocated for a process's binary data
 int process_free_binary_data(struct Process *process) {
-    kfree(process->ptr);
+    kfree(process->processBaseAddr);
     return 0;
 }
 
@@ -154,7 +154,7 @@ int process_free_program_data(struct Process *process) {
 
 // Switches to any available process. If no processes are available, triggers a panic
 void process_switch_to_any() {
-    for (int i = 0; i < PEACHOS_MAX_PROCESSES; i++) {
+    for (int i = 0; i < MAX_PROCESSES; i++) {
         if (processes[i]) {
             process_switch(processes[i]);
             return;
@@ -188,7 +188,7 @@ int process_terminate(struct Process *process) {
     }
 
     // Free the process stack memory.
-    kfree(process->stack);
+    kfree(process->stackPtr);
     // Free the task
     task_free(process->task);
     // Unlink the process from the process array.
@@ -200,8 +200,8 @@ int process_terminate(struct Process *process) {
 
 // Retrieves the arguments passed to a process
 void process_get_arguments(struct Process *process, int *argc, char ***argv) {
-    *argc = process->arguments.argc;
-    *argv = process->arguments.argv;
+    *argc = process->processArguments.argc;
+    *argv = process->processArguments.argv;
 }
 
 // Counts the number of command arguments
@@ -247,8 +247,8 @@ int process_inject_arguments(struct Process *process, struct CommandArgument *ro
         i++;
     }
 
-    process->arguments.argc = argc;
-    process->arguments.argv = argv;
+    process->processArguments.argc = argc;
+    process->processArguments.argv = argv;
     out:
     return res;
 }
@@ -303,7 +303,7 @@ static int process_load_binary(const char *filename, struct Process *process) {
     }
 
     process->filetype = PROCESS_FILETYPE_BINARY;
-    process->ptr = program_data_ptr;
+    process->processBaseAddr = program_data_ptr;
     process->size = stat.filesize;
 
     out:
@@ -345,8 +345,8 @@ static int process_load_data(const char *filename, struct Process *process) {
 // Maps a binary file into the process's address space
 int process_map_binary(struct Process *process) {
     int res = 0;
-    paging_map_to(process->task->page_directory, (void *) PEACHOS_PROGRAM_VIRTUAL_ADDRESS, process->ptr,
-                  paging_align_address(process->ptr + process->size),
+    paging_map_to(process->task->page_directory, (void *) PROGRAM_VIRTUAL_ADDRESS, process->processBaseAddr,
+                  paging_align_address(process->processBaseAddr + process->size),
                   PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITEABLE);
     return res;
 }
@@ -397,8 +397,8 @@ int process_map_memory(struct Process *process) {
     }
 
     // Finally map the stack
-    paging_map_to(process->task->page_directory, (void *) PEACHOS_PROGRAM_VIRTUAL_STACK_ADDRESS_END, process->stack,
-                  paging_align_address(process->stack + PEACHOS_USER_PROGRAM_STACK_SIZE),
+    paging_map_to(process->task->page_directory, (void *) PROGRAM_STACK_VIRTUAL_ADDRESS_END, process->stackPtr,
+                  paging_align_address(process->stackPtr + USER_PROGRAM_STACK_SIZE),
                   PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITEABLE);
     out:
     return res;
@@ -406,7 +406,7 @@ int process_map_memory(struct Process *process) {
 
 // Finds a free slot in the process array
 int process_get_free_slot() {
-    for (int i = 0; i < PEACHOS_MAX_PROCESSES; i++) {
+    for (int i = 0; i < MAX_PROCESSES; i++) {
         if (processes[i] == 0)
             return i;
     }
@@ -462,14 +462,14 @@ int process_load_for_slot(const char *filename, struct Process **process, int pr
         goto out;
     }
 
-    program_stack_ptr = kzalloc(PEACHOS_USER_PROGRAM_STACK_SIZE);
+    program_stack_ptr = kzalloc(USER_PROGRAM_STACK_SIZE);
     if (!program_stack_ptr) {
         res = -ENOMEM;
         goto out;
     }
 
     strncpy(_process->filename, filename, sizeof(_process->filename));
-    _process->stack = program_stack_ptr;
+    _process->stackPtr = program_stack_ptr;
     _process->id = process_slot;
 
     // Create a task
@@ -488,7 +488,7 @@ int process_load_for_slot(const char *filename, struct Process **process, int pr
 
     *process = _process;
 
-    // Add the process to the array
+    // Add the process to process buffer
     processes[process_slot] = _process;
 
     out:

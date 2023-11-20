@@ -8,14 +8,14 @@
 #include "io/Io.h"
 #include "Status.h"
 
-struct IdtDesc idt_descriptors[PEACHOS_TOTAL_INTERRUPTS];
+struct IdtDesc idt_descriptors[TOTAL_INTERRUPTS];
 struct IdtrDesc idtr_descriptor;
 
-extern void *interrupt_pointer_table[PEACHOS_TOTAL_INTERRUPTS];
+extern void *interrupt_pointer_table[TOTAL_INTERRUPTS];
 
-static INTERRUPT_CALLBACK_FUNCTION interrupt_callbacks[PEACHOS_TOTAL_INTERRUPTS];
+static INTERRUPT_CALLBACK_FUNCTION interrupt_callbacks[TOTAL_INTERRUPTS];
 
-static ISR80H_COMMAND isr80h_commands[PEACHOS_MAX_ISR80H_COMMANDS];
+static ISR80H_COMMAND isr80h_commands[MAX_ISR80H_COMMANDS];
 
 extern void idt_load(struct IdtrDesc *ptr);
 
@@ -70,7 +70,7 @@ void idt_init() {
     idtr_descriptor.limit = sizeof(idt_descriptors) - 1;
     idtr_descriptor.base = (uint32_t) idt_descriptors;
 
-    for (int i = 0; i < PEACHOS_TOTAL_INTERRUPTS; i++) {
+    for (int i = 0; i < TOTAL_INTERRUPTS; i++) {
         idt_set(i, interrupt_pointer_table[i]);
     }
 
@@ -90,7 +90,7 @@ void idt_init() {
 }
 
 int idt_register_interrupt_callback(int interrupt, INTERRUPT_CALLBACK_FUNCTION interrupt_callback) {
-    if (interrupt < 0 || interrupt >= PEACHOS_TOTAL_INTERRUPTS) {
+    if (interrupt < 0 || interrupt >= TOTAL_INTERRUPTS) {
         return -EINVARG;
     }
 
@@ -99,7 +99,7 @@ int idt_register_interrupt_callback(int interrupt, INTERRUPT_CALLBACK_FUNCTION i
 }
 
 void isr80h_register_command(int command_id, ISR80H_COMMAND command) {
-    if (command_id < 0 || command_id >= PEACHOS_MAX_ISR80H_COMMANDS) {
+    if (command_id < 0 || command_id >= MAX_ISR80H_COMMANDS) {
         panic("The command is out of bounds\n");
     }
 
@@ -113,7 +113,7 @@ void isr80h_register_command(int command_id, ISR80H_COMMAND command) {
 void *isr80h_handle_command(int command, struct InterruptFrame *frame) {
     void *result = 0;
 
-    if (command < 0 || command >= PEACHOS_MAX_ISR80H_COMMANDS) {
+    if (command < 0 || command >= MAX_ISR80H_COMMANDS) {
         // Invalid command
         return 0;
     }
