@@ -24,7 +24,7 @@ static int pathparser_get_drive_by_path(const char **path) {
 
 static struct PathRoot *pathparser_create_root(int drive_number) {
     struct PathRoot *path_r = kzalloc(sizeof(struct PathRoot));
-    path_r->drive_no = drive_number;
+    path_r->driveNo = drive_number;
     path_r->first = 0;
     return path_r;
 }

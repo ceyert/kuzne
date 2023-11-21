@@ -44,11 +44,11 @@ void keyboard_backspace(struct Process *process) {
 }
 
 void keyboard_set_capslock(struct Keyboard *keyboard, caps_lock_t state) {
-    keyboard->capslock_state = state;
+    keyboard->capslockState = state;
 }
 
 caps_lock_t keyboard_get_capslock(struct Keyboard *keyboard) {
-    return keyboard->capslock_state;
+    return keyboard->capslockState;
 }
 
 void keyboard_push(char c) {

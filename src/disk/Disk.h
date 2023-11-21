@@ -12,7 +12,7 @@ struct Disk {
 
     disk_t type;
 
-    int sector_size;
+    int sectorSize;
 
     // The id of the disk
     int diskId;
@@ -20,7 +20,7 @@ struct Disk {
     struct Filesystem *filesystem;
 
     // The private data of our filesystem
-    void *fs_private;
+    void *fsPrivate;
 };
 
 extern void disk_search_and_init();

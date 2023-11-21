@@ -10,7 +10,7 @@
 struct ElfFile {
     char filename[MAX_PATH_SIZE];
 
-    int in_memory_size;
+    int inMemorySize;
 
     /**
      * The physical memory address that this elf file is loaded at

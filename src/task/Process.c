@@ -130,14 +130,14 @@ int process_free_binary_data(struct Process *process) {
 
 // Frees the memory allocated for a process's ELF file data
 int process_free_elf_data(struct Process *process) {
-    elf_close(process->elf_file);
+    elf_close(process->elfFile);
     return 0;
 }
 
 // Frees the memory allocated for a process's program data, depending on its file type
 int process_free_program_data(struct Process *process) {
     int res = 0;
-    switch (process->filetype) {
+    switch (process->fileType) {
         case PROCESS_FILETYPE_BINARY:
             res = process_free_binary_data(process);
             break;
@@ -166,7 +166,7 @@ void process_switch_to_any() {
 
 // Removes a process from the process array and switches to another process if necessary
 static void process_unlink(struct Process *process) {
-    processes[process->id] = 0x00;
+    processes[process->processId] = 0x00;
 
     if (current_process == process) {
         process_switch_to_any();
@@ -302,7 +302,7 @@ static int process_load_binary(const char *filename, struct Process *process) {
         goto out;
     }
 
-    process->filetype = PROCESS_FILETYPE_BINARY;
+    process->fileType = PROCESS_FILETYPE_BINARY;
     process->processBaseAddr = program_data_ptr;
     process->size = stat.filesize;
 
@@ -325,8 +325,8 @@ static int process_load_elf(const char *filename, struct Process *process) {
         goto out;
     }
 
-    process->filetype = PROCESS_FILETYPE_ELF;
-    process->elf_file = elf_file;
+    process->fileType = PROCESS_FILETYPE_ELF;
+    process->elfFile = elf_file;
     out:
     return res;
 }
@@ -355,7 +355,7 @@ int process_map_binary(struct Process *process) {
 static int process_map_elf(struct Process *process) {
     int res = 0;
 
-    struct ElfFile *elf_file = process->elf_file;
+    struct ElfFile *elf_file = process->elfFile;
     struct ElfHeader *header = elf_header(elf_file);
     struct Elf32Phdr *phdrs = elf_pheader(header);
     for (int i = 0; i < header->e_phnum; i++) {
@@ -379,7 +379,7 @@ static int process_map_elf(struct Process *process) {
 int process_map_memory(struct Process *process) {
     int res = 0;
 
-    switch (process->filetype) {
+    switch (process->fileType) {
         case PROCESS_FILETYPE_ELF:
             res = process_map_elf(process);
             break;
@@ -470,7 +470,7 @@ int process_load_for_slot(const char *filename, struct Process **process, int pr
 
     strncpy(_process->filename, filename, sizeof(_process->filename));
     _process->stackPtr = program_stack_ptr;
-    _process->id = process_slot;
+    _process->processId = process_slot;
 
     // Create a task
     task = task_new(_process);
