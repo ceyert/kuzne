@@ -1,6 +1,8 @@
 # Kuzne
 
-Experimental kernel development in C.
+Experimental X86 based kernel development in C.
+
+Requirements :
 
 - sudo apt install nasm
 - brew install i686-elf-gcc (macos & linux)
