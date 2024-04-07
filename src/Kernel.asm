@@ -14,6 +14,8 @@ _start:
     mov fs, ax
     mov gs, ax
     mov ss, ax
+
+    ; Set sp & bp address
     mov ebp, 0x00200000
     mov esp, ebp
 

@@ -3,6 +3,8 @@
 mkdir ./bin
 mkdir ./build
 
+mkdir ./mount_point
+
 mkdir ./build/idt
 mkdir ./build/memory
 mkdir ./build/memory/heap
@@ -21,8 +23,9 @@ mkdir ./build/loader/formats
 mkdir ./build/vga
 
 mkdir ./programs/blank/build
+mkdir ./programs/shell/build
+mkdir ./programs/stdlib/build
 
-mkdir ./mount_point
 
 export PREFIX="$HOME/opt/cross"
 export TARGET=i686-elf

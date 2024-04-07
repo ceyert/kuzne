@@ -4,7 +4,6 @@ INCLUDES = -I./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
 all: ./bin/boot.bin ./bin/kernel.bin user_programs
-	rm -rf ./bin/os.bin
 	dd if=./bin/boot.bin >> ./bin/os.bin
 	dd if=./bin/kernel.bin >> ./bin/os.bin
 	dd if=/dev/zero bs=1048576 count=16 >> ./bin/os.bin
@@ -135,8 +134,7 @@ user_programs_clean:
 	cd ./programs/shell && $(MAKE) clean
 
 clean: user_programs_clean
-	rm -rf ./bin/boot.bin
-	rm -rf ./bin/kernel.bin
-	rm -rf ./bin/os.bin
+	rm -rf ./bin
 	rm -rf ${FILES}
-	rm -rf ./build/kernelfull.o
+	rm -rf ./build
+	rm -rf ./mount_point
