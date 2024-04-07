@@ -52,9 +52,7 @@ __START__:
  ;Jump to the payload
  jmp 0000h:8000h
 
- ;Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
- ;  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
- ;Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
+ ; ------------------------------------------------------------
 
  ;CX = Wait (in ms) Max 65536 us (=0 on input)
  us_wait:
@@ -64,13 +62,12 @@ __START__:
 
   ret
 
+; ------------------------------------------------------------
+
   WAIT_10_ms     EQU 10000
   WAIT_200_us    EQU 200
 
- ;Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
- ;  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
- ;Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
-
+; ------------------------------------------------------------
 
  enable_lapic:
 
@@ -92,10 +89,7 @@ __START__:
   mov DWORD [fs: eax+APIC_REG_SIV], ecx
 
   ret
-
- ;Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
- ;  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
- ;Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
+; ------------------------------------------------------------  
 
  lapic_send_sipi:
   mov eax, DWORD [APIC_BASE]
@@ -115,9 +109,7 @@ __START__:
 
   ret
 
-  ;Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
- ;  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
- ;Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
+; ------------------------------------------------------------
 
  lapic_send_init:
   mov eax, DWORD [APIC_BASE]
@@ -137,6 +129,8 @@ __START__:
 
   ret
 
+; ------------------------------------------------------------
+
  IA32_APIC_BASE_MSR    EQU    1bh
 
  APIC_REG_SIV        EQU    0f0h
@@ -146,15 +140,10 @@ __START__:
 
  APIC_REG_ID        EQU 20h
 
- ;Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
- ;  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
- ;Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
-
  APIC_BASE            dd     00h
 
- ;Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
- ;  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
- ;Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
+
+; ------------------------------------------------------------
 
 unrealmode:
  lgdt [cs:GDT]
@@ -178,6 +167,8 @@ unrealmode:
  ;So it can be called from everywhere
  retf
 
+; ------------------------------------------------------------
+
  GDT:
     dw 0fh
     dd GDT + 7c00h
@@ -186,9 +177,7 @@ unrealmode:
     dd 0000ffffh
     dd 00cf9200h
 
- ;Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
- ;  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
- ;Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll  Ll
+; ------------------------------------------------------------
 
 payload_start_abs:
 ; payload starts at segment:offset 0800h:0000h
@@ -250,6 +239,8 @@ section payload, vstart=0000h, align=1
   cli
   hlt
 
+; ------------------------------------------------------------
+
   ;DL = Number
   ;DI = ptr to text buffer
   itoa8:
@@ -267,12 +258,12 @@ section payload, vstart=0000h, align=1
 
     ret
 
+; ------------------------------------------------------------
+
   digits db "0123456789abcdef"
   counter dw 0
 
  payload_end:
-
-
 
 ; Boot signature is at physical offset 01feh of
 ; the boot sector
