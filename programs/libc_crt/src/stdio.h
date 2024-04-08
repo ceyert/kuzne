@@ -1,5 +1,5 @@
-#ifndef PEACHOS_STDIO
-#define PEACHOS_STDIO
+#ifndef KUZNE_STDIO
+#define KUZNE_STDIO
 
 int putchar(int c);
 

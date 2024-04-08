@@ -1,50 +1,58 @@
 section .asm
 
+
+; Low-level input/output operations between the CPU and peripheral devices. 
+; These operations use the in and out instructions for reading from and writing to device ports. 
+
 global insb
 global insw
 global outb
 global outw
 
+; insb: Reads a byte from a specified I/O port into AL register.
 insb:
-    push ebp
-    mov ebp, esp
+    push ebp                ; Save the base pointer
+    mov ebp, esp            ; Establish a stack frame
 
-    xor eax, eax
-    mov edx, [ebp+8]
-    in al, dx
+    xor eax, eax            ; Clear EAX to ensure AL will be clean
+    mov edx, [ebp+8]        ; Load the port address into EDX
+    in al, dx               ; Read a byte from the port into AL
 
-    pop ebp
-    ret
+    pop ebp                 ; Restore the base pointer
+    ret                     
 
+; insw: Reads a word (2 bytes) from a specified I/O port into AX register.
 insw:
-    push ebp
-    mov ebp, esp
+    push ebp                ; Save the base pointer
+    mov ebp, esp            ; Establish a stack frame
 
-    xor eax, eax
-    mov edx, [ebp+8]
-    in ax, dx
+    xor eax, eax            ; Clear EAX to ensure AX will be clean
+    mov edx, [ebp+8]        ; Load the port address into EDX
+    in ax, dx               ; Read a word from the port into AX
 
-    pop ebp
-    ret
+    pop ebp                 ; Restore the base pointer
+    ret                     
 
+; outb: Writes a byte to a specified I/O port.
 outb:
-    push ebp
-    mov ebp, esp
+    push ebp                ; Save the base pointer
+    mov ebp, esp            ; Establish a stack frame
 
-    mov eax, [ebp+12]
-    mov edx, [ebp+8]
-    out dx, al
+    mov eax, [ebp+12]       ; Move the byte to be written into EAX
+    mov edx, [ebp+8]        ; Load the port address into EDX
+    out dx, al              ; Write the byte in AL to the port
 
-    pop ebp
-    ret
+    pop ebp                 ; Restore the base pointer
+    ret                     
 
+; outw: Writes a word (2 bytes) to a specified I/O port.
 outw:
-    push ebp
-    mov ebp, esp
+    push ebp                ; Save the base pointer
+    mov ebp, esp            ; Establish a stack frame
 
-    mov eax, [ebp+12]
-    mov edx, [ebp+8]
-    out dx, ax
+    mov eax, [ebp+12]       ; Move the word to be written into EAX
+    mov edx, [ebp+8]        ; Load the port address into EDX
+    out dx, ax              ; Write the word in AX to the port
 
-    pop ebp
-    ret
+    pop ebp                 ; Restore the base pointer
+    ret                     

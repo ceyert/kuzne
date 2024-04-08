@@ -24,7 +24,7 @@ mkdir ./build/vga
 
 mkdir ./programs/blank/build
 mkdir ./programs/shell/build
-mkdir ./programs/stdlib/build
+mkdir ./programs/libc_crt/build
 
 
 export PREFIX="$HOME/opt/cross"

@@ -1,8 +1,8 @@
 #ifndef ELF_H
 #define ELF_H
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #define PF_X 0x01
 #define PF_W 0x02
@@ -59,7 +59,8 @@ typedef int32_t elf32_sword_t;
 typedef uint32_t elf32_addr_t;
 typedef int32_t elf32_off_t;
 
-struct Elf32Phdr {
+struct Elf32Phdr
+{
     elf32_word_t p_type;
     elf32_off_t p_offset;
     elf32_addr_t p_vaddr;
@@ -70,7 +71,8 @@ struct Elf32Phdr {
     elf32_word_t p_align;
 } __attribute__((packed));
 
-struct Elf32Shdr {
+struct Elf32Shdr
+{
     elf32_word_t sh_name;
     elf32_word_t sh_type;
     elf32_word_t sh_flags;
@@ -83,7 +85,8 @@ struct Elf32Shdr {
     elf32_word_t sh_entsize;
 } __attribute__((packed));
 
-struct ElfHeader {
+struct ElfHeader
+{
     unsigned char e_ident[EI_NIDENT];
     elf32_half_t e_type;
     elf32_half_t e_machine;
@@ -100,16 +103,19 @@ struct ElfHeader {
     elf32_half_t e_shstrndx;
 } __attribute__((packed));
 
-struct Elf32Dyn {
+struct Elf32Dyn
+{
     elf32_sword_t d_tag;
-    union {
+    union
+    {
         elf32_word_t d_val;
         elf32_addr_t d_ptr;
     } d_un;
 
 } __attribute__((packed));
 
-struct Elf32Sym {
+struct Elf32Sym
+{
     elf32_word_t st_name;
     elf32_addr_t st_value;
     elf32_word_t st_size;
@@ -118,8 +124,8 @@ struct Elf32Sym {
     elf32_half_t st_shndx;
 } __attribute__((packed));
 
-extern void *elf_get_entry_ptr(struct ElfHeader *elf_header);
+extern void* elf_get_entry_ptr(struct ElfHeader* elf_header);
 
-extern uint32_t elf_get_entry(struct ElfHeader *elf_header);
+extern uint32_t elf_get_entry(struct ElfHeader* elf_header);
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef PEACHOS_STDLIB_H
-#define PEACHOS_STDLIB_H
+#ifndef KUZNE_STDLIB_H
+#define KUZNE_STDLIB_H
 
 #include <stddef.h>
 

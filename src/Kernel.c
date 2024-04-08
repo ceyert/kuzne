@@ -1,27 +1,27 @@
+#include "Config.h"
 #include "Kernel.h"
-#include "vga/Vga.h"
+#include "Status.h"
+#include "disk/Disk.h"
+#include "disk/Streamer.h"
+#include "fs/File.h"
+#include "fs/Pparser.h"
+#include "gdt/Gdt.h"
 #include "idt/Idt.h"
+#include "isr80h/Isr80h.h"
+#include "keyboard/Keyboard.h"
+#include "memory/Memory.h"
 #include "memory/heap/Kheap.h"
 #include "memory/paging/Paging.h"
-#include "memory/Memory.h"
-#include "keyboard/Keyboard.h"
 #include "string/String.h"
-#include "isr80h/Isr80h.h"
-#include "task/Task.h"
 #include "task/Process.h"
-#include "fs/File.h"
-#include "disk/Disk.h"
-#include "fs/Pparser.h"
-#include "disk/Streamer.h"
+#include "task/Task.h"
 #include "task/Tss.h"
-#include "gdt/Gdt.h"
-#include "Config.h"
-#include "Status.h"
+#include "vga/Vga.h"
 
+static struct Paging4GbChunk* kernel_chunk = 0;
 
-static struct Paging4GbChunk *kernel_chunk = 0;
-
-void kernel_page() {
+void kernel_page()
+{
     kernel_registers();
     paging_switch(kernel_chunk);
 }
@@ -31,16 +31,16 @@ struct Tss Tss;
 struct Gdt gdt_real[TOTAL_GDT_SEGMENTS];
 
 struct GdtStructured gdt_structured[TOTAL_GDT_SEGMENTS] = {
-        {.base = 0x00, .limit = 0x00, .type = 0x00},                // NULL Segment
-        {.base = 0x00, .limit = 0xffffffff, .type = 0x9a},           // Kernel code segment
-        {.base = 0x00, .limit = 0xffffffff, .type = 0x92},            // Kernel data segment
-        {.base = 0x00, .limit = 0xffffffff, .type = 0xf8},              // User code segment
-        {.base = 0x00, .limit = 0xffffffff, .type = 0xf2},             // User data segment
-        {.base = (uint32_t) & Tss, .limit=sizeof(Tss), .type = 0xE9}      // TSS Segment
+    {.base = 0x00, .limit = 0x00, .type = GDT_NULL_SEGMENT},                 // NULL Segment
+    {.base = 0x00, .limit = 0xffffffff, .type = GDT_KERNEL_CODE_SEGMENT},    // Kernel code segment
+    {.base = 0x00, .limit = 0xffffffff, .type = GDT_KERNEL_DATA_SEGMENT},    // Kernel data segment
+    {.base = 0x00, .limit = 0xffffffff, .type = GDT_USER_CODE_SEGMENT},      // User code segment
+    {.base = 0x00, .limit = 0xffffffff, .type = GDT_USER_DATA_SEGMENT},      // User data segment
+    {.base = (uint32_t)&Tss, .limit = sizeof(Tss), .type = GDT_TSS_SEGMENT}  // TSS Segment
 };
 
-void kernel_main() {
-
+void kernel_main()
+{
     terminal_initialize();
 
     memset(gdt_real, 0x00, sizeof(gdt_real));
@@ -85,13 +85,16 @@ void kernel_main() {
     // Initialize all the system keyboards
     keyboard_init();
 
-    struct Process *process = 0;
+    struct Process* process = 0;
     int res = process_load_switch("0:/shell.elf", &process);
-    if (res != PEACHOS_ALL_OK) {
+    if (res != ALL_OK)
+    {
         panic("Failed to load shell.elf\n");
     }
 
     task_run_first_ever_task();
 
-    while (1) {}
+    while (1)
+    {
+    }
 }

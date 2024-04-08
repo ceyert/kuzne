@@ -87,7 +87,7 @@ gdt_descriptor:
     mov ecx, 100
     mov edi, 0x0100000
     call ata_lba_read
-    jmp CODE_SEG:0x0100000
+    jmp CODE_SEG:0x0100000  ; jump address 0x0100000 to execute 
 
 ata_lba_read:
     mov ebx, eax, ; Backup the LBA

@@ -2,11 +2,11 @@
 
 global _start
 extern c_start
-extern peachos_exit
+extern kuzne_exit
 
 section .asm
 
 _start:
     call c_start
-    call peachos_exit
+    call kuzne_exit
     ret

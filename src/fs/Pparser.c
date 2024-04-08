@@ -1,17 +1,20 @@
-#include "Pparser.h"
 #include "Kernel.h"
-#include "string/String.h"
-#include "memory/heap/Kheap.h"
-#include "memory/Memory.h"
+#include "Pparser.h"
 #include "Status.h"
+#include "memory/Memory.h"
+#include "memory/heap/Kheap.h"
+#include "string/String.h"
 
-static int pathparser_path_valid_format(const char *filename) {
+static int pathparser_path_valid_format(const char* filename)
+{
     int len = strnlen(filename, PEACHOS_MAX_PATH);
-    return (len >= 3 && isdigit(filename[0]) && memcmp((void *) &filename[1], ":/", 2) == 0);
+    return (len >= 3 && isdigit(filename[0]) && memcmp((void*)&filename[1], ":/", 2) == 0);
 }
 
-static int pathparser_get_drive_by_path(const char **path) {
-    if (!pathparser_path_valid_format(*path)) {
+static int pathparser_get_drive_by_path(const char** path)
+{
+    if (!pathparser_path_valid_format(*path))
+    {
         return -EBADPATH;
     }
 
@@ -22,29 +25,33 @@ static int pathparser_get_drive_by_path(const char **path) {
     return drive_no;
 }
 
-static struct PathRoot *pathparser_create_root(int drive_number) {
-    struct PathRoot *path_r = kzalloc(sizeof(struct PathRoot));
+static struct PathRoot* pathparser_create_root(int drive_number)
+{
+    struct PathRoot* path_r = kzalloc(sizeof(struct PathRoot));
     path_r->driveNo = drive_number;
     path_r->first = 0;
     return path_r;
 }
 
-
-static const char *pathparser_get_path_part(const char **path) {
-    char *result_path_part = kzalloc(PEACHOS_MAX_PATH);
+static const char* pathparser_get_path_part(const char** path)
+{
+    char* result_path_part = kzalloc(PEACHOS_MAX_PATH);
     int i = 0;
-    while (**path != '/' && **path != 0x00) {
+    while (**path != '/' && **path != 0x00)
+    {
         result_path_part[i] = **path;
         *path += 1;
         i++;
     }
 
-    if (**path == '/') {
+    if (**path == '/')
+    {
         // Skip the forward slash to avoid problems
         *path += 1;
     }
 
-    if (i == 0) {
+    if (i == 0)
+    {
         kfree(result_path_part);
         result_path_part = 0;
     }
@@ -52,28 +59,33 @@ static const char *pathparser_get_path_part(const char **path) {
     return result_path_part;
 }
 
-struct PathPart *pathparser_parse_path_part(struct PathPart *last_part, const char **path) {
-    const char *path_part_str = pathparser_get_path_part(path);
-    if (!path_part_str) {
+struct PathPart* pathparser_parse_path_part(struct PathPart* last_part, const char** path)
+{
+    const char* path_part_str = pathparser_get_path_part(path);
+    if (!path_part_str)
+    {
         return 0;
     }
 
-    struct PathPart *part = kzalloc(sizeof(struct PathPart));
+    struct PathPart* part = kzalloc(sizeof(struct PathPart));
     part->part = path_part_str;
     part->next = 0x00;
 
-    if (last_part) {
+    if (last_part)
+    {
         last_part->next = part;
     }
 
     return part;
 }
 
-void pathparser_free(struct PathRoot *root) {
-    struct PathPart *part = root->first;
-    while (part) {
-        struct PathPart *next_part = part->next;
-        kfree((void *) part->part);
+void pathparser_free(struct PathRoot* root)
+{
+    struct PathPart* part = root->first;
+    while (part)
+    {
+        struct PathPart* next_part = part->next;
+        kfree((void*)part->part);
         kfree(part);
         part = next_part;
     }
@@ -81,36 +93,42 @@ void pathparser_free(struct PathRoot *root) {
     kfree(root);
 }
 
-struct PathRoot *pathparser_parse(const char *path, const char *current_directory_path) {
+struct PathRoot* pathparser_parse(const char* path, const char* current_directory_path)
+{
     int res = 0;
-    const char *tmp_path = path;
-    struct PathRoot *path_root = 0;
+    const char* tmp_path = path;
+    struct PathRoot* path_root = 0;
 
-    if (strlen(path) > PEACHOS_MAX_PATH) {
+    if (strlen(path) > PEACHOS_MAX_PATH)
+    {
         goto out;
     }
 
     res = pathparser_get_drive_by_path(&tmp_path);
-    if (res < 0) {
+    if (res < 0)
+    {
         goto out;
     }
 
     path_root = pathparser_create_root(res);
-    if (!path_root) {
+    if (!path_root)
+    {
         goto out;
     }
 
-    struct PathPart *first_part = pathparser_parse_path_part(NULL, &tmp_path);
-    if (!first_part) {
+    struct PathPart* first_part = pathparser_parse_path_part(NULL, &tmp_path);
+    if (!first_part)
+    {
         goto out;
     }
 
     path_root->first = first_part;
-    struct PathPart *part = pathparser_parse_path_part(first_part, &tmp_path);
-    while (part) {
+    struct PathPart* part = pathparser_parse_path_part(first_part, &tmp_path);
+    while (part)
+    {
         part = pathparser_parse_path_part(part, &tmp_path);
     }
 
-    out:
+out:
     return path_root;
 }

@@ -1,5 +1,5 @@
-#ifndef PEACHOS_MEMORY_H
-#define PEACHOS_MEMORY_H
+#ifndef KUZNE_MEMORY_H
+#define KUZNE_MEMORY_H
 
 #include <stddef.h>
 

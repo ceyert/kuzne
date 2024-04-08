@@ -12,10 +12,20 @@ struct Gdt {
     uint8_t base_24_31_bits;
 } __attribute__((packed));
 
+enum GdtTypes
+{
+    GDT_NULL_SEGMENT = 0x00,
+    GDT_KERNEL_CODE_SEGMENT = 0x9a,
+    GDT_KERNEL_DATA_SEGMENT = 0x92,
+    GDT_USER_CODE_SEGMENT = 0xf8,
+    GDT_USER_DATA_SEGMENT = 0xf2,
+    GDT_TSS_SEGMENT = 0xE9
+};
+
 struct GdtStructured {
     uint32_t base;
     uint32_t limit;
-    uint8_t type;
+    enum GdtTypes type;
 };
 
 extern void gdt_load(struct Gdt *gdt, int size);

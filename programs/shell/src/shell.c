@@ -1,18 +1,25 @@
 #include "shell.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "peachos.h"
+#include "syscalls.h"
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv)
+{
     print("Shell v1.0.0\n");
-    while (1) {
+
+    while (1)
+    {
         print("> ");
-        char buf[1024];
-        peachos_terminal_readline(buf, sizeof(buf), true);
+
+        char buffer[1024];
+        kuzne_terminal_readline(buffer, sizeof(buffer), true);
+
         print("\n");
-        peachos_system_run(buf);
+
+        kuzne_system_run(buffer);
 
         print("\n");
     }
+
     return 0;
 }

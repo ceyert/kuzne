@@ -1,4 +1,4 @@
-#include "String.h"
+#include "string.h"
 
 char tolower(char s1)
 {
@@ -112,79 +112,59 @@ int tonumericdigit(char c)
     return c - 48;
 }
 
-char* itoa(int i)
+char* sp = 0;
+
+char* strtok(char* str, const char* delimiters)
 {
-    static char text[12];
-    int loc = 11;
-    text[11] = 0;
-    char neg = 1;
-    if (i >= 0)
+    int i = 0;
+    int len = strlen(delimiters);
+    if (!str && !sp) return 0;
+
+    if (str && !sp)
     {
-        neg = 0;
-        i = -i;
+        sp = str;
     }
 
-    while (i)
+    char* p_start = sp;
+    while (1)
     {
-        text[--loc] = '0' - (i % 10);
-        i /= 10;
+        for (i = 0; i < len; i++)
+        {
+            if (*p_start == delimiters[i])
+            {
+                p_start++;
+                break;
+            }
+        }
+
+        if (i == len)
+        {
+            sp = p_start;
+            break;
+        }
     }
 
-    if (loc == 11) text[--loc] = '0';
-
-    if (neg) text[--loc] = '-';
-
-    return &text[loc];
-}
-
-char* itoa_hex(int i)
-{
-    static char text[9];  // Buffer for 8 hex digits + null terminator. Note: This gets overwritten on each call.
-    int loc = 8;
-    text[8] = '\0';  // Null-terminator for string
-
-    if (i == 0)
+    if (*sp == '\0')
     {
-        text[7] = '0';  // Handle 0 explicitly
-        return &text[7];
+        sp = 0;
+        return sp;
     }
 
-    // Convert to hexadecimal
-    while (i != 0 && loc > 0)
+    // Find end of substring
+    while (*sp != '\0')
     {
-        int digit = i & 0xF;  // Extract the last 4 bits
-        text[--loc] = (digit > 9) ? (digit - 10 + 'A') : (digit + '0');
-        i >>= 4;  // Shift right by 4 bits to process the next digit
+        for (i = 0; i < len; i++)
+        {
+            if (*sp == delimiters[i])
+            {
+                *sp = '\0';
+                break;
+            }
+        }
+
+        sp++;
+        if (i < len) break;
     }
 
-    return &text[loc];
-}
-
-char* ptr_to_hex(const unsigned long ptr)
-{
-    static char text[17];  // Buffer for 16 hex digits (for 64-bit addresses) + null terminator
-    static const char hexDigits[] = "0123456789abcdef";
-    unsigned long addr = ptr;  // Cast pointer to unsigned long
-    int loc = 16;
-    text[16] = '\0';  // Null-terminator for string
-
-    for (int i = 0; i < 16; ++i)
-    {
-        text[i] = '0';  // Initialize buffer with zeros
-    }
-
-    if (addr == 0)
-    {
-        return &text[15];  // Return "0" for null pointer
-    }
-
-    // Convert to hexadecimal
-    while (addr != 0 && loc > 0)
-    {
-        int digit = addr & 0xF;  // Extract the last 4 bits
-        text[--loc] = hexDigits[digit];
-        addr >>= 4;  // Shift right by 4 bits to process the next digit
-    }
-
-    return &text[loc];
+    return p_start;
 }

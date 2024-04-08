@@ -1,45 +1,50 @@
-#include "Task.h"
 #include "Kernel.h"
-#include "vga/Vga.h"
-#include "Status.h"
 #include "Process.h"
-#include "memory/heap/Kheap.h"
-#include "memory/Memory.h"
-#include "string/String.h"
-#include "memory/paging/Paging.h"
-#include "loader/formats/Elfloader.h"
+#include "Status.h"
+#include "Task.h"
 #include "idt/Idt.h"
+#include "loader/formats/Elfloader.h"
+#include "memory/Memory.h"
+#include "memory/heap/Kheap.h"
+#include "memory/paging/Paging.h"
+#include "string/String.h"
+#include "vga/Vga.h"
 
 // The current task that is running
-struct Task *current_task = 0;
+struct Task* current_task = 0;
 
 // Task linked list
-struct Task *task_tail = 0;
-struct Task *task_head = 0;
+struct Task* task_tail = 0;
+struct Task* task_head = 0;
 
 // Function to initialize a task with a given process
-int task_init(struct Task *task, struct Process *process);
+int task_init(struct Task* task, struct Process* process);
 
 // Function to retrieve the currently running task
-struct Task *task_current() {
+struct Task* task_current()
+{
     return current_task;
 }
 
 // Function to create a new task for a given process
-struct Task *task_new(struct Process *process) {
+struct Task* task_new(struct Process* process)
+{
     int res = 0;
-    struct Task *task = kzalloc(sizeof(struct Task));
-    if (!task) {
+    struct Task* task = kzalloc(sizeof(struct Task));
+    if (!task)
+    {
         res = -ENOMEM;
         goto out;
     }
 
     res = task_init(task, process);
-    if (res != PEACHOS_ALL_OK) {
+    if (res != ALL_OK)
+    {
         goto out;
     }
 
-    if (task_head == 0) {
+    if (task_head == 0)
+    {
         task_head = task;
         task_tail = task;
         current_task = task;
@@ -50,8 +55,9 @@ struct Task *task_new(struct Process *process) {
     task->prev = task_tail;
     task_tail = task;
 
-    out:
-    if (ISERR(res)) {
+out:
+    if (ISERR(res))
+    {
         task_free(task);
         return ERROR(res);
     }
@@ -60,8 +66,10 @@ struct Task *task_new(struct Process *process) {
 }
 
 // Function to get the next task in the linked list
-struct Task *task_get_next() {
-    if (!current_task->next) {
+struct Task* task_get_next()
+{
+    if (!current_task->next)
+    {
         return task_head;
     }
 
@@ -69,26 +77,32 @@ struct Task *task_get_next() {
 }
 
 // Internal function to remove a task from the task list
-static void task_list_remove(struct Task *task) {
-    if (task->prev) {
+static void task_list_remove(struct Task* task)
+{
+    if (task->prev)
+    {
         task->prev->next = task->next;
     }
 
-    if (task == task_head) {
+    if (task == task_head)
+    {
         task_head = task->next;
     }
 
-    if (task == task_tail) {
+    if (task == task_tail)
+    {
         task_tail = task->prev;
     }
 
-    if (task == current_task) {
+    if (task == current_task)
+    {
         current_task = task_get_next();
     }
 }
 
 // Function to free resources associated with a task
-int task_free(struct Task *task) {
+int task_free(struct Task* task)
+{
     paging_free_4gb(task->page_directory);
     task_list_remove(task);
 
@@ -98,9 +112,11 @@ int task_free(struct Task *task) {
 }
 
 // Function to switch to the next task
-void task_next() {
-    struct Task *next_task = task_get_next();
-    if (!next_task) {
+void task_next()
+{
+    struct Task* next_task = task_get_next();
+    if (!next_task)
+    {
         panic("No more tasks!\n");
     }
 
@@ -109,14 +125,16 @@ void task_next() {
 }
 
 // Function to switch the current task to a specified task
-int task_switch(struct Task *task) {
+int task_switch(struct Task* task)
+{
     current_task = task;
     paging_switch(task->page_directory);
     return 0;
 }
 
 // Function to save the state of a task, typically used before switching tasks
-void task_save_state(struct Task *task, struct InterruptFrame *frame) {
+void task_save_state(struct Task* task, struct InterruptFrame* frame)
+{
     task->registers.ip = frame->ip;
     task->registers.cs = frame->cs;
     task->registers.flags = frame->flags;
@@ -132,19 +150,22 @@ void task_save_state(struct Task *task, struct InterruptFrame *frame) {
 }
 
 // Function to copy a string from one task to another, handling virtual to physical address mapping
-int copy_string_from_task(struct Task *task, void *virtual, void *phys, int max) {
-    if (max >= PAGING_PAGE_SIZE) {
+int copy_string_from_task(struct Task* task, void* virtual, void* phys, int max)
+{
+    if (max >= PAGING_PAGE_SIZE)
+    {
         return -EINVARG;
     }
 
     int res = 0;
-    char *tmp = kzalloc(max);
-    if (!tmp) {
+    char* tmp = kzalloc(max);
+    if (!tmp)
+    {
         res = -ENOMEM;
         goto out;
     }
 
-    uint32_t *task_directory = task->page_directory->directory_entry;
+    uint32_t* task_directory = task->page_directory->directory_entry;
     uint32_t old_entry = paging_get(task_directory, tmp);
     paging_map(task->page_directory, tmp, tmp, PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     paging_switch(task->page_directory);
@@ -152,46 +173,53 @@ int copy_string_from_task(struct Task *task, void *virtual, void *phys, int max)
     kernel_page();
 
     res = paging_set(task_directory, tmp, old_entry);
-    if (res < 0) {
+    if (res < 0)
+    {
         res = -EIO;
         goto out_free;
     }
 
     strncpy(phys, tmp, max);
 
-    out_free:
+out_free:
     kfree(tmp);
-    out:
+out:
     return res;
 }
 
 // Function to save the state of the current task
-void task_current_save_state(struct InterruptFrame *frame) {
-    if (!task_current()) {
+void task_current_save_state(struct InterruptFrame* frame)
+{
+    if (!task_current())
+    {
         panic("No current task to save\n");
     }
 
-    struct Task *task = task_current();
+    struct Task* task = task_current();
     task_save_state(task, frame);
 }
 
 // Function to switch the page directory to the current task's page directory
-int task_page() {
+int task_page()
+{
     user_registers();
     task_switch(current_task);
     return 0;
 }
 
 // Function to switch the page directory to a specified task's page directory
-int task_page_task(struct Task *task) {
+int task_page_task(struct Task* task)
+{
     user_registers();
     paging_switch(task->page_directory);
     return 0;
 }
 
 // Function to start the first ever task in the system
-void task_run_first_ever_task() {
-    if (!current_task) {
+void task_run_first_ever_task()
+{
+    if (!current_task)
+    {
         panic("task_run_first_ever_task(): No current task exists!\n");
     }
 
@@ -200,16 +228,19 @@ void task_run_first_ever_task() {
 }
 
 // Function to initialize a task, setting up its page directory and registers
-int task_init(struct Task *task, struct Process *process) {
+int task_init(struct Task* task, struct Process* process)
+{
     memset(task, 0, sizeof(struct Task));
     // Map new 4GB address space
     task->page_directory = paging_new_4gb(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
-    if (!task->page_directory) {
+    if (!task->page_directory)
+    {
         return -EIO;
     }
 
     task->registers.ip = PROGRAM_VIRTUAL_ADDRESS;
-    if (process->fileType == PROCESS_FILETYPE_ELF) {
+    if (process->fileType == PROCESS_FILETYPE_ELF)
+    {
         task->registers.ip = elf_header(process->elfFile)->e_entry;
     }
 
@@ -223,15 +254,16 @@ int task_init(struct Task *task, struct Process *process) {
 }
 
 // Function to get a specific item from a task's stack
-void *task_get_stack_item(struct Task *task, int index) {
-    void *result = 0;
+void* task_get_stack_item(struct Task* task, int index)
+{
+    void* result = 0;
 
-    uint32_t *sp_ptr = (uint32_t *) task->registers.esp;
+    uint32_t* sp_ptr = (uint32_t*)task->registers.esp;
 
     // Switch to the given tasks page
     task_page_task(task);
 
-    result = (void *) sp_ptr[index];
+    result = (void*)sp_ptr[index];
 
     // Switch back to the kernel page
     kernel_page();
@@ -240,6 +272,7 @@ void *task_get_stack_item(struct Task *task, int index) {
 }
 
 // Function to convert a virtual address in a task's address space to a physical address
-void *task_virtual_address_to_physical(struct Task *task, void *virtual_address) {
+void* task_virtual_address_to_physical(struct Task* task, void* virtual_address)
+{
     return paging_get_physical_address(task->page_directory->directory_entry, virtual_address);
 }

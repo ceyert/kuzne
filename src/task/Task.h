@@ -4,8 +4,9 @@
 #include "Config.h"
 #include "memory/paging/Paging.h"
 
-// storage symbol decleration
+// storage symbol declerations
 struct InterruptFrame;
+struct Process;
 
 struct Registers {
     uint32_t edi;
@@ -22,9 +23,6 @@ struct Registers {
     uint32_t esp;
     uint32_t ss;
 };
-
-
-struct Process;
 
 struct Task {
     /**
