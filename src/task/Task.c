@@ -232,7 +232,7 @@ int task_init(struct Task* task, struct Process* process)
 {
     memset(task, 0, sizeof(struct Task));
     // Enable 4GB memory regions
-    task->page_directory = enable_4gb_paging(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    task->page_directory = enable_4gb_virtual_memory_addresses(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     if (!task->page_directory)
     {
         return -EIO;

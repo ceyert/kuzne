@@ -71,7 +71,7 @@ void kernel_main()
     tss_load(0x28);
 
     // Setup paging
-    kernel_chunk = enable_4gb_paging(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    kernel_chunk = enable_4gb_virtual_memory_addresses(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
 
     // Switch to kernel paging chunk
     paging_switch(kernel_chunk);

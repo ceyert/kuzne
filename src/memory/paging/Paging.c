@@ -7,10 +7,10 @@ void paging_load_directory(uint32_t* directory);
 static uint32_t* current_directory = 0;
 
 
-// Enables 4GB memory regions mapping. 
-// Regions not mapped yet.
+// Enables 4GB virtual memory addresses. (32 bits memory addresses) 
+// Regions not mapped with physical memory yet.
 // Allocates 4MB for pages, 
-struct Paging4GbChunk* enable_4gb_paging(uint8_t flags)
+struct Paging4GbChunk* enable_4gb_virtual_memory_addresses(uint8_t flags)
 {
     // Page tables ptr
     uint32_t* page_tables_ptr = kzalloc(sizeof(uint32_t) * TOTAL_PAGES_PER_TABLE);
