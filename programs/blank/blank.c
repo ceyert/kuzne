@@ -6,8 +6,7 @@ int main(int argc, char** argv)
 {
     {
         int value = 48;
-        printf("Value: %i \n", value);
-        printf("Value address: %p \n", &value);
+        printf("stack value address: %p \n", &value);
     }
 
     {

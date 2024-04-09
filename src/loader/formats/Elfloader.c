@@ -29,7 +29,7 @@ static bool elf_valid_encoding(struct ElfHeader* header)
 
 static bool elf_is_executable(struct ElfHeader* header)
 {
-    return header->e_type == ET_EXEC && header->e_entry >= PROGRAM_VIRTUAL_ADDRESS;
+    return header->e_type == ET_EXEC && header->e_entry >= USER_PROCESS_VIRTUAL_BASE_ADDRESS_NON_ELF;
 }
 
 static bool elf_has_program_header(struct ElfHeader* header)
@@ -119,6 +119,7 @@ int elf_process_phdr_pt_load(struct ElfFile* elf_file, struct Elf32Phdr* phdr)
     }
 
     unsigned int end_virtual_address = phdr->p_vaddr + phdr->p_filesz;
+
     if (elf_file->virtual_end_address <= (void*)(end_virtual_address) || elf_file->virtual_end_address == 0x00)
     {
         elf_file->virtual_end_address = (void*)end_virtual_address;
@@ -132,12 +133,15 @@ int elf_process_pheader(struct ElfFile* elf_file, struct Elf32Phdr* phdr)
     int res = 0;
     switch (phdr->p_type)
     {
+        // All necessary sections are part of loadable segments PT_LOAD type.
         case PT_LOAD:
+            // load sections into memory (.TEXT, .DATA, .BSS, .RODATA)
             res = elf_process_phdr_pt_load(elf_file, phdr);
             break;
     }
     return res;
 }
+
 
 int elf_process_pheaders(struct ElfFile* elf_file)
 {

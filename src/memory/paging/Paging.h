@@ -1,44 +1,10 @@
 /**
  * @file Paging.h
  * @brief Interface and structures for managing paging in a system.
- *
- * Defines constants, structures, and functions for setting up, managing, and utilizing
- * a paging system for memory management. This includes creating page directories,
- * enabling paging, and mapping virtual addresses to physical addresses.
- */
-
-
-/*
- Page Directory
-+---------------+       +--------------+                       Base Addr : 0x01000000
-| PD Entry 0    | ----> | Page Table 0 | -----> +----------+      +-------------+
-+---------------+       +--------------+        | Page 0   | ---> |             |
-| PD Entry 1    | ----> | Page Table 1 |        +----------+      | Page Offset |
-+---------------+       +--------------+        | Page 1   |      | (4KB)       |
-| PD Entry 2    |       |   ......     |        +----------+      +-------------+
-+---------------+       +--------------+        |  ......  |
-| ......        |       |Page Table 1023|        +----------+
-+---------------+       +--------------+        | Page 1023 |
-| PD Entry 1023 |                                +----------+
-+---------------+
-
-Each Page Directory Entry points to a Page Table.
-Each Page Table contains 1024 Page Entries (for 4KB pages, this maps 4MB of memory).
-Each Page Entry maps to a 4KB page in physical memory.
-
 */
 
 
-/*
-64 bits virtual address : 
-0000 1111 1111 1111 | 1111 1111 1111 1111 | 1111 1111 1111 1111 | 1111 1111 1111 1111
 
-PML4 Index: Bits 47-39
-PDPT Index: Bits 38-30
-PD Index: Bits 29-21
-PT Index: Bits 20-12
-Page Offset: Bits 11-0
-*/
 
 #ifndef PAGING_H
 #define PAGING_H
@@ -46,6 +12,7 @@ Page Offset: Bits 11-0
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include "Memory_Constants.h"
 
 #define PAGING_CACHE_DISABLED  0b00010000 ///< Disable caching for this page.
 #define PAGING_WRITE_THROUGH   0b00001000 ///< Enable write-through caching.
@@ -53,16 +20,6 @@ Page Offset: Bits 11-0
 #define PAGING_IS_WRITEABLE    0b00000010 ///< Page is writable.
 #define PAGING_IS_PRESENT      0b00000001 ///< Page is present in memory.
 
-
-
-/*
-Each page 4096 bytes (4KB)
-Each page table contains 1024 pages 
-Each page table can map 1024 * (4096 bytes) = 4MB
-*/
-
-#define PAGE_SIZE 4096 ///< Size of each page (4KB).
-#define TOTAL_PAGES_PER_TABLE 1024 ///< Number of pages per table.
 
 /**
  * @struct Paging4GbChunk

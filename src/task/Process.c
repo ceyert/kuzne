@@ -378,6 +378,11 @@ static int process_load_elf(const char* filename, struct Process* process)
 
     process->fileType = PROCESS_FILETYPE_ELF;
     process->elfFile = elf_file;
+    logAddress("elf_memory : ", (unsigned long)process->elfFile->elf_memory);
+    logAddress("physical_base_address: ", (unsigned long)process->elfFile->physical_base_address);
+    logAddress("physical_end_address: ", (unsigned long)process->elfFile->physical_end_address);
+    logAddress("virtual_base_address: ", (unsigned long)process->elfFile->virtual_base_address);
+    logAddress("virtual_end_address: ", (unsigned long)process->elfFile->virtual_end_address);
 out:
     return res;
 }
@@ -399,29 +404,55 @@ static int process_load_data(const char* filename, struct Process* process)
 int process_map_binary(struct Process* process)
 {
     int res = 0;
-    paging_map_to(process->task->page_directory, (void*)PROGRAM_VIRTUAL_ADDRESS, process->processBaseAddr,
+    paging_map_to(process->task->page_directory, (void*)USER_PROCESS_VIRTUAL_BASE_ADDRESS_NON_ELF, process->processBaseAddr,
                   paging_align_address(process->processBaseAddr + process->size),
                   PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITEABLE);
     return res;
 }
 
-// Maps an ELF file into the process's address space
-static int process_map_elf(struct Process* process)
+
+/**
+ * 
+ * Processes the PT_LOAD program header to map sections into memory.
+ * The PT_LOAD program header type is crucial for defining executable and data segments
+ * that need to be loaded into memory for a program to run. This function is responsible
+ * for interpreting the PT_LOAD header from an ELF file and mapping the corresponding
+ * sections (.text, .data, .rodata, and .bss) into the virtual address space of the process.
+ * 
+ * Maps ELF file segments into the virtual address space of a process.
+ *
+ * This function takes ELF file, then maps each segment of the ELF file physical address into 
+ * process's virtual address space according to the segment headers. 
+ * 
+ * Mapping is necessary to execute the program contained in the ELF
+ * file by making its code and data accessible in the process's memory space.
+ *
+ * The function utilizes the paging mechanism to map virtual addresses to physical
+ * addresses, respecting the permissions and requirements defined in the ELF program headers.
+ */
+static int process_map_loadable_elf_sections(struct Process* process)
 {
     int res = 0;
 
     struct ElfFile* elf_file = process->elfFile;
+
     struct ElfHeader* header = elf_header(elf_file);
+
     struct Elf32Phdr* phdrs = elf_pheader(header);
+
     for (int i = 0; i < header->e_phnum; i++)
     {
         struct Elf32Phdr* phdr = &phdrs[i];
+
         void* phdr_phys_address = elf_phdr_phys_address(elf_file, phdr);
+
         int flags = PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL;
+
         if (phdr->p_flags & PF_W)
         {
             flags |= PAGING_IS_WRITEABLE;
         }
+
         res = paging_map_to(process->task->page_directory, paging_align_to_lower_page((void*)phdr->p_vaddr),
                             paging_align_to_lower_page(phdr_phys_address),
                             paging_align_address(phdr_phys_address + phdr->p_memsz), flags);
@@ -441,7 +472,7 @@ int process_map_memory(struct Process* process)
     switch (process->fileType)
     {
         case PROCESS_FILETYPE_ELF:
-            res = process_map_elf(process);
+            res = process_map_loadable_elf_sections(process);
             break;
 
         case PROCESS_FILETYPE_BINARY:
@@ -457,10 +488,15 @@ int process_map_memory(struct Process* process)
         goto out;
     }
 
-    // Finally map the stack
-    paging_map_to(process->task->page_directory, (void*)PROGRAM_STACK_VIRTUAL_ADDRESS_END, process->stackPtr,
-                  paging_align_address(process->stackPtr + USER_PROGRAM_STACK_SIZE),
-                  PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITEABLE);
+    // Maps physical stack memory address with predefined stack virtual memory address.
+    paging_map_to(process->task->page_directory, 
+                (void*)USER_PROCESS_STACK_VIRTUAL_ADDRESS_END, process->stackPtr,
+                paging_align_address(process->stackPtr + USER_PROCESS_STACK_SIZE),
+                PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITEABLE);
+
+    logAddress("stack: ", (unsigned long)process->stackPtr);
+    logAddress("mapped with pre-defined stack end: ", USER_PROCESS_STACK_VIRTUAL_ADDRESS_END);
+
 out:
     return res;
 }
@@ -532,7 +568,7 @@ int process_load_for_slot(const char* filename, struct Process** process, int pr
         goto out;
     }
 
-    program_stack_ptr = kzalloc(USER_PROGRAM_STACK_SIZE);
+    program_stack_ptr = kzalloc(USER_PROCESS_STACK_SIZE);
     if (!program_stack_ptr)
     {
         res = -ENOMEM;
@@ -543,7 +579,7 @@ int process_load_for_slot(const char* filename, struct Process** process, int pr
     _process->stackPtr = program_stack_ptr;
     _process->processId = process_slot;
 
-    logAddress("process stackPtr allocated: ", (unsigned long)_process->stackPtr);
+    logAddress("stack allocated: ", (unsigned long)_process->stackPtr);
 
     // Create a new task
     task = task_new(_process);
@@ -572,10 +608,9 @@ out:
     {
         if (_process && _process->task)
         {
+            // Free the process data
             task_free(_process->task);
         }
-
-        // Free the process data
     }
     return res;
 }

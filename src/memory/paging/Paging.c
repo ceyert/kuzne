@@ -6,7 +6,7 @@ void paging_load_directory(uint32_t* directory);
 
 static uint32_t* current_directory = 0;
 
-// 4MB memory allocation, 4GB memory access via offseting
+// 4MB memory allocation for pages, 4GB memory access via offseting. But not mapped yet.
 struct Paging4GbChunk* paging_new_4gb(uint8_t flags)
 {
     // 1024 page tables
@@ -23,6 +23,13 @@ struct Paging4GbChunk* paging_new_4gb(uint8_t flags)
         for (int page_idx = 0; page_idx < TOTAL_PAGES_PER_TABLE; page_idx++)
         {
             // Map page address with 4KB(PAGE_SIZE) offset
+
+            // A memory address can be accessd from page base address + 4KB
+
+            // Page1 base address 0 to 4 KB offset
+            // Page2 base address 4 to 8 KB offset
+            // Page3 base address 8 to 12 KB offset
+
             page_table_ptr[page_idx] = (pagetable_offset_4_mb + (page_idx * PAGE_SIZE)) | flags;
         }
 

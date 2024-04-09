@@ -238,9 +238,8 @@ int task_init(struct Task* task, struct Process* process)
         return -EIO;
     }
 
-    logAddress("process page directory: ", (unsigned long)task->page_directory->directory_entry);
-
-    task->registers.ip = PROGRAM_VIRTUAL_ADDRESS;
+    task->registers.ip = USER_PROCESS_VIRTUAL_BASE_ADDRESS_NON_ELF;
+    
     if (process->fileType == PROCESS_FILETYPE_ELF)
     {
         task->registers.ip = elf_header(process->elfFile)->e_entry;
@@ -248,12 +247,11 @@ int task_init(struct Task* task, struct Process* process)
 
     task->registers.ss = USER_DATA_SEGMENT;
     task->registers.cs = USER_CODE_SEGMENT;
-    task->registers.esp = PROGRAM_STACK_VIRTUAL_ADDRESS_START;
+    task->registers.esp = USER_PROCESS_STACK_VIRTUAL_ADDRESS_BASE;
 
     task->process = process;
 
     logAddress("process IP: ", (unsigned long)task->registers.ip);
-    logAddress("process stackPtr: ", (unsigned long)process->stackPtr);
     logAddress("process esp: ", (unsigned long)task->registers.esp);
 
     return 0;

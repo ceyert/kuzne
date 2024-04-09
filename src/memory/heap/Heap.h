@@ -1,7 +1,7 @@
 #ifndef HEAP_H
 #define HEAP_H
 
-#include "Config.h"
+#include "Memory_Constants.h"
 #include <stdint.h>
 #include <stddef.h>
 
