@@ -401,26 +401,26 @@ static int process_map_loadable_elf_sections(struct Process* process)
 
     struct ElfFile* elf_file = process->elfFile;
 
-    struct ElfHeader* header = elf_header(elf_file);
+    struct ElfHeader* elf_header_ptr = elf_header(elf_file);
 
-    struct Elf32Phdr* phdrs = elf_pheader(header);
+    struct Elf32Phdr* program_headers = elf_pheader(elf_header_ptr);
 
-    for (int i = 0; i < header->e_phnum; i++)
+    for (int i = 0; i < elf_header_ptr->e_phnum; i++)
     {
-        struct Elf32Phdr* phdr = &phdrs[i];
+        struct Elf32Phdr* program_header = &program_headers[i];
 
-        void* phdr_phys_address = elf_phdr_phys_address(elf_file, phdr);
+        void* program_header_physical_address = elf_program_header_physical_address(elf_file, program_header);
 
-        int flags = PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL;
+        int page_flags = PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL;
 
-        if (phdr->p_flags & PF_W)
+        if (program_header->p_flags & PF_W)
         {
-            flags |= PAGING_IS_WRITEABLE;
+            page_flags |= PAGING_IS_WRITEABLE;
         }
 
-        res = paging_map_to(process->task->page_directory, paging_align_to_lower_page((void*)phdr->p_vaddr),
-                            paging_align_to_lower_page(phdr_phys_address),
-                            paging_align_address(phdr_phys_address + phdr->p_memsz), flags);
+        res = paging_map_to(process->task->page_directory, paging_align_to_lower_page((void*)program_header->p_vaddr),
+                            paging_align_to_lower_page(program_header_physical_address),
+                            paging_align_address(program_header_physical_address + program_header->p_memsz), page_flags);
         if (ISERR(res))
         {
             break;

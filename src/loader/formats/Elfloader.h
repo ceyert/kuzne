@@ -144,6 +144,6 @@ extern struct Elf32Shdr *elf_section(struct ElfHeader *header, int index);
  * @param phdr Pointer to the Elf32Phdr (program header).
  * @return void* Physical address of the segment.
  */
-extern void *elf_phdr_phys_address(struct ElfFile *file, struct Elf32Phdr *phdr);
+extern void *elf_program_header_physical_address(struct ElfFile *file, struct Elf32Phdr *phdr);
 
 #endif // ELFLOADER_H

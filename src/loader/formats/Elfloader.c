@@ -73,7 +73,7 @@ struct Elf32Shdr* elf_section(struct ElfHeader* header, int index)
     return &elf_sheader(header)[index];
 }
 
-void* elf_phdr_phys_address(struct ElfFile* file, struct Elf32Phdr* phdr)
+void* elf_program_header_physical_address(struct ElfFile* file, struct Elf32Phdr* phdr)
 {
     return elf_memory(file) + phdr->p_offset;
 }
