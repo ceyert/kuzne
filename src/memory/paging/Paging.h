@@ -32,12 +32,12 @@ struct Paging4GbChunk {
 };
 
 /**
- * @brief Creates a new 4GB chunk of memory with paging.
+ * @brief Enables a new 4GB chunk of memory with paging.
  *
  * @param flags Flags to apply to each page in this chunk.
  * @return struct Paging4GbChunk* Pointer to the new 4GB chunk.
  */
-extern struct Paging4GbChunk *paging_new_4gb(uint8_t flags);
+extern struct Paging4GbChunk *enable_4gb_paging(uint8_t flags);
 
 /**
  * @brief Switches the current page directory to the one specified by the 4GB chunk.

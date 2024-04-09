@@ -6,45 +6,46 @@ void paging_load_directory(uint32_t* directory);
 
 static uint32_t* current_directory = 0;
 
-// 4MB memory allocation for pages, 4GB memory access via offseting. But not mapped yet.
-struct Paging4GbChunk* paging_new_4gb(uint8_t flags)
+
+// Enables 4GB memory regions mapping. 
+// Regions not mapped yet.
+// Allocates 4MB for pages, 
+struct Paging4GbChunk* enable_4gb_paging(uint8_t flags)
 {
-    // 1024 page tables
+    // Page tables ptr
     uint32_t* page_tables_ptr = kzalloc(sizeof(uint32_t) * TOTAL_PAGES_PER_TABLE);
 
     int pagetable_offset_4_mb = 0;
 
+    // Allocate 1024 page tables
     for (int i = 0; i < TOTAL_PAGES_PER_TABLE; i++)
     {
-        // 1024 pages
+        // Allocate 1024 pages
         uint32_t* page_table_ptr = kzalloc(sizeof(uint32_t) * TOTAL_PAGES_PER_TABLE);
 
-        // Maps page table with 4MB(1024 * 4KB) physical addresses. 
+        // Maps page table with 4MB(1024 * 4KB) physical address offsets. 
         for (int page_idx = 0; page_idx < TOTAL_PAGES_PER_TABLE; page_idx++)
         {
-            // Map page address with 4KB(PAGE_SIZE) offset
+            // Page1 : 0 to 4 KB offset
+            // Page2 : 4 to 8 KB offset
+            // Page3 : 8 to 12 KB offset
 
-            // A memory address can be accessd from page base address + 4KB
-
-            // Page1 base address 0 to 4 KB offset
-            // Page2 base address 4 to 8 KB offset
-            // Page3 base address 8 to 12 KB offset
-
+            // Map page with 4KB offset
             page_table_ptr[page_idx] = (pagetable_offset_4_mb + (page_idx * PAGE_SIZE)) | flags;
         }
 
-        pagetable_offset_4_mb += (TOTAL_PAGES_PER_TABLE * PAGE_SIZE); // move offset 4MB
+        pagetable_offset_4_mb += (TOTAL_PAGES_PER_TABLE * PAGE_SIZE); // move page table offset 4MB
 
         page_tables_ptr[i] = (uint32_t)page_table_ptr | flags | PAGING_IS_WRITEABLE;
     }
 
-    // 1024 page tables
+    // 1024 page tables (page directory)
     // Each page table 1024 pages
     // Each page 4KB offset
     // 1024 * 1024 * 4096 = 4294967296 (4GB)
 
-    // 4KB allocation each malloc
-    // 1024 itearations
+    // 4KB(4096) allocation each malloc
+    // 1024 iterations
     // 1024 * 4096 = 4MB memory allocations
 
     struct Paging4GbChunk* chunk_4gb = kzalloc(sizeof(struct Paging4GbChunk));

@@ -231,8 +231,8 @@ void task_run_first_ever_task()
 int task_init(struct Task* task, struct Process* process)
 {
     memset(task, 0, sizeof(struct Task));
-    // Map new 4GB address space
-    task->page_directory = paging_new_4gb(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    // Enable 4GB memory regions
+    task->page_directory = enable_4gb_paging(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     if (!task->page_directory)
     {
         return -EIO;
