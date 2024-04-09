@@ -81,7 +81,7 @@ struct Process {
     struct ProcessArguments processArguments; ///< Command line arguments for the process.
 };
 
-extern int process_switch(struct Process *process);
+extern int set_current_process(struct Process *process);
 
 extern int process_load_switch(const char *filename, struct Process **process);
 

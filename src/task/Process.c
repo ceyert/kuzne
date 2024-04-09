@@ -12,9 +12,9 @@
 #include "vga/Vga.h"
 
 // The current process that is running
-struct Process* current_process = 0;
+struct Process* CURRENT_PROCESS_ = 0;
 
-static struct Process* processes[MAX_PROCESSES] = {};
+static struct Process* PROCESS_BUFFER_[MAX_PROCESSES] = {};
 
 // Initializes a process by setting all its fields to zero
 static void process_init(struct Process* process)
@@ -25,7 +25,7 @@ static void process_init(struct Process* process)
 // Returns the currently running process
 struct Process* process_current()
 {
-    return current_process;
+    return CURRENT_PROCESS_;
 }
 
 // Retrieves a process by its ID, or returns NULL if the ID is invalid or out of range
@@ -36,13 +36,13 @@ struct Process* process_get(int process_id)
         return NULL;
     }
 
-    return processes[process_id];
+    return PROCESS_BUFFER_[process_id];
 }
 
 // Switches the current process to the specified process
-int process_switch(struct Process* process)
+int set_current_process(struct Process* process)
 {
-    current_process = process;
+    CURRENT_PROCESS_ = process;
     return 0;
 }
 
@@ -181,9 +181,9 @@ void process_switch_to_any()
 {
     for (int i = 0; i < MAX_PROCESSES; i++)
     {
-        if (processes[i])
+        if (PROCESS_BUFFER_[i])
         {
-            process_switch(processes[i]);
+            set_current_process(PROCESS_BUFFER_[i]);
             return;
         }
     }
@@ -194,9 +194,9 @@ void process_switch_to_any()
 // Removes a process from the process array and switches to another process if necessary
 static void process_unlink(struct Process* process)
 {
-    processes[process->processId] = 0x00;
+    PROCESS_BUFFER_[process->processId] = 0x00;
 
-    if (current_process == process)
+    if (CURRENT_PROCESS_ == process)
     {
         process_switch_to_any();
     }
@@ -365,41 +365,6 @@ out:
     return res;
 }
 
-// Loads an ELF file into a process
-static int process_load_elf(const char* filename, struct Process* process)
-{
-    int res = 0;
-    struct ElfFile* elf_file = 0;
-    res = elf_load(filename, &elf_file);
-    if (ISERR(res))
-    {
-        goto out;
-    }
-
-    process->fileType = PROCESS_FILETYPE_ELF;
-    process->elfFile = elf_file;
-    logAddress("elf_memory : ", (unsigned long)process->elfFile->elf_memory);
-    logAddress("physical_base_address: ", (unsigned long)process->elfFile->physical_base_address);
-    logAddress("physical_end_address: ", (unsigned long)process->elfFile->physical_end_address);
-    logAddress("virtual_base_address: ", (unsigned long)process->elfFile->virtual_base_address);
-    logAddress("virtual_end_address: ", (unsigned long)process->elfFile->virtual_end_address);
-out:
-    return res;
-}
-
-// Loads either an ELF file or a binary file into a process
-static int process_load_data(const char* filename, struct Process* process)
-{
-    int res = 0;
-    res = process_load_elf(filename, process);
-    if (res == -EINFORMAT)
-    {
-        res = process_load_binary(filename, process);
-    }
-
-    return res;
-}
-
 // Maps a binary file into the process's address space
 int process_map_binary(struct Process* process)
 {
@@ -501,22 +466,132 @@ out:
     return res;
 }
 
+// Loads an ELF file into a process
+static int process_load_elf(const char* filename, struct Process* process)
+{
+    int res = 0;
+    struct ElfFile* elf_file = 0;
+    res = elf_load(filename, &elf_file);
+    if (ISERR(res))
+    {
+        goto out;
+    }
+
+    process->fileType = PROCESS_FILETYPE_ELF;
+    process->elfFile = elf_file;
+    logAddress("elf_memory : ", (unsigned long)process->elfFile->elf_memory);
+    logAddress("physical_base_address: ", (unsigned long)process->elfFile->physical_base_address);
+    logAddress("physical_end_address: ", (unsigned long)process->elfFile->physical_end_address);
+    logAddress("virtual_base_address: ", (unsigned long)process->elfFile->virtual_base_address);
+    logAddress("virtual_end_address: ", (unsigned long)process->elfFile->virtual_end_address);
+out:
+    return res;
+}
+
+// Loads either an ELF file or a binary file into a process
+static int process_load_data(const char* filename, struct Process* process)
+{
+    int res = 0;
+    res = process_load_elf(filename, process);
+    if (res == -EINFORMAT)
+    {
+        res = process_load_binary(filename, process);
+    }
+
+    return res;
+}
+
 // Finds a free slot in the process array
-int process_get_free_slot()
+int get_free_process_from_buffer()
 {
     for (int i = 0; i < MAX_PROCESSES; i++)
     {
-        if (processes[i] == 0) return i;
+        if (PROCESS_BUFFER_[i] == 0) return i;
     }
 
     return -EISTKN;
+}
+
+// Loads a process for a specific slot in the process array
+int process_load_for_slot(const char* filename, struct Process** process, int process_slot)
+{
+    int res = 0;
+    struct Task* task = 0;
+    struct Process* new_process_;
+    void* program_stack_ptr = 0;
+
+    if (process_get(process_slot) != 0)
+    {
+        res = -EISTKN;
+        goto out;
+    }
+
+    new_process_ = kzalloc(sizeof(struct Process));
+    if (!new_process_)
+    {
+        res = -ENOMEM;
+        goto out;
+    }
+
+    process_init(new_process_);
+    res = process_load_data(filename, new_process_);
+    if (res < 0)
+    {
+        goto out;
+    }
+
+    program_stack_ptr = kzalloc(USER_PROCESS_STACK_SIZE);
+    if (!program_stack_ptr)
+    {
+        res = -ENOMEM;
+        goto out;
+    }
+
+    strncpy(new_process_->filename, filename, sizeof(new_process_->filename));
+    new_process_->stackPtr = program_stack_ptr;
+    new_process_->processId = process_slot;
+
+    logAddress("stack allocated: ", (unsigned long)new_process_->stackPtr);
+
+    // Create a new task
+    task = task_new(new_process_);
+
+    if (ERROR_I(task) == 0)
+    {
+        res = ERROR_I(task);
+        goto out;
+    }
+
+    new_process_->task = task;
+
+    res = process_map_memory(new_process_);
+    if (res < 0)
+    {
+        goto out;
+    }
+
+    *process = new_process_;
+
+    // Add the process to process buffer
+    PROCESS_BUFFER_[process_slot] = new_process_;
+
+out:
+    if (ISERR(res))
+    {
+        if (new_process_ && new_process_->task)
+        {
+            // Free the process data
+            task_free(new_process_->task);
+        }
+    }
+    return res;
 }
 
 // Loads a process from a file and allocates a slot for it
 int process_load(const char* filename, struct Process** process)
 {
     int res = 0;
-    int process_slot = process_get_free_slot();
+    int process_slot = get_free_process_from_buffer();
     if (process_slot < 0)
     {
         res = -EISTKN;
@@ -534,83 +609,8 @@ int process_load_switch(const char* filename, struct Process** process)
     int res = process_load(filename, process);
     if (res == 0)
     {
-        process_switch(*process);
+        set_current_process(*process);
     }
 
-    return res;
-}
-
-// Loads a process for a specific slot in the process array
-int process_load_for_slot(const char* filename, struct Process** process, int process_slot)
-{
-    int res = 0;
-    struct Task* task = 0;
-    struct Process* _process;
-    void* program_stack_ptr = 0;
-
-    if (process_get(process_slot) != 0)
-    {
-        res = -EISTKN;
-        goto out;
-    }
-
-    _process = kzalloc(sizeof(struct Process));
-    if (!_process)
-    {
-        res = -ENOMEM;
-        goto out;
-    }
-
-    process_init(_process);
-    res = process_load_data(filename, _process);
-    if (res < 0)
-    {
-        goto out;
-    }
-
-    program_stack_ptr = kzalloc(USER_PROCESS_STACK_SIZE);
-    if (!program_stack_ptr)
-    {
-        res = -ENOMEM;
-        goto out;
-    }
-
-    strncpy(_process->filename, filename, sizeof(_process->filename));
-    _process->stackPtr = program_stack_ptr;
-    _process->processId = process_slot;
-
-    logAddress("stack allocated: ", (unsigned long)_process->stackPtr);
-
-    // Create a new task
-    task = task_new(_process);
-
-    if (ERROR_I(task) == 0)
-    {
-        res = ERROR_I(task);
-        goto out;
-    }
-
-    _process->task = task;
-
-    res = process_map_memory(_process);
-    if (res < 0)
-    {
-        goto out;
-    }
-
-    *process = _process;
-
-    // Add the process to process buffer
-    processes[process_slot] = _process;
-
-out:
-    if (ISERR(res))
-    {
-        if (_process && _process->task)
-        {
-            // Free the process data
-            task_free(_process->task);
-        }
-    }
     return res;
 }

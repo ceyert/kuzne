@@ -72,6 +72,7 @@ void idt_handle_exception()
     task_next();
 }
 
+// Used to schedule tasks
 void idt_clock()
 {
     outb(0x20, 0x20);
