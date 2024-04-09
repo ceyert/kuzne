@@ -23,7 +23,7 @@
 
 /*
  Page Directory
-+---------------+       +--------------+
++---------------+       +--------------+                       Base Addr : 0x01000000
 | PD Entry 0    | ----> | Page Table 0 | -----> +----------+      +-------------+
 +---------------+       +--------------+        | Page 0   | ---> | Physical    |
 | PD Entry 1    | ----> | Page Table 1 |        +----------+      | Memory Page |
@@ -40,6 +40,15 @@ Each Page Table contains 1024 Page Entries (for 4KB pages, this maps 4MB of memo
 Each Page Entry maps to a 4KB page in physical memory.
 
 4096 * 1024 = 4194304 (4GB) bytes each page directory entry
+
+64 bits virtual address : 
+0000 1111 1111 1111 | 1111 1111 1111 1111 | 1111 1111 1111 1111 | 1111 1111 1111 1111
+
+PML4 Index: Bits 47-39
+PDPT Index: Bits 38-30
+PD Index: Bits 29-21
+PT Index: Bits 20-12
+Page Offset: Bits 11-0
 */
 
 #define PAGE_SIZE 4096 ///< Size of each page (4KB).
