@@ -1,5 +1,5 @@
-#include "Misc.h"
-#include "idt/Idt.h"
+#include "Misc_isr.h"
+#include "interrupt_descriptor_table/Idt.h"
 #include "task/Task.h"
 
 void *isr80h_command0_sum(struct InterruptFrame *frame) 

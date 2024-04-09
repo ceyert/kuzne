@@ -5,7 +5,8 @@ mkdir ./build
 
 mkdir ./mount_point
 
-mkdir ./build/idt
+mkdir ./build/interrupt_descriptor_table
+mkdir ./build/interrupt_service_routines
 mkdir ./build/memory
 mkdir ./build/memory/heap
 mkdir ./build/memory/paging
@@ -16,7 +17,6 @@ mkdir ./build/string
 mkdir ./build/fs/fat
 mkdir ./build/gdt
 mkdir ./build/task
-mkdir ./build/isr80h
 mkdir ./build/keyboard
 mkdir ./build/loader
 mkdir ./build/loader/formats

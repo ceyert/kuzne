@@ -2,7 +2,7 @@
 #include "Process.h"
 #include "Status.h"
 #include "Task.h"
-#include "idt/Idt.h"
+#include "interrupt_descriptor_table/Idt.h"
 #include "loader/formats/Elfloader.h"
 #include "memory/Memory.h"
 #include "memory/heap/Kheap.h"
@@ -152,7 +152,7 @@ void task_save_state(struct Task* task, struct InterruptFrame* frame)
 // Function to copy a string from one task to another, handling virtual to physical address mapping
 int copy_string_from_task(struct Task* task, void* virtual, void* phys, int max)
 {
-    if (max >= PAGING_PAGE_SIZE)
+    if (max >= PAGE_SIZE)
     {
         return -EINVARG;
     }

@@ -1,3 +1,11 @@
+/**
+ * @file Process.h
+ * @brief Process management and manipulation functions.
+ *
+ * Defines the structure of a process in the system, including its memory allocations, arguments,
+ * and state. Provides functions for creating, switching, and managing processes.
+ */
+
 #ifndef PROCESS_H
 #define PROCESS_H
 
@@ -7,61 +15,70 @@
 #include "Task.h"
 #include "Config.h"
 
-#define PROCESS_FILETYPE_ELF 0
-#define PROCESS_FILETYPE_BINARY 1
+// Process file type definitions
+#define PROCESS_FILETYPE_ELF 0 ///< ELF format.
+#define PROCESS_FILETYPE_BINARY 1 ///< Binary format, such as a.out.
 
-typedef unsigned char process_filetype_t;
+typedef unsigned char process_filetype_t; ///< Type for process file format.
 
+/**
+ * @struct ProcessAllocation
+ * @brief Represents a single memory allocation within a process.
+ */
 struct ProcessAllocation {
-    void *ptr;
-    size_t size;
+    void *ptr;  ///< Pointer to the allocated memory.
+    size_t size; ///< Size of the allocated memory.
 };
 
+/**
+ * @struct CommandArgument
+ * @brief Linked list of command line arguments.
+ */
 struct CommandArgument {
-    char argument[512];
-    struct CommandArgument *next;
+    char argument[512]; ///< Single command line argument.
+    struct CommandArgument *next; ///< Pointer to the next argument in the list.
 };
 
+/**
+ * @struct ProcessArguments
+ * @brief Contains process arguments in a format suitable for passing to a program.
+ */
 struct ProcessArguments {
-    int argc;
-    char **argv;
+    int argc;   ///< Argument count.
+    char **argv; ///< Argument values.
 };
 
+/**
+ * @struct Process
+ * @brief Represents a process in the system.
+ */
 struct Process {
-    // The process id
-    uint16_t processId;
+    uint16_t processId; ///< The process ID.
 
-    char filename[MAX_PATH_SIZE];
+    char filename[MAX_PATH_SIZE]; ///< Filename associated with the process.
 
-    // The main process task
-    struct Task *task;
+    struct Task *task; ///< Main process task.
 
-    // The memory (malloc) allocations of the process
-    struct ProcessAllocation allocations[MAX_PROGRAM_ALLOCATIONS];
+    struct ProcessAllocation allocations[MAX_PROGRAM_ALLOCATIONS]; ///< Memory allocations of the process.
 
-    process_filetype_t fileType;
+    process_filetype_t fileType; ///< File type of the process executable.
 
     union {
-        // The physical pointer to the process memory.
-        void *processBaseAddr;
-        struct ElfFile *elfFile;
+        void *processBaseAddr; ///< Base address of the process memory for binary files.
+        struct ElfFile *elfFile; ///< Pointer to ELF file structure if process is an ELF.
     };
 
+    void *stackPtr; ///< Pointer to the process's stack memory.
 
-    // The physical pointer to the stack memory
-    void *stackPtr;
+    uint32_t size; ///< Size of the process memory.
 
-    // The size of the data pointed to by "ptr"
-    uint32_t size;
-
-    struct KeyboardBuffer {
-        char buffer[KEYBOARD_BUFFER_SIZE];
-        int tail;
-        int head;
+    struct KeyboardBuffer { ///< Keyboard circular buffer for the process.
+        char buffer[KEYBOARD_BUFFER_SIZE]; ///< Actual buffer.
+        int tail; ///< Tail index for the circular buffer.
+        int head; ///< Head index for the circular buffer.
     } keyboard;
 
-    // The arguments of the process.
-    struct ProcessArguments processArguments;
+    struct ProcessArguments processArguments; ///< Command line arguments for the process.
 };
 
 extern int process_switch(struct Process *process);
@@ -86,4 +103,4 @@ extern int process_inject_arguments(struct Process *process, struct CommandArgum
 
 extern int process_terminate(struct Process *process);
 
-#endif
+#endif // PROCESS_H

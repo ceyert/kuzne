@@ -80,10 +80,10 @@ char* ptr_to_hex(const unsigned long ptr)
 
 void* malloc(size_t size)
 {
-    return kuzne_malloc(size);
+    return kuzne_syscall_malloc(size);
 }
 
 void free(void* ptr)
 {
-    kuzne_free(ptr);
+    kuzne_syscall_free(ptr);
 }

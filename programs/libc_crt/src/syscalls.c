@@ -19,7 +19,7 @@ struct CommandArgument* kuzne_parse_command(const char* command, int max)
         goto out;
     }
 
-    root_command = kuzne_malloc(sizeof(struct CommandArgument));
+    root_command = kuzne_syscall_malloc(sizeof(struct CommandArgument));
 
     if (!root_command)
     {
@@ -33,7 +33,7 @@ struct CommandArgument* kuzne_parse_command(const char* command, int max)
     token = strtok(NULL, " ");
     while (token != 0)
     {
-        struct CommandArgument* new_command = kuzne_malloc(sizeof(struct CommandArgument));
+        struct CommandArgument* new_command = kuzne_syscall_malloc(sizeof(struct CommandArgument));
         if (!new_command)
         {
             break;
@@ -54,7 +54,7 @@ int kuzne_getkeyblock()
     int val = 0;
     do
     {
-        val = kuzne_getkey();
+        val = kuzne_syscall_getkey();
     } while (val == 0);
     return val;
 }
@@ -74,7 +74,7 @@ void kuzne_terminal_readline(char* out, int max, bool output_while_typing)
 
         if (output_while_typing)
         {
-            kuzne_putchar(key);
+            kuzne_syscall_putchar(key);
         }
 
         // Backspace
@@ -103,5 +103,5 @@ int kuzne_system_run(const char* command)
         return -1;
     }
 
-    return kuzne_system(root_command_argument);
+    return kuzne_syscall_system(root_command_argument);
 }

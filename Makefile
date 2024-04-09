@@ -1,5 +1,5 @@
 CC = i686-elf-gcc 
-FILES = ./build/kernel.asm.o ./build/kernel.o ./build/loader/formats/elf.o ./build/loader/formats/elfloader.o  ./build/isr80h/isr80h.o ./build/isr80h/process.o ./build/isr80h/heap.o ./build/keyboard/keyboard.o ./build/keyboard/classic.o ./build/isr80h/io.o ./build/isr80h/misc.o ./build/disk/disk.o ./build/disk/streamer.o ./build/task/process.o ./build/task/task.o ./build/task/task.asm.o ./build/task/tss.asm.o ./build/fs/pparser.o ./build/fs/file.o ./build/fs/fat/fat16.o ./build/string/string.o ./build/idt/idt.asm.o ./build/idt/idt.o ./build/memory/memory.o ./build/io/io.asm.o ./build/gdt/gdt.o ./build/gdt/gdt.asm.o ./build/memory/heap/heap.o ./build/memory/heap/kheap.o ./build/memory/paging/paging.o ./build/memory/paging/paging.asm.o ./build/vga/vga.o
+FILES = ./build/kernel.asm.o ./build/kernel.o ./build/loader/formats/elf.o ./build/loader/formats/elfloader.o  ./build/interrupt_service_routines/interrupt_service_routines.o ./build/interrupt_service_routines/process_isr.o ./build/interrupt_service_routines/heap_isr.o ./build/keyboard/keyboard.o ./build/keyboard/classic.o ./build/interrupt_service_routines/io_isr.o ./build/interrupt_service_routines/misc_isr.o ./build/disk/disk.o ./build/disk/streamer.o ./build/task/process.o ./build/task/task.o ./build/task/task.asm.o ./build/task/tss.asm.o ./build/fs/pparser.o ./build/fs/file.o ./build/fs/fat/fat16.o ./build/string/string.o ./build/interrupt_descriptor_table/idt.asm.o ./build/interrupt_descriptor_table/idt.o ./build/memory/memory.o ./build/io/io.asm.o ./build/gdt/gdt.o ./build/gdt/gdt.asm.o ./build/memory/heap/heap.o ./build/memory/heap/kheap.o ./build/memory/paging/paging.o ./build/memory/paging/paging.asm.o ./build/vga/vga.o
 INCLUDES = -I./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
@@ -32,8 +32,8 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/vga/vga.o: ./src/vga/Vga.c
 	$(CC) $(INCLUDES) $(FLAGS) -std=gnu99 -c ./src/vga/Vga.c -o ./build/vga/vga.o	
 
-./build/idt/idt.asm.o: ./src/idt/Idt.asm
-	nasm -f elf -g ./src/idt/Idt.asm -o ./build/idt/idt.asm.o
+./build/interrupt_descriptor_table/idt.asm.o: ./src/interrupt_descriptor_table/Idt.asm
+	nasm -f elf -g ./src/interrupt_descriptor_table/Idt.asm -o ./build/interrupt_descriptor_table/idt.asm.o
 
 ./build/loader/formats/elf.o: ./src/loader/formats/Elf.c
 	$(CC) $(INCLUDES) -I./src/loader/formats $(FLAGS) -std=gnu99 -c ./src/loader/formats/Elf.c -o ./build/loader/formats/elf.o
@@ -47,20 +47,20 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/gdt/gdt.asm.o: ./src/gdt/Gdt.asm
 	nasm -f elf -g ./src/gdt/Gdt.asm -o ./build/gdt/gdt.asm.o
 
-./build/isr80h/isr80h.o: ./src/isr80h/Isr80h.c
-	$(CC) $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/Isr80h.c -o ./build/isr80h/isr80h.o
+./build/interrupt_service_routines/interrupt_service_routines.o: ./src/interrupt_service_routines/interrupt_service_routines.c
+	$(CC) $(INCLUDES) -I./src/interrupt_service_routines $(FLAGS) -std=gnu99 -c ./src/interrupt_service_routines/interrupt_service_routines.c -o ./build/interrupt_service_routines/interrupt_service_routines.o
 
-./build/isr80h/heap.o: ./src/isr80h/Heap.c
-	$(CC) $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/Heap.c -o ./build/isr80h/heap.o
+./build/interrupt_service_routines/heap_isr.o: ./src/interrupt_service_routines/Heap_isr.c
+	$(CC) $(INCLUDES) -I./src/interrupt_service_routines $(FLAGS) -std=gnu99 -c ./src/interrupt_service_routines/Heap_isr.c -o ./build/interrupt_service_routines/heap_isr.o
 
-./build/isr80h/misc.o: ./src/isr80h/Misc.c
-	$(CC) $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/Misc.c -o ./build/isr80h/misc.o
+./build/interrupt_service_routines/misc_isr.o: ./src/interrupt_service_routines/Misc_isr.c
+	$(CC) $(INCLUDES) -I./src/interrupt_service_routines $(FLAGS) -std=gnu99 -c ./src/interrupt_service_routines/Misc_isr.c -o ./build/interrupt_service_routines/misc_isr.o
 
-./build/isr80h/io.o: ./src/isr80h/Io.c
-	$(CC) $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/Io.c -o ./build/isr80h/io.o
+./build/interrupt_service_routines/io_isr.o: ./src/interrupt_service_routines/Io_isr.c
+	$(CC) $(INCLUDES) -I./src/interrupt_service_routines $(FLAGS) -std=gnu99 -c ./src/interrupt_service_routines/Io_isr.c -o ./build/interrupt_service_routines/io_isr.o
 
-./build/isr80h/process.o: ./src/isr80h/Process.c
-	$(CC) $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/Process.c -o ./build/isr80h/process.o
+./build/interrupt_service_routines/process_isr.o: ./src/interrupt_service_routines/Process_isr.c
+	$(CC) $(INCLUDES) -I./src/interrupt_service_routines $(FLAGS) -std=gnu99 -c ./src/interrupt_service_routines/Process_isr.c -o ./build/interrupt_service_routines/process_isr.o
 
 
 ./build/keyboard/keyboard.o: ./src/keyboard/Keyboard.c
@@ -71,8 +71,8 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	$(CC) $(INCLUDES) -I./src/keyboard $(FLAGS) -std=gnu99 -c ./src/keyboard/Classic.c -o ./build/keyboard/classic.o
 
 
-./build/idt/idt.o: ./src/idt/Idt.c
-	$(CC) $(INCLUDES) -I./src/idt $(FLAGS) -std=gnu99 -c ./src/idt/Idt.c -o ./build/idt/idt.o
+./build/interrupt_descriptor_table/idt.o: ./src/interrupt_descriptor_table/Idt.c
+	$(CC) $(INCLUDES) -I./src/interrupt_descriptor_table $(FLAGS) -std=gnu99 -c ./src/interrupt_descriptor_table/Idt.c -o ./build/interrupt_descriptor_table/idt.o
 
 ./build/memory/memory.o: ./src/memory/Memory.c
 	$(CC) $(INCLUDES) -I./src/memory $(FLAGS) -std=gnu99 -c ./src/memory/Memory.c -o ./build/memory/memory.o
@@ -119,8 +119,8 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/fs/file.o: ./src/fs/File.c
 	$(CC) $(INCLUDES) -I./src/fs $(FLAGS) -std=gnu99 -c ./src/fs/File.c -o ./build/fs/file.o
 
-./build/fs/pparser.o: ./src/fs/Pparser.c
-	$(CC) $(INCLUDES) -I./src/fs $(FLAGS) -std=gnu99 -c ./src/fs/Pparser.c -o ./build/fs/pparser.o
+./build/fs/pparser.o: ./src/fs/PathParser.c
+	$(CC) $(INCLUDES) -I./src/fs $(FLAGS) -std=gnu99 -c ./src/fs/PathParser.c -o ./build/fs/pparser.o
 
 ./build/string/string.o: ./src/string/String.c
 	$(CC) $(INCLUDES) -I./src/string $(FLAGS) -std=gnu99 -c ./src/string/String.c -o ./build/string/string.o

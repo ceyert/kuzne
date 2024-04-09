@@ -1,7 +1,7 @@
 #include "Classic.h"
 #include "Kernel.h"
 #include "Keyboard.h"
-#include "idt/Idt.h"
+#include "interrupt_descriptor_table/Idt.h"
 #include "io/Io.h"
 #include "task/Task.h"
 

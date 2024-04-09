@@ -1,48 +1,49 @@
+/**
+ * @file Task.h
+ * @brief Task management for multitasking.
+ *
+ * Provides the definitions and functions necessary for creating, managing, and switching between
+ * tasks in a multitasking environment. A task represents an individual unit of work, such as a process
+ * or thread, within the system.
+ */
+
 #ifndef TASK_H
 #define TASK_H
 
 #include "Config.h"
 #include "memory/paging/Paging.h"
 
-// storage symbol declerations
-struct InterruptFrame;
-struct Process;
+struct InterruptFrame; ///< Forward declaration for interrupt frame structure.
+struct Process; ///< Forward declaration for process structure.
 
+/**
+ * @struct Registers
+ * @brief CPU register context for a task.
+ *
+ * Represents the state of various general-purpose registers of the CPU
+ * at a given point in time. Used for context switching between tasks.
+ */
 struct Registers {
-    uint32_t edi;
-    uint32_t esi;
-    uint32_t ebp;
-    uint32_t ebx;
-    uint32_t edx;
-    uint32_t ecx;
-    uint32_t eax;
-
-    uint32_t ip;
-    uint32_t cs;
-    uint32_t flags;
-    uint32_t esp;
-    uint32_t ss;
+    uint32_t edi, esi, ebp, ebx, edx, ecx, eax; ///< General purpose registers.
+    uint32_t ip, cs, flags, esp, ss; ///< Instruction pointer, code segment, flags, stack pointer, stack segment.
 };
 
+/**
+ * @struct Task
+ * @brief Represents a single task in the system.
+ *
+ * Contains information necessary for task switching, including CPU register state,
+ * page directory for memory management, and linkage to other tasks in a doubly linked list.
+ */
 struct Task {
-    /**
-     * The page directory of the task
-     */
-    struct Paging4GbChunk *page_directory;
-
-    // The registers of the task when the task is not running
-    struct Registers registers;
-
-    // The process of the task
-    struct Process *process;
-
-    // The next task in the linked list
-    struct Task *next;
-
-    // Previous task in the linked list
-    struct Task *prev;
+    struct Paging4GbChunk *page_directory; ///< Page directory for task's virtual memory.
+    struct Registers registers; ///< Saved register state for the task.
+    struct Process *process; ///< Associated process.
+    struct Task *next; ///< Next task in the task list.
+    struct Task *prev; ///< Previous task in the task list.
 };
 
+// Task management functions
 extern struct Task *task_new(struct Process *process);
 
 extern struct Task *task_current();
@@ -67,11 +68,7 @@ extern void user_registers();
 
 extern void task_current_save_state(struct InterruptFrame *frame);
 
-extern int copy_string_from_task(struct Task *task, void * virtual,
-
-void *phys,
-int max
-);
+extern int copy_string_from_task(struct Task *task, void *virtual, void *phys, int max);
 
 extern void *task_get_stack_item(struct Task *task, int index);
 
@@ -79,4 +76,4 @@ extern void *task_virtual_address_to_physical(struct Task *task, void *virtual_a
 
 extern void task_next();
 
-#endif
+#endif // TASK_H

@@ -5,7 +5,7 @@
 
 int putchar(int c)
 {
-    kuzne_putchar((char)c);
+    kuzne_syscall_putchar((char)c);
     return 0;
 }
 

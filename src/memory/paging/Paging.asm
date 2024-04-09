@@ -1,4 +1,4 @@
-[BITS 32]  ; this assembly code is for 32-bit architecture
+[BITS 32]  ; 32-bit architecture
 
 section .asm
 

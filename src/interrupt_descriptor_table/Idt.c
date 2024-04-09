@@ -84,7 +84,7 @@ void idt_init()
     }
 
     idt_set(0, idt_zero);
-    idt_set(0x80, isr80h_wrapper);
+    idt_set(0x80, isr80h_wrapper); // set interrupt service routines
 
     for (int i = 0; i < 0x20; i++)
     {
@@ -143,6 +143,7 @@ void* isr80h_handle_command(int command, struct InterruptFrame* frame)
     return result;
 }
 
+// Executes interrupt service routine called by 'isr80h_wrapper' 
 void* isr80h_handler(int command, struct InterruptFrame* frame)
 {
     void* res = 0;
