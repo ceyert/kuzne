@@ -6,23 +6,42 @@ void paging_load_directory(uint32_t* directory);
 
 static uint32_t* current_directory = 0;
 
+// 4MB memory allocation, 4GB memory access via offseting
 struct Paging4GbChunk* paging_new_4gb(uint8_t flags)
 {
-    uint32_t* directory = kzalloc(sizeof(uint32_t) * TOTAL_PAGES_PER_TABLE);
-    int offset = 0;
+    // 1024 page tables
+    uint32_t* page_tables_ptr = kzalloc(sizeof(uint32_t) * TOTAL_PAGES_PER_TABLE);
+
+    int pagetable_offset_4_mb = 0;
+
     for (int i = 0; i < TOTAL_PAGES_PER_TABLE; i++)
     {
-        uint32_t* entry = kzalloc(sizeof(uint32_t) * TOTAL_PAGES_PER_TABLE);
-        for (int b = 0; b < TOTAL_PAGES_PER_TABLE; b++)
+        // 1024 pages
+        uint32_t* page_table_ptr = kzalloc(sizeof(uint32_t) * TOTAL_PAGES_PER_TABLE);
+
+        // Maps page table with 4MB(1024 * 4KB) physical addresses. 
+        for (int page_idx = 0; page_idx < TOTAL_PAGES_PER_TABLE; page_idx++)
         {
-            entry[b] = (offset + (b * PAGE_SIZE)) | flags;
+            // Map page address with 4KB(PAGE_SIZE) offset
+            page_table_ptr[page_idx] = (pagetable_offset_4_mb + (page_idx * PAGE_SIZE)) | flags;
         }
-        offset += (TOTAL_PAGES_PER_TABLE * PAGE_SIZE);
-        directory[i] = (uint32_t)entry | flags | PAGING_IS_WRITEABLE;
+
+        pagetable_offset_4_mb += (TOTAL_PAGES_PER_TABLE * PAGE_SIZE); // move offset 4MB
+
+        page_tables_ptr[i] = (uint32_t)page_table_ptr | flags | PAGING_IS_WRITEABLE;
     }
 
+    // 1024 page tables
+    // Each page table 1024 pages
+    // Each page 4KB offset
+    // 1024 * 1024 * 4096 = 4294967296 (4GB)
+
+    // 4KB allocation each malloc
+    // 1024 itearations
+    // 1024 * 4096 = 4MB memory allocations
+
     struct Paging4GbChunk* chunk_4gb = kzalloc(sizeof(struct Paging4GbChunk));
-    chunk_4gb->directory_entry = directory;
+    chunk_4gb->directory_entry = page_tables_ptr;
     return chunk_4gb;
 }
 

@@ -7,6 +7,39 @@
  * enabling paging, and mapping virtual addresses to physical addresses.
  */
 
+
+/*
+ Page Directory
++---------------+       +--------------+                       Base Addr : 0x01000000
+| PD Entry 0    | ----> | Page Table 0 | -----> +----------+      +-------------+
++---------------+       +--------------+        | Page 0   | ---> |             |
+| PD Entry 1    | ----> | Page Table 1 |        +----------+      | Page Offset |
++---------------+       +--------------+        | Page 1   |      | (4KB)       |
+| PD Entry 2    |       |   ......     |        +----------+      +-------------+
++---------------+       +--------------+        |  ......  |
+| ......        |       |Page Table 1023|        +----------+
++---------------+       +--------------+        | Page 1023 |
+| PD Entry 1023 |                                +----------+
++---------------+
+
+Each Page Directory Entry points to a Page Table.
+Each Page Table contains 1024 Page Entries (for 4KB pages, this maps 4MB of memory).
+Each Page Entry maps to a 4KB page in physical memory.
+
+*/
+
+
+/*
+64 bits virtual address : 
+0000 1111 1111 1111 | 1111 1111 1111 1111 | 1111 1111 1111 1111 | 1111 1111 1111 1111
+
+PML4 Index: Bits 47-39
+PDPT Index: Bits 38-30
+PD Index: Bits 29-21
+PT Index: Bits 20-12
+Page Offset: Bits 11-0
+*/
+
 #ifndef PAGING_H
 #define PAGING_H
 
@@ -21,34 +54,11 @@
 #define PAGING_IS_PRESENT      0b00000001 ///< Page is present in memory.
 
 
+
 /*
- Page Directory
-+---------------+       +--------------+                       Base Addr : 0x01000000
-| PD Entry 0    | ----> | Page Table 0 | -----> +----------+      +-------------+
-+---------------+       +--------------+        | Page 0   | ---> | Physical    |
-| PD Entry 1    | ----> | Page Table 1 |        +----------+      | Memory Page |
-+---------------+       +--------------+        | Page 1   |      | (4KB)       |
-| PD Entry 2    |       |   ......     |        +----------+      +-------------+
-+---------------+       +--------------+        |  ......  |
-| ......        |       |Page Table 1023|        +----------+
-+---------------+       +--------------+        | Page 1023 |
-| PD Entry 1023 |                                +----------+
-+---------------+
-
-Each Page Directory Entry points to a Page Table.
-Each Page Table contains 1024 Page Entries (for 4KB pages, this maps 4MB of memory).
-Each Page Entry maps to a 4KB page in physical memory.
-
-4096 * 1024 = 4194304 (4GB) bytes each page directory entry
-
-64 bits virtual address : 
-0000 1111 1111 1111 | 1111 1111 1111 1111 | 1111 1111 1111 1111 | 1111 1111 1111 1111
-
-PML4 Index: Bits 47-39
-PDPT Index: Bits 38-30
-PD Index: Bits 29-21
-PT Index: Bits 20-12
-Page Offset: Bits 11-0
+Each page 4096 bytes (4KB)
+Each page table contains 1024 pages 
+Each page table can map 1024 * (4096 bytes) = 4MB
 */
 
 #define PAGE_SIZE 4096 ///< Size of each page (4KB).

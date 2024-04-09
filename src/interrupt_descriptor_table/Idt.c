@@ -30,23 +30,31 @@ void no_interrupt_handler()
     outb(0x20, 0x20);
 }
 
+void idt_zero_callback()
+{
+    panic("Divide by zero error!\n");
+}
+
+
+void idt_page_fault_callback()
+{
+    panic("Page fault error!\n");
+}
+
 void interrupt_handler(int interrupt, struct InterruptFrame* frame)
 {
-    kernel_page();
+    kernel_page(); // switch to kernel pages
+
     if (interrupt_callbacks[interrupt] != 0)
     {
         task_current_save_state(frame);
         interrupt_callbacks[interrupt](frame);
     }
 
-    task_page();
+    task_page(); // switch to process pages
     outb(0x20, 0x20);
 }
 
-void idt_zero()
-{
-    print("Divide by zero error\n");
-}
 
 void idt_set(int interrupt_no, void* address)
 {
@@ -83,8 +91,10 @@ void idt_init()
         idt_set(i, interrupt_pointer_table[i]);
     }
 
-    idt_set(0, idt_zero);
+    // https://wiki.osdev.org/Exceptions
+    idt_set(0, idt_zero_callback);
     idt_set(0x80, isr80h_wrapper); // set interrupt service routines
+    idt_set(0xE, idt_page_fault_callback);
 
     for (int i = 0; i < 0x20; i++)
     {

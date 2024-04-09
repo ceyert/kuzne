@@ -238,6 +238,8 @@ int task_init(struct Task* task, struct Process* process)
         return -EIO;
     }
 
+    logAddress("process page directory: ", (unsigned long)task->page_directory->directory_entry);
+
     task->registers.ip = PROGRAM_VIRTUAL_ADDRESS;
     if (process->fileType == PROCESS_FILETYPE_ELF)
     {
@@ -249,6 +251,10 @@ int task_init(struct Task* task, struct Process* process)
     task->registers.esp = PROGRAM_STACK_VIRTUAL_ADDRESS_START;
 
     task->process = process;
+
+    logAddress("process IP: ", (unsigned long)task->registers.ip);
+    logAddress("process stackPtr: ", (unsigned long)process->stackPtr);
+    logAddress("process esp: ", (unsigned long)task->registers.esp);
 
     return 0;
 }

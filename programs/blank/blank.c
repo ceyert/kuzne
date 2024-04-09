@@ -4,13 +4,27 @@
 
 int main(int argc, char** argv)
 {
-    int value = 48;
-    printf("Value: %i \n", value);
+    {
+        int value = 48;
+        printf("Value: %i \n", value);
+        printf("Value address: %p \n", &value);
+    }
 
-    void* ptr = malloc(512);
-    printf("Allocated memory: %p \n", ptr);
-    printf("Allocated memory: %p \n", &value);
-    free(ptr);
+    {
+        void* ptr = malloc(512);
+        printf("Heap address: %p \n", ptr);
+        free(ptr);
+    }
+
+    /*
+    Page Fault!
+    {
+        char* ptr = (char*)0x5fefa8;
+        *ptr = 5;
+        printf("Value: %i \n", *ptr);
+        printf("Value address: %p \n", ptr);
+    }
+    */
 
     return 0;
 }

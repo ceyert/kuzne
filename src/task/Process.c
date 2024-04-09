@@ -543,8 +543,11 @@ int process_load_for_slot(const char* filename, struct Process** process, int pr
     _process->stackPtr = program_stack_ptr;
     _process->processId = process_slot;
 
-    // Create a task
+    logAddress("process stackPtr allocated: ", (unsigned long)_process->stackPtr);
+
+    // Create a new task
     task = task_new(_process);
+
     if (ERROR_I(task) == 0)
     {
         res = ERROR_I(task);
