@@ -6,9 +6,7 @@ OUTPUT_FORMAT(elf32-i386)
 
 SECTIONS
 {
-    # Start the location counter at virtual address 0x400000, 
-    # which is a common base address for executables.
-    . = 0x400000;
+    . = 0x400000; #4MB offset
 
     # Define the .text section (executable code), aligning it to a 4KB boundary.
     # This helps ensure that the code section starts on a page boundary,

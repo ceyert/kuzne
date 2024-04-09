@@ -4,7 +4,7 @@
 //---------------------------------Block Heap-----------------------------------------
 
 /*
-Heap Table Base Address (0x00007E00) :  .......
+Heap Map Base Address (0x00007E00) :  .......
                                         .  1  .  Entry 1 (8 bits)
                                         .......
                                         .  1  .  Entry 2 (8 bits)
@@ -20,11 +20,11 @@ Heap Base Address (0x01000000)  :       ........
                                         ........
 */
 
-//  480.5 KiB avaiable (https://wiki.osdev.org/Memory_Map_(x86))
-#define HEAP_TABLE_BASE_ADDRESS 0x00007E00
+//  480.5 KiB avaiable : https://wiki.osdev.org/Memory_Map_(x86)
+#define HEAP_MAP_BASE_ADDRESS 0x00007E00 // 31.5 KB offset
 
-// Free to use RAM (https://wiki.osdev.org/Memory_Map_(x86))
-#define HEAP_BASE_ADDRESS 0x01000000
+// Free to use RAM : https://wiki.osdev.org/Memory_Map_(x86)
+#define HEAP_BASE_ADDRESS 0x01000000 // 16MB offset
 
 // 1024 bytes * 1024 = 1048576 (1MB), => 1048576 * 100 = 104857600 (100 MB)
 // 100MB available!
@@ -34,7 +34,7 @@ Heap Base Address (0x01000000)  :       ........
 #define HEAP_BLOCK_SIZE 4096
 
 // Total 25600 blocks (104857600/4096)
-#define TOTAL_BLOCKS TOTAL_HEAP_SIZE / HEAP_BLOCK_SIZE;
+#define TOTAL_HEAP_MAP_BLOCKS TOTAL_HEAP_SIZE / HEAP_BLOCK_SIZE;
 
 //---------------------------------Block Heap-----------------------------------------
 

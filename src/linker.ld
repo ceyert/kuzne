@@ -2,7 +2,7 @@ ENTRY(_start)
 OUTPUT_FORMAT(binary)
 SECTIONS
 {
-    . = 1M;
+    . = 1M; # 0x00100000 1MB offset
     .text : ALIGN(4096)
     {
         *(.text)
