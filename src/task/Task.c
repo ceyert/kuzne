@@ -167,7 +167,7 @@ int copy_string_from_task(struct Task* task, void* virtual, void* phys, int max)
 
     uint32_t* task_directory = task->page_directory->directory_entry;
     uint32_t old_entry = paging_get(task_directory, tmp);
-    paging_map(task->page_directory, tmp, tmp, PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    map_virtual_address_to_physical_address(task->page_directory, tmp, tmp, PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     paging_switch(task->page_directory);
     strncpy(tmp, virtual, max);
     kernel_page();
@@ -232,7 +232,7 @@ int task_init(struct Task* task, struct Process* process)
 {
     memset(task, 0, sizeof(struct Task));
     // Enable 4GB memory regions
-    task->page_directory = enable_4gb_virtual_memory_addresses(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    task->page_directory = enable_4gb_virtual_memory_addressing(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     if (!task->page_directory)
     {
         return -EIO;

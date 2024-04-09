@@ -37,7 +37,7 @@ struct Paging4GbChunk {
  * @param flags Flags to apply to each page in this chunk.
  * @return struct Paging4GbChunk* Pointer to the new 4GB chunk.
  */
-extern struct Paging4GbChunk *enable_4gb_virtual_memory_addresses(uint8_t flags);
+extern struct Paging4GbChunk *enable_4gb_virtual_memory_addressing(uint8_t flags);
 
 /**
  * @brief Switches the current page directory to the one specified by the 4GB chunk.
@@ -117,7 +117,7 @@ extern int paging_map_range(struct Paging4GbChunk *directory, void *virt, void *
  * @param flags Flags for the mapping.
  * @return int Success or failure of the operation.
  */
-extern int paging_map(struct Paging4GbChunk *directory, void *virt, void *phys, int flags);
+extern int map_virtual_address_to_physical_address(struct Paging4GbChunk *directory, void *virt, void *phys, int flags);
 
 /**
  * @brief Aligns an address to the nearest lower page boundary.

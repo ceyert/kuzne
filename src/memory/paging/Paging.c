@@ -7,10 +7,10 @@ void paging_load_directory(uint32_t* directory);
 static uint32_t* current_directory = 0;
 
 
-// Enables 4GB virtual memory addresses. (32 bits memory addresses) 
+// Enables 4GB virtual memory addressing. (32 bits memory addresses) 
 // Regions not mapped with physical memory yet.
 // Allocates 4MB for pages, 
-struct Paging4GbChunk* enable_4gb_virtual_memory_addresses(uint8_t flags)
+struct Paging4GbChunk* enable_4gb_virtual_memory_addressing(uint8_t flags)
 {
     // Page tables ptr
     uint32_t* page_tables_ptr = kzalloc(sizeof(uint32_t) * TOTAL_PAGES_PER_TABLE);
@@ -115,7 +115,7 @@ void* paging_align_to_lower_page(void* addr)
     return (void*)_addr;
 }
 
-int paging_map(struct Paging4GbChunk* directory, void* virt, void* phys, int flags)
+int map_virtual_address_to_physical_address(struct Paging4GbChunk* directory, void* virt, void* phys, int flags)
 {
     if (((unsigned int)virt % PAGE_SIZE) || ((unsigned int)phys % PAGE_SIZE))
     {
@@ -130,7 +130,7 @@ int paging_map_range(struct Paging4GbChunk* directory, void* virt, void* phys, i
     int res = 0;
     for (int i = 0; i < count; i++)
     {
-        res = paging_map(directory, virt, phys, flags);
+        res = map_virtual_address_to_physical_address(directory, virt, phys, flags);
         if (res < 0) break;
         virt += PAGE_SIZE;
         phys += PAGE_SIZE;

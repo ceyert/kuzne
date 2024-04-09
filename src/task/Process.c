@@ -479,7 +479,6 @@ static int process_load_elf(const char* filename, struct Process* process)
 
     process->fileType = PROCESS_FILETYPE_ELF;
     process->elfFile = elf_file;
-    logAddress("elf_memory : ", (unsigned long)process->elfFile->elf_memory);
     logAddress("physical_base_address: ", (unsigned long)process->elfFile->physical_base_address);
     logAddress("physical_end_address: ", (unsigned long)process->elfFile->physical_end_address);
     logAddress("virtual_base_address: ", (unsigned long)process->elfFile->virtual_base_address);

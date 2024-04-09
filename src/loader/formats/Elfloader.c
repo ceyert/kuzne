@@ -1,4 +1,5 @@
 #include "Config.h"
+#include "vga/Vga.h"
 #include "Elfloader.h"
 #include "Kernel.h"
 #include "Status.h"
@@ -199,6 +200,9 @@ int elf_load(const char* filename, struct ElfFile** file_out)
     }
 
     elf_file->elf_memory = kzalloc(stat.filesize);
+    
+    logAddress("elf_memory : ", (unsigned long)elf_file->elf_memory);
+
     res = fread(elf_file->elf_memory, stat.filesize, 1, fd);
     if (res < 0)
     {
