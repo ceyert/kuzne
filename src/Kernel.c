@@ -18,12 +18,12 @@
 #include "process/Tss.h"
 #include "vga/Vga.h"
 
-static struct Paging4GbChunk* kernel_chunk = 0;
+static struct Paging4GbChunk* KERNEL_PAGE_DIRECTORY_ = 0;
 
 void kernel_page()
 {
     kernel_registers();
-    set_current_page_directory(kernel_chunk);
+    set_current_page_directory(KERNEL_PAGE_DIRECTORY_);
 }
 
 struct Tss Tss;
@@ -71,10 +71,10 @@ void kernel_main()
     tss_load(0x28);
 
     // Setup paging
-    kernel_chunk = enable_4gb_virtual_memory_addressing(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    KERNEL_PAGE_DIRECTORY_ = enable_4gb_virtual_memory_addressing(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
 
     // Switch to kernel paging chunk
-    set_current_page_directory(kernel_chunk);
+    set_current_page_directory(KERNEL_PAGE_DIRECTORY_);
 
     // Enable paging
     enable_paging();
