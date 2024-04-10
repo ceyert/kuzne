@@ -11,11 +11,11 @@
 #include "vga/Vga.h"
 
 // The current task that is running
-struct Task* current_task = 0;
+struct Task* CURRENT_TASK_ = 0;
 
-// Task linked list
-struct Task* task_tail = 0;
-struct Task* task_head = 0;
+// Task doubly linked list
+struct Task* TASK_FRONT_ = 0;
+struct Task* TASK_TAIL_ = 0;
 
 // Function to initialize a task with a given process
 int task_init(struct Task* task, struct Process* process);
@@ -23,57 +23,60 @@ int task_init(struct Task* task, struct Process* process);
 // Function to retrieve the currently running task
 struct Task* task_current()
 {
-    return current_task;
+    return CURRENT_TASK_;
 }
 
 // Function to create a new task for a given process
 struct Task* task_new(struct Process* process)
 {
     int res = 0;
-    struct Task* task = kzalloc(sizeof(struct Task));
-    if (!task)
+    struct Task* newTask = kzalloc(sizeof(struct Task));
+    if (!newTask)
     {
         res = -ENOMEM;
         goto out;
     }
 
-    res = task_init(task, process);
+    res = task_init(newTask, process);
     if (res != ALL_OK)
     {
         goto out;
     }
 
-    if (task_head == 0)
+    if (TASK_FRONT_ == 0)
     {
-        task_head = task;
-        task_tail = task;
-        current_task = task;
+        TASK_FRONT_ = newTask;
+        TASK_TAIL_ = newTask;
+        CURRENT_TASK_ = newTask;
         goto out;
     }
 
-    task_tail->next = task;
-    task->prev = task_tail;
-    task_tail = task;
+    // add newTask to queue
+    {
+        TASK_TAIL_->next = newTask;
+        newTask->prev = TASK_TAIL_;
+        TASK_TAIL_ = newTask;
+    }
 
 out:
     if (ISERR(res))
     {
-        task_free(task);
+        task_free(newTask);
         return ERROR(res);
     }
 
-    return task;
+    return newTask;
 }
 
 // Function to get the next task in the linked list
 struct Task* task_get_next()
 {
-    if (!current_task->next)
+    if (!CURRENT_TASK_->next)
     {
-        return task_head;
+        return TASK_FRONT_;
     }
 
-    return current_task->next;
+    return CURRENT_TASK_->next;
 }
 
 // Internal function to remove a task from the task list
@@ -84,19 +87,19 @@ static void task_list_remove(struct Task* task)
         task->prev->next = task->next;
     }
 
-    if (task == task_head)
+    if (task == TASK_FRONT_)
     {
-        task_head = task->next;
+        TASK_FRONT_ = task->next;
     }
 
-    if (task == task_tail)
+    if (task == TASK_TAIL_)
     {
-        task_tail = task->prev;
+        TASK_TAIL_ = task->prev;
     }
 
-    if (task == current_task)
+    if (task == CURRENT_TASK_)
     {
-        current_task = task_get_next();
+        CURRENT_TASK_ = task_get_next();
     }
 }
 
@@ -127,7 +130,7 @@ void task_next()
 // Function to switch the current task to a specified task
 int task_switch(struct Task* task)
 {
-    current_task = task;
+    CURRENT_TASK_ = task;
     paging_switch(task->page_directory);
     return 0;
 }
@@ -203,7 +206,7 @@ void task_current_save_state(struct InterruptFrame* frame)
 int task_page()
 {
     user_registers();
-    task_switch(current_task);
+    task_switch(CURRENT_TASK_);
     return 0;
 }
 
@@ -218,13 +221,13 @@ int task_page_task(struct Task* task)
 // Function to start the first ever task in the system
 void task_run_first_ever_task()
 {
-    if (!current_task)
+    if (!CURRENT_TASK_)
     {
         panic("task_run_first_ever_task(): No current task exists!\n");
     }
 
-    task_switch(task_head);
-    task_return(&task_head->registers);
+    task_switch(TASK_FRONT_);
+    task_return(&TASK_FRONT_->registers);
 }
 
 // Function to initialize a task, setting up its page directory and registers
