@@ -23,7 +23,7 @@ static struct Paging4GbChunk* kernel_chunk = 0;
 void kernel_page()
 {
     kernel_registers();
-    paging_switch(kernel_chunk);
+    set_current_page_directory(kernel_chunk);
 }
 
 struct Tss Tss;
@@ -74,7 +74,7 @@ void kernel_main()
     kernel_chunk = enable_4gb_virtual_memory_addressing(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
 
     // Switch to kernel paging chunk
-    paging_switch(kernel_chunk);
+    set_current_page_directory(kernel_chunk);
 
     // Enable paging
     enable_paging();
@@ -92,7 +92,7 @@ void kernel_main()
         panic("Failed to load shell.elf\n");
     }
 
-    task_run_first_ever_task();
+    run_first_task();
 
     while (1)
     {

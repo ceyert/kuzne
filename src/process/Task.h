@@ -52,13 +52,13 @@ extern struct Task *task_get_next();
 
 extern int task_free(struct Task *task);
 
-extern int task_switch(struct Task *task);
+extern int set_current_task(struct Task *task);
 
 extern int task_page();
 
 extern int task_page_task(struct Task *task);
 
-extern void task_run_first_ever_task();
+extern void run_first_task();
 
 extern void task_return(struct Registers *regs);
 
@@ -74,6 +74,6 @@ extern void *task_get_stack_item(struct Task *task, int index);
 
 extern void *task_virtual_address_to_physical(struct Task *task, void *virtual_address);
 
-extern void task_next();
+extern void run_next_task();
 
 #endif // TASK_H

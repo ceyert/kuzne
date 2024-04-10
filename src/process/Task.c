@@ -17,16 +17,15 @@ struct Task* CURRENT_TASK_ = 0;
 struct Task* TASK_FRONT_ = 0;
 struct Task* TASK_TAIL_ = 0;
 
-// Function to initialize a task with a given process
 int task_init(struct Task* task, struct Process* process);
 
-// Function to retrieve the currently running task
+
 struct Task* task_current()
 {
     return CURRENT_TASK_;
 }
 
-// Function to create a new task for a given process
+
 struct Task* task_new(struct Process* process)
 {
     int res = 0;
@@ -68,7 +67,7 @@ out:
     return newTask;
 }
 
-// Function to get the next task in the linked list
+// get next task in linked list
 struct Task* task_get_next()
 {
     if (!CURRENT_TASK_->next)
@@ -79,8 +78,8 @@ struct Task* task_get_next()
     return CURRENT_TASK_->next;
 }
 
-// Internal function to remove a task from the task list
-static void task_list_remove(struct Task* task)
+// remove task from linked list
+static void remove_task_from_list(struct Task* task)
 {
     if (task->prev)
     {
@@ -107,7 +106,7 @@ static void task_list_remove(struct Task* task)
 int task_free(struct Task* task)
 {
     paging_free_4gb(task->page_directory);
-    task_list_remove(task);
+    remove_task_from_list(task);
 
     // Finally free the task data
     kfree(task);
@@ -115,7 +114,7 @@ int task_free(struct Task* task)
 }
 
 // Function to switch to the next task
-void task_next()
+void run_next_task()
 {
     struct Task* next_task = task_get_next();
     if (!next_task)
@@ -123,15 +122,15 @@ void task_next()
         panic("No more tasks!\n");
     }
 
-    task_switch(next_task);
+    set_current_task(next_task);
     task_return(&next_task->registers);
 }
 
 // Function to switch the current task to a specified task
-int task_switch(struct Task* task)
+int set_current_task(struct Task* task)
 {
     CURRENT_TASK_ = task;
-    paging_switch(task->page_directory);
+    set_current_page_directory(task->page_directory);
     return 0;
 }
 
@@ -171,7 +170,7 @@ int copy_string_from_task(struct Task* task, void* virtual, void* phys, int max)
     uint32_t* task_directory = task->page_directory->directory_entry;
     uint32_t old_entry = paging_get(task_directory, tmp);
     map_virtual_address_to_physical_address(task->page_directory, tmp, tmp, PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
-    paging_switch(task->page_directory);
+    set_current_page_directory(task->page_directory);
     strncpy(tmp, virtual, max);
     kernel_page();
 
@@ -206,7 +205,7 @@ void task_current_save_state(struct InterruptFrame* frame)
 int task_page()
 {
     user_registers();
-    task_switch(CURRENT_TASK_);
+    set_current_task(CURRENT_TASK_);
     return 0;
 }
 
@@ -214,19 +213,19 @@ int task_page()
 int task_page_task(struct Task* task)
 {
     user_registers();
-    paging_switch(task->page_directory);
+    set_current_page_directory(task->page_directory);
     return 0;
 }
 
-// Function to start the first ever task in the system
-void task_run_first_ever_task()
+// Function to start the first task
+void run_first_task()
 {
     if (!CURRENT_TASK_)
     {
-        panic("task_run_first_ever_task(): No current task exists!\n");
+        panic("No current task exists!\n");
     }
 
-    task_switch(TASK_FRONT_);
+    set_current_task(TASK_FRONT_);
     task_return(&TASK_FRONT_->registers);
 }
 
@@ -234,8 +233,10 @@ void task_run_first_ever_task()
 int task_init(struct Task* task, struct Process* process)
 {
     memset(task, 0, sizeof(struct Task));
+
     // Enable 4GB memory regions
     task->page_directory = enable_4gb_virtual_memory_addressing(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+
     if (!task->page_directory)
     {
         return -EIO;

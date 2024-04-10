@@ -221,8 +221,10 @@ int process_terminate(struct Process* process)
 
     // Free the process stack memory.
     kfree(process->stackPtr);
+
     // Free the task
     task_free(process->task);
+    
     // Unlink the process from the process array.
     process_unlink(process);
 
@@ -318,7 +320,7 @@ void process_free(struct Process* process, void* ptr)
 }
 
 // Loads a binary file into a process
-static int process_load_binary(const char* filename, struct Process* process)
+static int load_binary_file(const char* filename, struct Process* process)
 {
     void* program_data_ptr = 0x00;
     int res = 0;
@@ -467,11 +469,14 @@ out:
 }
 
 // Loads an ELF file into a process
-static int process_load_elf(const char* filename, struct Process* process)
+static int load_elf_file(const char* filename, struct Process* process)
 {
     int res = 0;
+
     struct ElfFile* elf_file = 0;
+
     res = elf_load(filename, &elf_file);
+
     if (ISERR(res))
     {
         goto out;
@@ -488,13 +493,13 @@ out:
 }
 
 // Loads either an ELF file or a binary file into a process
-static int process_load_data(const char* filename, struct Process* process)
+static int load_program_file(const char* filename, struct Process* process)
 {
     int res = 0;
-    res = process_load_elf(filename, process);
+    res = load_elf_file(filename, process);
     if (res == -EINFORMAT)
     {
-        res = process_load_binary(filename, process);
+        res = load_binary_file(filename, process);
     }
 
     return res;
@@ -533,7 +538,7 @@ int process_load_for_slot(const char* filename, struct Process** process, int pr
     }
 
     process_init(new_process_);
-    res = process_load_data(filename, new_process_);
+    res = load_program_file(filename, new_process_);
     if (res < 0)
     {
         goto out;

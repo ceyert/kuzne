@@ -44,7 +44,7 @@ extern struct Paging4GbChunk *enable_4gb_virtual_memory_addressing(uint8_t flags
  *
  * @param directory Pointer to the paging chunk whose directory to switch to.
  */
-extern void paging_switch(struct Paging4GbChunk *directory);
+extern void set_current_page_directory(struct Paging4GbChunk *directory);
 
 /**
  * @brief Enables paging on the system.

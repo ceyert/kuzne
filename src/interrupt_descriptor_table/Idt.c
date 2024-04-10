@@ -69,7 +69,7 @@ void idt_set(int interrupt_no, void* address)
 void idt_handle_exception()
 {
     process_terminate(task_current()->process);
-    task_next();
+    run_next_task();
 }
 
 // Used to schedule tasks
@@ -78,7 +78,7 @@ void idt_clock()
     outb(0x20, 0x20);
 
     // Switch to the next task
-    task_next();
+    run_next_task();
 }
 
 void idt_init()

@@ -27,7 +27,7 @@ void* isr80h_command6_process_load_start(struct InterruptFrame* frame)
         goto out;
     }
 
-    task_switch(process->task);
+    set_current_task(process->task);
     task_return(&process->task->registers);
 
 out:
@@ -63,7 +63,7 @@ void* isr80h_command7_invoke_system_command(struct InterruptFrame* frame)
         return ERROR(res);
     }
 
-    task_switch(process->task);
+    set_current_task(process->task);
     task_return(&process->task->registers);
 
     return 0;
@@ -82,7 +82,10 @@ void* isr80h_command8_get_program_arguments(struct InterruptFrame* frame)
 void* isr80h_command9_exit(struct InterruptFrame* frame)
 {
     struct Process* process = task_current()->process;
+
     process_terminate(process);
-    task_next();
+    
+    run_next_task();
+    
     return 0;
 }
