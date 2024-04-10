@@ -2,8 +2,8 @@
 #include "Kernel.h"
 #include "Keyboard.h"
 #include "Status.h"
-#include "task/Process.h"
-#include "task/Task.h"
+#include "process/Process.h"
+#include "process/Task.h"
 
 static struct Keyboard* keyboard_list_head = 0;
 static struct Keyboard* keyboard_list_last = 0;

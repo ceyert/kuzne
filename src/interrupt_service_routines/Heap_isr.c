@@ -1,6 +1,6 @@
 #include "Heap_isr.h"
-#include "task/Process.h"
-#include "task/Task.h"
+#include "process/Process.h"
+#include "process/Task.h"
 #include <stddef.h>
 
 void* isr80h_command4_malloc(struct InterruptFrame* frame)

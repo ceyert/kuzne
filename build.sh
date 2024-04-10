@@ -16,10 +16,9 @@ mkdir ./build/fs
 mkdir ./build/string
 mkdir ./build/fs/fat
 mkdir ./build/gdt
-mkdir ./build/task
+mkdir ./build/process
 mkdir ./build/keyboard
 mkdir ./build/loader
-mkdir ./build/loader/formats
 mkdir ./build/vga
 
 mkdir ./programs/blank/build

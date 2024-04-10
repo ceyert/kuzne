@@ -4,8 +4,8 @@
 #include "Status.h"
 #include "io/Io.h"
 #include "memory/Memory.h"
-#include "task/Process.h"
-#include "task/Task.h"
+#include "process/Process.h"
+#include "process/Task.h"
 #include "vga/Vga.h"
 
 struct IdtDesc idt_descriptors[TOTAL_INTERRUPTS];

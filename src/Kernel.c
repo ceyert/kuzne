@@ -13,9 +13,9 @@
 #include "memory/heap/Kheap.h"
 #include "memory/paging/Paging.h"
 #include "string/String.h"
-#include "task/Process.h"
-#include "task/Task.h"
-#include "task/Tss.h"
+#include "process/Process.h"
+#include "process/Task.h"
+#include "process/Tss.h"
 #include "vga/Vga.h"
 
 static struct Paging4GbChunk* kernel_chunk = 0;

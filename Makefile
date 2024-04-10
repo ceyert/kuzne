@@ -1,5 +1,5 @@
 CC = i686-elf-gcc 
-FILES = ./build/kernel.asm.o ./build/kernel.o ./build/loader/formats/elf.o ./build/loader/formats/elfloader.o  ./build/interrupt_service_routines/interrupt_service_routines.o ./build/interrupt_service_routines/process_isr.o ./build/interrupt_service_routines/heap_isr.o ./build/keyboard/keyboard.o ./build/keyboard/classic.o ./build/interrupt_service_routines/io_isr.o ./build/interrupt_service_routines/misc_isr.o ./build/disk/disk.o ./build/disk/streamer.o ./build/task/process.o ./build/task/task.o ./build/task/task.asm.o ./build/task/tss.asm.o ./build/fs/pparser.o ./build/fs/file.o ./build/fs/fat/fat16.o ./build/string/string.o ./build/interrupt_descriptor_table/idt.asm.o ./build/interrupt_descriptor_table/idt.o ./build/memory/memory.o ./build/io/io.asm.o ./build/gdt/gdt.o ./build/gdt/gdt.asm.o ./build/memory/heap/heap.o ./build/memory/heap/kheap.o ./build/memory/paging/paging.o ./build/memory/paging/paging.asm.o ./build/vga/vga.o
+FILES = ./build/kernel.asm.o ./build/kernel.o ./build/loader/elf.o ./build/loader/elfloader.o  ./build/interrupt_service_routines/interrupt_service_routines.o ./build/interrupt_service_routines/process_isr.o ./build/interrupt_service_routines/heap_isr.o ./build/keyboard/keyboard.o ./build/keyboard/classic.o ./build/interrupt_service_routines/io_isr.o ./build/interrupt_service_routines/misc_isr.o ./build/disk/disk.o ./build/disk/streamer.o ./build/process/process.o ./build/process/task.o ./build/process/task.asm.o ./build/process/tss.asm.o ./build/fs/pparser.o ./build/fs/file.o ./build/fs/fat/fat16.o ./build/string/string.o ./build/interrupt_descriptor_table/idt.asm.o ./build/interrupt_descriptor_table/idt.o ./build/memory/memory.o ./build/io/io.asm.o ./build/gdt/gdt.o ./build/gdt/gdt.asm.o ./build/memory/heap/heap.o ./build/memory/heap/kheap.o ./build/memory/paging/paging.o ./build/memory/paging/paging.asm.o ./build/vga/vga.o
 INCLUDES = -I./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
@@ -35,11 +35,11 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/interrupt_descriptor_table/idt.asm.o: ./src/interrupt_descriptor_table/Idt.asm
 	nasm -f elf -g ./src/interrupt_descriptor_table/Idt.asm -o ./build/interrupt_descriptor_table/idt.asm.o
 
-./build/loader/formats/elf.o: ./src/loader/formats/Elf.c
-	$(CC) $(INCLUDES) -I./src/loader/formats $(FLAGS) -std=gnu99 -c ./src/loader/formats/Elf.c -o ./build/loader/formats/elf.o
+./build/loader/elf.o: ./src/loader/Elf.c
+	$(CC) $(INCLUDES) -I./src/loader $(FLAGS) -std=gnu99 -c ./src/loader/Elf.c -o ./build/loader/elf.o
 
-./build/loader/formats/elfloader.o: ./src/loader/formats/Elfloader.c
-	$(CC) $(INCLUDES) -I./src/loader/formats $(FLAGS) -std=gnu99 -c ./src/loader/formats/Elfloader.c -o ./build/loader/formats/elfloader.o
+./build/loader/elfloader.o: ./src/loader/Elfloader.c
+	$(CC) $(INCLUDES) -I./src/loader $(FLAGS) -std=gnu99 -c ./src/loader/Elfloader.c -o ./build/loader/elfloader.o
 
 ./build/gdt/gdt.o: ./src/gdt/Gdt.c
 	$(CC) $(INCLUDES) -I./src/gdt $(FLAGS) -std=gnu99 -c ./src/gdt/Gdt.c -o ./build/gdt/gdt.o
@@ -78,18 +78,18 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	$(CC) $(INCLUDES) -I./src/memory $(FLAGS) -std=gnu99 -c ./src/memory/Memory.c -o ./build/memory/memory.o
 
 
-./build/task/process.o: ./src/task/Process.c
-	$(CC) $(INCLUDES) -I./src/task $(FLAGS) -std=gnu99 -c ./src/task/Process.c -o ./build/task/process.o
+./build/process/process.o: ./src/process/Process.c
+	$(CC) $(INCLUDES) -I./src/process $(FLAGS) -std=gnu99 -c ./src/process/Process.c -o ./build/process/process.o
 
 
-./build/task/task.o: ./src/task/Task.c
-	$(CC) $(INCLUDES) -I./src/task $(FLAGS) -std=gnu99 -c ./src/task/Task.c -o ./build/task/task.o
+./build/process/task.o: ./src/process/Task.c
+	$(CC) $(INCLUDES) -I./src/process $(FLAGS) -std=gnu99 -c ./src/process/Task.c -o ./build/process/task.o
 
-./build/task/task.asm.o: ./src/task/Task.asm
-	nasm -f elf -g ./src/task/Task.asm -o ./build/task/task.asm.o
+./build/process/task.asm.o: ./src/process/Task.asm
+	nasm -f elf -g ./src/process/Task.asm -o ./build/process/task.asm.o
 
-./build/task/tss.asm.o: ./src/task/Tss.asm
-	nasm -f elf -g ./src/task/Tss.asm -o ./build/task/tss.asm.o
+./build/process/tss.asm.o: ./src/process/Tss.asm
+	nasm -f elf -g ./src/process/Tss.asm -o ./build/process/tss.asm.o
 
 ./build/io/io.asm.o: ./src/io/Io.asm
 	nasm -f elf -g ./src/io/Io.asm -o ./build/io/io.asm.o

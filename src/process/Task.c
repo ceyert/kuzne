@@ -3,7 +3,7 @@
 #include "Status.h"
 #include "Task.h"
 #include "interrupt_descriptor_table/Idt.h"
-#include "loader/formats/Elfloader.h"
+#include "loader/Elfloader.h"
 #include "memory/Memory.h"
 #include "memory/heap/Kheap.h"
 #include "memory/paging/Paging.h"
@@ -247,7 +247,7 @@ int task_init(struct Task* task, struct Process* process)
 
     task->registers.ss = USER_DATA_SEGMENT;
     task->registers.cs = USER_CODE_SEGMENT;
-    task->registers.esp = USER_PROCESS_STACK_VIRTUAL_ADDRESS_BASE;
+    task->registers.esp = USER_PROCESS_STACK_VIRTUAL_ADDRESS_END; // SP grows high to low
 
     task->process = process;
 

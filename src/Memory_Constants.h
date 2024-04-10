@@ -1,7 +1,7 @@
 #ifndef MEMORY_CONSTANTS_H
 #define MEMORY_CONSTANTS_H
 
-//---------------------------------Block Heap-----------------------------------------
+//****************************************** Heap Map ******************************************
 
 /*
 Heap Map Base Address (0x00007E00) :  .......
@@ -36,10 +36,10 @@ Heap Base Address (0x01000000)  :       ........
 // Total 25600 blocks (104857600/4096)
 #define TOTAL_HEAP_MAP_BLOCKS TOTAL_HEAP_SIZE / HEAP_BLOCK_SIZE;
 
-//---------------------------------Block Heap-----------------------------------------
+//****************************************** Heap Map ******************************************
 
 
-//---------------------------------Paging-----------------------------------------
+//****************************************** Paging ******************************************
 
 /*
  Page Directory
@@ -74,10 +74,10 @@ Each page table can map 1024 * (4096 bytes) = 4MB
 #define PAGE_SIZE 4096 ///< Size of page (4KB).
 #define TOTAL_PAGES_PER_TABLE 1024 ///< Number of pages per page table.
 
-//---------------------------------Paging-----------------------------------------
+//****************************************** Paging ******************************************
 
 
-//--------------------------------- Pre-Defined User Process Virtual Addresses -----------------------------------------
+//****************************************** Pre-Defined User Process Virtual Addresses ******************************************
 
 /*
 On protected mode, CPU uses virtual memory by hardware default via MMU.
@@ -91,14 +91,19 @@ Process2 load/store : 0x400000 -> 0x360000
 After ELF allocated into memory, kernel must map virtual regions to physical regions. 
 */
 
-// 0x400000 is base virtual address each process(linker.ld) 
+// program linker.ld 
 #define USER_PROCESS_VIRTUAL_BASE_ADDRESS_NON_ELF 0x400000
 
-#define USER_PROCESS_STACK_SIZE 1024 * 16
-#define USER_PROCESS_STACK_VIRTUAL_ADDRESS_BASE 0x3FF000
-#define USER_PROCESS_STACK_VIRTUAL_ADDRESS_END USER_PROCESS_STACK_VIRTUAL_ADDRESS_BASE - USER_PROCESS_STACK_SIZE
+#define USER_PROCESS_STACK_SIZE 1024 * 16 // 16 KB stack size
 
-//--------------------------------- Pre-Defined User Process Virtual Addresses -----------------------------------------
+// 0x400000 - 0x3FF000 = 4096 (4KB) GAP between process base address and stack end.
+// This 4KB GAP between process's code/data base address and the end of the stack, guard region (PAGE_FAULT) to prevent stack overflow from corrupting the process's code/data.
+#define USER_PROCESS_STACK_VIRTUAL_ADDRESS_END 0x3FF000    
+
+// 0x3FB000
+#define USER_PROCESS_STACK_VIRTUAL_ADDRESS_BASE (USER_PROCESS_STACK_VIRTUAL_ADDRESS_END - USER_PROCESS_STACK_SIZE)
+
+//****************************************** Pre-Defined User Process Virtual Addresses ******************************************
 
 
 #endif

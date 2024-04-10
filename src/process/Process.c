@@ -3,12 +3,12 @@
 #include "Process.h"
 #include "Status.h"
 #include "fs/File.h"
-#include "loader/formats/Elfloader.h"
+#include "loader/Elfloader.h"
 #include "memory/Memory.h"
 #include "memory/heap/Kheap.h"
 #include "memory/paging/Paging.h"
 #include "string/String.h"
-#include "task/Task.h"
+#include "process/Task.h"
 #include "vga/Vga.h"
 
 // The current process that is running
@@ -455,12 +455,12 @@ int process_map_memory(struct Process* process)
 
     // Maps physical stack memory address with predefined stack virtual memory address.
     paging_map_to(process->task->page_directory, 
-                (void*)USER_PROCESS_STACK_VIRTUAL_ADDRESS_END, process->stackPtr,
+                (void*)USER_PROCESS_STACK_VIRTUAL_ADDRESS_BASE, process->stackPtr,
                 paging_align_address(process->stackPtr + USER_PROCESS_STACK_SIZE),
                 PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITEABLE);
 
     logAddress("stack: ", (unsigned long)process->stackPtr);
-    logAddress("mapped with pre-defined stack end: ", USER_PROCESS_STACK_VIRTUAL_ADDRESS_END);
+    logAddress("mapped with pre-defined stack base: ", USER_PROCESS_STACK_VIRTUAL_ADDRESS_BASE);
 
 out:
     return res;
