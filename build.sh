@@ -15,7 +15,7 @@ mkdir ./build/disk
 mkdir ./build/fs
 mkdir ./build/string
 mkdir ./build/fs/fat
-mkdir ./build/gdt
+mkdir ./build/global_descriptor_table
 mkdir ./build/process
 mkdir ./build/keyboard
 mkdir ./build/loader

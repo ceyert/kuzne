@@ -1,5 +1,5 @@
 CC = i686-elf-gcc 
-FILES = ./build/kernel.asm.o ./build/kernel.o ./build/loader/elf.o ./build/loader/elfloader.o  ./build/interrupt_service_routines/interrupt_service_routines.o ./build/interrupt_service_routines/process_isr.o ./build/interrupt_service_routines/heap_isr.o ./build/keyboard/keyboard.o ./build/keyboard/classic.o ./build/interrupt_service_routines/io_isr.o ./build/interrupt_service_routines/misc_isr.o ./build/disk/disk.o ./build/disk/streamer.o ./build/process/process.o ./build/process/task.o ./build/process/task.asm.o ./build/process/tss.asm.o ./build/fs/pparser.o ./build/fs/file.o ./build/fs/fat/fat16.o ./build/string/string.o ./build/interrupt_descriptor_table/idt.asm.o ./build/interrupt_descriptor_table/idt.o ./build/memory/memory.o ./build/io/io.asm.o ./build/gdt/gdt.o ./build/gdt/gdt.asm.o ./build/memory/heap/heap.o ./build/memory/heap/kheap.o ./build/memory/paging/paging.o ./build/memory/paging/paging.asm.o ./build/vga/vga.o
+FILES = ./build/kernel.asm.o ./build/kernel.o ./build/loader/elf.o ./build/loader/elfloader.o  ./build/interrupt_service_routines/interrupt_service_routines.o ./build/interrupt_service_routines/process_isr.o ./build/interrupt_service_routines/heap_isr.o ./build/keyboard/keyboard.o ./build/keyboard/classic.o ./build/interrupt_service_routines/io_isr.o ./build/interrupt_service_routines/misc_isr.o ./build/disk/disk.o ./build/disk/streamer.o ./build/process/process.o ./build/process/task.o ./build/process/task.asm.o ./build/process/tss.asm.o ./build/fs/pparser.o ./build/fs/file.o ./build/fs/fat/fat16.o ./build/string/string.o ./build/interrupt_descriptor_table/idt.asm.o ./build/interrupt_descriptor_table/idt.o ./build/memory/memory.o ./build/io/io.asm.o ./build/global_descriptor_table/gdt.o ./build/global_descriptor_table/gdt.asm.o ./build/memory/heap/heap.o ./build/memory/heap/kheap.o ./build/memory/paging/paging.o ./build/memory/paging/paging.asm.o ./build/vga/vga.o
 INCLUDES = -I./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
@@ -41,11 +41,11 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/loader/elfloader.o: ./src/loader/Elfloader.c
 	$(CC) $(INCLUDES) -I./src/loader $(FLAGS) -std=gnu99 -c ./src/loader/Elfloader.c -o ./build/loader/elfloader.o
 
-./build/gdt/gdt.o: ./src/gdt/Gdt.c
-	$(CC) $(INCLUDES) -I./src/gdt $(FLAGS) -std=gnu99 -c ./src/gdt/Gdt.c -o ./build/gdt/gdt.o
+./build/global_descriptor_table/gdt.o: ./src/global_descriptor_table/Gdt.c
+	$(CC) $(INCLUDES) -I./src/global_descriptor_table $(FLAGS) -std=gnu99 -c ./src/global_descriptor_table/Gdt.c -o ./build/global_descriptor_table/gdt.o
 
-./build/gdt/gdt.asm.o: ./src/gdt/Gdt.asm
-	nasm -f elf -g ./src/gdt/Gdt.asm -o ./build/gdt/gdt.asm.o
+./build/global_descriptor_table/gdt.asm.o: ./src/global_descriptor_table/Gdt.asm
+	nasm -f elf -g ./src/global_descriptor_table/Gdt.asm -o ./build/global_descriptor_table/gdt.asm.o
 
 ./build/interrupt_service_routines/interrupt_service_routines.o: ./src/interrupt_service_routines/interrupt_service_routines.c
 	$(CC) $(INCLUDES) -I./src/interrupt_service_routines $(FLAGS) -std=gnu99 -c ./src/interrupt_service_routines/interrupt_service_routines.c -o ./build/interrupt_service_routines/interrupt_service_routines.o

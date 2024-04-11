@@ -5,7 +5,7 @@
 #include "disk/Streamer.h"
 #include "fs/File.h"
 #include "fs/PathParser.h"
-#include "gdt/Gdt.h"
+#include "global_descriptor_table/Gdt.h"
 #include "interrupt_descriptor_table/Idt.h"
 #include "interrupt_service_routines/interrupt_service_routines.h"
 #include "keyboard/Keyboard.h"
