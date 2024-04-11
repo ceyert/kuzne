@@ -12,10 +12,10 @@
 #include "memory/Memory.h"
 #include "memory/heap/Kheap.h"
 #include "memory/paging/Paging.h"
+#include "string/String.h"
 #include "process/Process.h"
 #include "process/Task.h"
 #include "process/Tss.h"
-#include "string/String.h"
 #include "vga/Vga.h"
 
 static struct Paging4GbChunk* KERNEL_PAGE_DIRECTORY_ = 0;
@@ -71,8 +71,7 @@ void kernel_main()
     tss_load(0x28);
 
     // Setup paging
-    KERNEL_PAGE_DIRECTORY_ =
-        enable_4gb_virtual_memory_addressing(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    KERNEL_PAGE_DIRECTORY_ = enable_4gb_virtual_memory_addressing(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
 
     // Switch to kernel paging chunk
     set_current_page_directory(KERNEL_PAGE_DIRECTORY_);
@@ -87,27 +86,11 @@ void kernel_main()
     keyboard_init();
 
     struct Process* process = 0;
-
-    int res = process_load_switch("0:/blank.elf", &process);
-    if (res != ALL_OK)
-    {
-        panic("Failed to load blank.elf\n");
-    }
-
-    struct CommandArgument commandArgument;
-    strcpy(commandArgument.argument, "A");
-    commandArgument.next = 0x00;
-    process_inject_arguments(process, &commandArgument);
-
-    res = process_load_switch("0:/blank.elf", &process);
+    int res = process_load_switch("0:/shell.elf", &process);
     if (res != ALL_OK)
     {
         panic("Failed to load shell.elf\n");
     }
-
-    strcpy(commandArgument.argument, "Z");
-    commandArgument.next = 0x00;
-    process_inject_arguments(process, &commandArgument);
 
     run_first_task();
 
