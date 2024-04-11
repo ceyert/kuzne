@@ -83,6 +83,33 @@ void idt_clock()
 
 void idt_init()
 {
+/*
+    IVT Offset | INT #     | Description
+-----------+-----------+-----------------------------------
+0x0000     | 0x00      | Divide by 0
+0x0004     | 0x01      | Reserved
+0x0008     | 0x02      | NMI Interrupt
+0x000C     | 0x03      | Breakpoint (INT3)
+0x0010     | 0x04      | Overflow (INTO)
+0x0014     | 0x05      | Bounds range exceeded (BOUND)
+0x0018     | 0x06      | Invalid opcode (UD2)
+0x001C     | 0x07      | Device not available (WAIT/FWAIT)
+0x0020     | 0x08      | Double fault
+0x0024     | 0x09      | Coprocessor segment overrun
+0x0028     | 0x0A      | Invalid TSS
+0x002C     | 0x0B      | Segment not present
+0x0030     | 0x0C      | Stack-segment fault
+0x0034     | 0x0D      | General protection fault
+0x0038     | 0x0E      | Page fault
+0x003C     | 0x0F      | Reserved
+0x0040     | 0x10      | x87 FPU error
+0x0044     | 0x11      | Alignment check
+0x0048     | 0x12      | Machine check
+0x004C     | 0x13      | SIMD Floating-Point Exception
+0x00xx     | 0x14-0x1F | Reserved
+0x0xxx     | 0x20-0xFF | User definable
+*/
+
     memset(idt_descriptors, 0, sizeof(idt_descriptors));
     idtr_descriptor.limit = sizeof(idt_descriptors) - 1;
     idtr_descriptor.base = (uint32_t)idt_descriptors;
@@ -102,7 +129,9 @@ void idt_init()
         idt_register_interrupt_callback(i, idt_handle_exception);
     }
 
-    idt_register_interrupt_callback(0x20, idt_clock);
+    // Clock interrupt
+    int clock_int = 0x20;
+    idt_register_interrupt_callback(clock_int, idt_clock);
 
     // Load the interrupt descriptor table
     idt_load(&idtr_descriptor);
