@@ -187,7 +187,7 @@ char* ptr_to_hex(const unsigned long ptr)
     {
         int digit = addr & 0xF;  // Extract the last 4 bits
         text[--loc] = hexDigits[digit];
-        addr >>= 4;  // Shift right by 4 bits to process the next digit
+        addr >>= 4;  // Shift right by 4 bits (divide by 4) to process the next digit
     }
 
     return &text[loc];

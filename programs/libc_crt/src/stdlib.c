@@ -52,14 +52,19 @@ char* itoa_hex(int i)
 char* ptr_to_hex(const unsigned long ptr)
 {
     static char text[17];  // Buffer for 16 hex digits (for 64-bit addresses) + null terminator
-    static const char hexDigits[] = "0123456789abcdef";
-    unsigned long addr = ptr;  // Cast pointer to unsigned long
-    int loc = 16;
-    text[16] = '\0';  // Null-terminator for string
 
+    static const char hexDigits[] = "0123456789ABCDEF";
+
+    unsigned long addr = ptr;  
+
+    int loc = 16;
+
+    text[loc] = '\0';  
+
+    // Initialize buffer with zeros
     for (int i = 0; i < 16; ++i)
     {
-        text[i] = '0';  // Initialize buffer with zeros
+        text[i] = '0';  
     }
 
     if (addr == 0)
@@ -72,7 +77,7 @@ char* ptr_to_hex(const unsigned long ptr)
     {
         int digit = addr & 0xF;  // Extract the last 4 bits
         text[--loc] = hexDigits[digit];
-        addr >>= 4;  // Shift right by 4 bits to process the next digit
+        addr >>= 4;  // Shift right by 4 bits (divide by 4) to process the next digit
     }
 
     return &text[loc];
