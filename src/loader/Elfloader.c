@@ -103,6 +103,14 @@ void* elf_phys_end(struct ElfFile* file)
     return file->physical_end_address;
 }
 
+void elf_close(struct ElfFile* file)
+{
+    if (!file) return;
+
+    kernel_free_alloc(file->elf_memory);
+    kernel_free_alloc(file);
+}
+
 int elf_validate_loaded(struct ElfHeader* header)
 {
     return (elf_valid_signature(header) && elf_valid_class(header) && elf_valid_encoding(header)
@@ -219,12 +227,4 @@ int elf_load(const char* filename, struct ElfFile** file_out)
 out:
     fclose(fd);
     return res;
-}
-
-void elf_close(struct ElfFile* file)
-{
-    if (!file) return;
-
-    kernel_free_alloc(file->elf_memory);
-    kernel_free_alloc(file);
 }
