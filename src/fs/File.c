@@ -5,7 +5,7 @@
 #include "disk/Disk.h"
 #include "fat/Fat16.h"
 #include "memory/Memory.h"
-#include "memory/heap/Kheap.h"
+#include "malloc/Kheap.h"
 #include "string/String.h"
 #include "vga/Vga.h"
 

@@ -8,7 +8,7 @@ mkdir ./mount_point
 mkdir ./build/interrupt_descriptor_table
 mkdir ./build/interrupt_service_routines
 mkdir ./build/memory
-mkdir ./build/memory/heap
+mkdir ./build/malloc
 mkdir ./build/paging
 mkdir ./build/io
 mkdir ./build/disk

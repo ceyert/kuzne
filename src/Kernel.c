@@ -10,7 +10,7 @@
 #include "interrupt_service_routines/interrupt_service_routines.h"
 #include "keyboard/Keyboard.h"
 #include "memory/Memory.h"
-#include "memory/heap/Kheap.h"
+#include "malloc/Kheap.h"
 #include "paging/Paging.h"
 #include "string/String.h"
 #include "process/Process.h"

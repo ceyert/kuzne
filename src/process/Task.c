@@ -5,7 +5,7 @@
 #include "interrupt_descriptor_table/Idt.h"
 #include "loader/Elfloader.h"
 #include "memory/Memory.h"
-#include "memory/heap/Kheap.h"
+#include "malloc/Kheap.h"
 #include "paging/Paging.h"
 #include "string/String.h"
 #include "vga/Vga.h"
@@ -19,51 +19,16 @@ struct Task* TASK_TAIL_ = 0;
 int task_init(struct Task* task, struct Process* process);
 
 
-struct Task* task_current()
+// Function to convert a virtual address in a task's address space to a physical address
+void* task_virtual_address_to_physical(struct Task* task, void* virtual_address)
 {
-    return CURRENT_TASK_;
+    return paging_get_physical_address(task->page_directory->directory_entry, virtual_address);
 }
 
 
-struct Task* task_new(struct Process* process)
+struct Task* task_current()
 {
-    int res = 0;
-    struct Task* newTask = kernel_zeroed_alloc(sizeof(struct Task));
-    if (!newTask)
-    {
-        res = -ENOMEM;
-        goto out;
-    }
-
-    res = task_init(newTask, process);
-    if (res != ALL_OK)
-    {
-        goto out;
-    }
-
-    if (TASK_FRONT_ == 0)
-    {
-        TASK_FRONT_ = newTask;
-        TASK_TAIL_ = newTask;
-        CURRENT_TASK_ = newTask;
-        goto out;
-    }
-
-    // add newTask to queue
-    {
-        TASK_TAIL_->next = newTask;
-        newTask->prev = TASK_TAIL_;
-        TASK_TAIL_ = newTask;
-    }
-
-out:
-    if (ISERR(res))
-    {
-        task_free(newTask);
-        return ERROR(res);
-    }
-
-    return newTask;
+    return CURRENT_TASK_;
 }
 
 // get next task in linked list
@@ -77,39 +42,6 @@ struct Task* task_get_next()
     return CURRENT_TASK_->next;
 }
 
-// remove task from linked list
-static void remove_task_from_list(struct Task* task)
-{
-    if (task->prev)
-    {
-        task->prev->next = task->next;
-    }
-
-    if (task == TASK_FRONT_)
-    {
-        TASK_FRONT_ = task->next;
-    }
-
-    if (task == TASK_TAIL_)
-    {
-        TASK_TAIL_ = task->prev;
-    }
-
-    if (task == CURRENT_TASK_)
-    {
-        CURRENT_TASK_ = task_get_next();
-    }
-}
-
-// Function to free resources associated with a task
-int task_free(struct Task* task)
-{
-    paging_free_4gb(task->page_directory);
-    remove_task_from_list(task);
-
-    kernel_free_alloc(task);
-    return 0;
-}
 
 // Function to switch to the next task
 void run_next_task()
@@ -215,6 +147,61 @@ int task_page_task(struct Task* task)
     return 0;
 }
 
+// Function to get a specific item from a task's stack
+void* task_get_stack_item(struct Task* task, int index)
+{
+    void* result = 0;
+
+    uint32_t* sp_ptr = (uint32_t*)task->registers.esp;
+
+    // Switch to the given tasks page
+    task_page_task(task);
+
+    result = (void*)sp_ptr[index];
+
+    // Switch back to the kernel page
+    kernel_page();
+
+    return result;
+}
+
+
+static void remove_task_from_list(struct Task* task)
+{
+    // If the task is not the first task, update the previous task's 'next' pointer
+    if (task->prev)
+    {
+        task->prev->next = task->next;  // Point the previous task's 'next' to the current task's 'next', bypassing the current task
+    }
+
+    // Check if the task to remove is the front task in the list
+    if (task == TASK_FRONT_)
+    {
+        TASK_FRONT_ = task->next;  // Update the front task pointer to the next task in the list
+    }
+
+    // Check if the task to remove is the tail task in the list
+    if (task == TASK_TAIL_)
+    {
+        TASK_TAIL_ = task->prev;  // Update the tail task pointer to the previous task in the list
+    }
+
+    // Check if the task to remove is the currently active task
+    if (task == CURRENT_TASK_)
+    {
+        CURRENT_TASK_ = task_get_next();  // Update the current task pointer to the next available task
+    }
+}
+
+int task_free(struct Task* task)
+{
+    paging_free_4gb(task->page_directory);
+    remove_task_from_list(task);
+
+    kernel_free_alloc(task);
+    return 0;
+}
+
 // Function to start the first task
 void run_first_task()
 {
@@ -227,7 +214,6 @@ void run_first_task()
     task_return(&TASK_FRONT_->registers);
 }
 
-// Function to initialize a task, setting up its page directory and registers
 int task_init(struct Task* task, struct Process* process)
 {
     memset(task, 0, sizeof(struct Task));
@@ -259,26 +245,43 @@ int task_init(struct Task* task, struct Process* process)
     return 0;
 }
 
-// Function to get a specific item from a task's stack
-void* task_get_stack_item(struct Task* task, int index)
+struct Task* task_new(struct Process* process)
 {
-    void* result = 0;
+    int res = 0;
+    struct Task* newTask = kernel_zeroed_alloc(sizeof(struct Task));
+    if (!newTask)
+    {
+        res = -ENOMEM;
+        goto out;
+    }
 
-    uint32_t* sp_ptr = (uint32_t*)task->registers.esp;
+    res = task_init(newTask, process);
+    if (res != ALL_OK)
+    {
+        goto out;
+    }
 
-    // Switch to the given tasks page
-    task_page_task(task);
+    if (TASK_FRONT_ == 0)
+    {
+        TASK_FRONT_ = newTask;
+        TASK_TAIL_ = newTask;
+        CURRENT_TASK_ = newTask;
+        goto out;
+    }
 
-    result = (void*)sp_ptr[index];
+    // add newTask to queue
+    {
+        TASK_TAIL_->next = newTask;
+        newTask->prev = TASK_TAIL_;
+        TASK_TAIL_ = newTask;
+    }
 
-    // Switch back to the kernel page
-    kernel_page();
+out:
+    if (ISERR(res))
+    {
+        task_free(newTask);
+        return ERROR(res);
+    }
 
-    return result;
-}
-
-// Function to convert a virtual address in a task's address space to a physical address
-void* task_virtual_address_to_physical(struct Task* task, void* virtual_address)
-{
-    return paging_get_physical_address(task->page_directory->directory_entry, virtual_address);
+    return newTask;
 }

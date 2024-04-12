@@ -1,6 +1,6 @@
 #include "Config.h"
 #include "Streamer.h"
-#include "memory/heap/Kheap.h"
+#include "malloc/Kheap.h"
 
 #include <stdbool.h>
 
