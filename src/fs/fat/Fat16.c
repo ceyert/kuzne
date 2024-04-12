@@ -222,7 +222,7 @@ int fat16_get_root_directory(struct Disk* disk, struct fat_private* fat_private,
 
     int total_items = fat16_get_total_items_for_directory(disk, root_dir_sector_pos);
 
-    dir = kzalloc(root_dir_size);
+    dir = kernel_zeroed_alloc(root_dir_size);
     if (!dir)
     {
         res = -ENOMEM;
@@ -252,7 +252,7 @@ out:
 err_out:
     if (dir)
     {
-        kfree(dir);
+        kernel_free_alloc(dir);
     }
 
     return res;
@@ -261,7 +261,7 @@ err_out:
 int fat16_resolve(struct Disk* disk)
 {
     int res = 0;
-    struct fat_private* fat_private = kzalloc(sizeof(struct fat_private));
+    struct fat_private* fat_private = kernel_zeroed_alloc(sizeof(struct fat_private));
     fat16_init_private(disk, fat_private);
 
     disk->fsPrivate = fat_private;
@@ -300,7 +300,7 @@ out:
 
     if (res < 0)
     {
-        kfree(fat_private);
+        kernel_free_alloc(fat_private);
         disk->fsPrivate = 0;
     }
     return res;
@@ -345,7 +345,7 @@ struct fat_directory_item* fat16_clone_directory_item(struct fat_directory_item*
         return 0;
     }
 
-    item_copy = kzalloc(size);
+    item_copy = kernel_zeroed_alloc(size);
     if (!item_copy)
     {
         return 0;
@@ -506,10 +506,10 @@ void fat16_free_directory(struct fat_directory* directory)
 
     if (directory->item)
     {
-        kfree(directory->item);
+        kernel_free_alloc(directory->item);
     }
 
-    kfree(directory);
+    kernel_free_alloc(directory);
 }
 
 void fat16_fat_item_free(struct fat_item* item)
@@ -520,10 +520,10 @@ void fat16_fat_item_free(struct fat_item* item)
     }
     else if (item->type == FAT_ITEM_TYPE_FILE)
     {
-        kfree(item->item);
+        kernel_free_alloc(item->item);
     }
 
-    kfree(item);
+    kernel_free_alloc(item);
 }
 
 struct fat_directory* fat16_load_fat_directory(struct Disk* disk, struct fat_directory_item* item)
@@ -537,7 +537,7 @@ struct fat_directory* fat16_load_fat_directory(struct Disk* disk, struct fat_dir
         goto out;
     }
 
-    directory = kzalloc(sizeof(struct fat_directory));
+    directory = kernel_zeroed_alloc(sizeof(struct fat_directory));
     if (!directory)
     {
         res = -ENOMEM;
@@ -549,7 +549,7 @@ struct fat_directory* fat16_load_fat_directory(struct Disk* disk, struct fat_dir
     int total_items = fat16_get_total_items_for_directory(disk, cluster_sector);
     directory->total = total_items;
     int directory_size = directory->total * sizeof(struct fat_directory_item);
-    directory->item = kzalloc(directory_size);
+    directory->item = kernel_zeroed_alloc(directory_size);
     if (!directory->item)
     {
         res = -ENOMEM;
@@ -572,7 +572,7 @@ out:
 
 struct fat_item* fat16_new_fat_item_for_directory_item(struct Disk* disk, struct fat_directory_item* item)
 {
-    struct fat_item* f_item = kzalloc(sizeof(struct fat_item));
+    struct fat_item* f_item = kernel_zeroed_alloc(sizeof(struct fat_item));
     if (!f_item)
     {
         return 0;
@@ -646,7 +646,7 @@ void* fat16_open(struct Disk* disk, struct PathPart* path, file_mode_t mode)
         goto err_out;
     }
 
-    descriptor = kzalloc(sizeof(struct fat_file_descriptor));
+    descriptor = kernel_zeroed_alloc(sizeof(struct fat_file_descriptor));
     if (!descriptor)
     {
         err_code = -ENOMEM;
@@ -664,7 +664,7 @@ void* fat16_open(struct Disk* disk, struct PathPart* path, file_mode_t mode)
     return descriptor;
 
 err_out:
-    if (descriptor) kfree(descriptor);
+    if (descriptor) kernel_free_alloc(descriptor);
 
     return ERROR(err_code);
 }
@@ -672,7 +672,7 @@ err_out:
 static void fat16_free_file_descriptor(struct fat_file_descriptor* desc)
 {
     fat16_fat_item_free(desc->item);
-    kfree(desc);
+    kernel_free_alloc(desc);
 }
 
 int fat16_close(void* private)

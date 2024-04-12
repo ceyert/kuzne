@@ -4,12 +4,12 @@
 #include <stdint.h>
 #include <stddef.h>
 
-extern void kheap_init();
+extern void kernel_heap_init();
 
-extern void *kmalloc(size_t size);
+extern void *kernel_malloc(size_t size);
 
-extern void *kzalloc(size_t size);
+extern void *kernel_zeroed_alloc(size_t size);
 
-extern void kfree(void *ptr);
+extern void kernel_free_alloc(void *ptr);
 
 #endif

@@ -1,5 +1,5 @@
 CC = i686-elf-gcc 
-FILES = ./build/kernel.asm.o ./build/kernel.o ./build/loader/elf.o ./build/loader/elfloader.o  ./build/interrupt_service_routines/interrupt_service_routines.o ./build/interrupt_service_routines/process_isr.o ./build/interrupt_service_routines/heap_isr.o ./build/keyboard/keyboard.o ./build/keyboard/classic.o ./build/interrupt_service_routines/io_isr.o ./build/interrupt_service_routines/misc_isr.o ./build/disk/disk.o ./build/disk/streamer.o ./build/process/process.o ./build/process/task.o ./build/process/task.asm.o ./build/process/tss.asm.o ./build/fs/pparser.o ./build/fs/file.o ./build/fs/fat/fat16.o ./build/string/string.o ./build/interrupt_descriptor_table/idt.asm.o ./build/interrupt_descriptor_table/idt.o ./build/memory/memory.o ./build/io/io.asm.o ./build/global_descriptor_table/gdt.o ./build/global_descriptor_table/gdt.asm.o ./build/memory/heap/heap.o ./build/memory/heap/kheap.o ./build/memory/paging/paging.o ./build/memory/paging/paging.asm.o ./build/vga/vga.o
+FILES = ./build/kernel.asm.o ./build/kernel.o ./build/loader/elf.o ./build/loader/elfloader.o  ./build/interrupt_service_routines/interrupt_service_routines.o ./build/interrupt_service_routines/process_isr.o ./build/interrupt_service_routines/heap_isr.o ./build/keyboard/keyboard.o ./build/keyboard/classic.o ./build/interrupt_service_routines/io_isr.o ./build/interrupt_service_routines/misc_isr.o ./build/disk/disk.o ./build/disk/streamer.o ./build/process/process.o ./build/process/task.o ./build/process/task.asm.o ./build/process/tss.asm.o ./build/fs/pparser.o ./build/fs/file.o ./build/fs/fat/fat16.o ./build/string/string.o ./build/interrupt_descriptor_table/idt.asm.o ./build/interrupt_descriptor_table/idt.o ./build/memory/memory.o ./build/io/io.asm.o ./build/global_descriptor_table/gdt.o ./build/global_descriptor_table/gdt.asm.o ./build/memory/heap/heap.o ./build/memory/heap/kheap.o ./build/paging/paging.o ./build/paging/paging.asm.o ./build/vga/vga.o
 INCLUDES = -I./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
@@ -100,11 +100,11 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/memory/heap/kheap.o: ./src/memory/heap/Kheap.c
 	$(CC) $(INCLUDES) -I./src/memory/heap $(FLAGS) -std=gnu99 -c ./src/memory/heap/Kheap.c -o ./build/memory/heap/kheap.o
 
-./build/memory/paging/paging.o: ./src/memory/paging/Paging.c
-	$(CC) $(INCLUDES) -I./src/memory/paging $(FLAGS) -std=gnu99 -c ./src/memory/paging/Paging.c -o ./build/memory/paging/paging.o
+./build/paging/paging.o: ./src/paging/Paging.c
+	$(CC) $(INCLUDES) -I./src/paging $(FLAGS) -std=gnu99 -c ./src/paging/Paging.c -o ./build/paging/paging.o
 
-./build/memory/paging/paging.asm.o: ./src/memory/paging/Paging.asm
-	nasm -f elf -g ./src/memory/paging/Paging.asm -o ./build/memory/paging/paging.asm.o
+./build/paging/paging.asm.o: ./src/paging/Paging.asm
+	nasm -f elf -g ./src/paging/Paging.asm -o ./build/paging/paging.asm.o
 
 ./build/disk/disk.o: src/disk/Disk.c
 	$(CC) $(INCLUDES) -I./src/disk $(FLAGS) -std=gnu99 -c ./src/disk/Disk.c -o ./build/disk/disk.o

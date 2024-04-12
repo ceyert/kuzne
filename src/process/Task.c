@@ -6,11 +6,10 @@
 #include "loader/Elfloader.h"
 #include "memory/Memory.h"
 #include "memory/heap/Kheap.h"
-#include "memory/paging/Paging.h"
+#include "paging/Paging.h"
 #include "string/String.h"
 #include "vga/Vga.h"
 
-// The current task that is running
 struct Task* CURRENT_TASK_ = 0;
 
 // Task doubly linked list
@@ -29,7 +28,7 @@ struct Task* task_current()
 struct Task* task_new(struct Process* process)
 {
     int res = 0;
-    struct Task* newTask = kzalloc(sizeof(struct Task));
+    struct Task* newTask = kernel_zeroed_alloc(sizeof(struct Task));
     if (!newTask)
     {
         res = -ENOMEM;
@@ -108,8 +107,7 @@ int task_free(struct Task* task)
     paging_free_4gb(task->page_directory);
     remove_task_from_list(task);
 
-    // Finally free the task data
-    kfree(task);
+    kernel_free_alloc(task);
     return 0;
 }
 
@@ -160,7 +158,7 @@ int copy_string_from_task(struct Task* task, void* virtual, void* phys, int max)
     }
 
     int res = 0;
-    char* tmp = kzalloc(max);
+    char* tmp = kernel_zeroed_alloc(max);
     if (!tmp)
     {
         res = -ENOMEM;
@@ -184,7 +182,7 @@ int copy_string_from_task(struct Task* task, void* virtual, void* phys, int max)
     strncpy(phys, tmp, max);
 
 out_free:
-    kfree(tmp);
+    kernel_free_alloc(tmp);
 out:
     return res;
 }

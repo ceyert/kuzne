@@ -1,5 +1,6 @@
 #include "shell.h"
 #include "stdio.h"
+#include "string.h"
 #include "stdlib.h"
 #include "syscalls.h"
 
@@ -9,10 +10,17 @@ int main(int argc, char** argv)
 
     while (1)
     {
-        print("> ");
+        print("$ ");
 
         char buffer[1024];
+
         kuzne_terminal_readline(buffer, sizeof(buffer), true);
+
+        if (strncmp(buffer, "exit", 4) == 0)
+        {
+            print("\n");
+            break;
+        }
 
         print("\n");
 

@@ -9,7 +9,7 @@ mkdir ./build/interrupt_descriptor_table
 mkdir ./build/interrupt_service_routines
 mkdir ./build/memory
 mkdir ./build/memory/heap
-mkdir ./build/memory/paging
+mkdir ./build/paging
 mkdir ./build/io
 mkdir ./build/disk
 mkdir ./build/fs

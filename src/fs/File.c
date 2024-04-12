@@ -61,7 +61,7 @@ void fs_init()
 static void file_free_descriptor(struct FileDescriptor* desc)
 {
     file_descriptors[desc->index - 1] = 0x00;
-    kfree(desc);
+    kernel_free_alloc(desc);
 }
 
 static int file_new_descriptor(struct FileDescriptor** desc_out)
@@ -71,7 +71,7 @@ static int file_new_descriptor(struct FileDescriptor** desc_out)
     {
         if (file_descriptors[i] == 0)
         {
-            struct FileDescriptor* desc = kzalloc(sizeof(struct FileDescriptor));
+            struct FileDescriptor* desc = kernel_zeroed_alloc(sizeof(struct FileDescriptor));
             // Descriptors start at 1
             desc->index = i + 1;
             file_descriptors[i] = desc;

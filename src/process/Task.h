@@ -11,7 +11,7 @@
 #define TASK_H
 
 #include "Config.h"
-#include "memory/paging/Paging.h"
+#include "paging/Paging.h"
 
 struct InterruptFrame; ///< Forward declaration for interrupt frame structure.
 struct Process; ///< Forward declaration for process structure.

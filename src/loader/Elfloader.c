@@ -6,7 +6,7 @@
 #include "fs/File.h"
 #include "memory/Memory.h"
 #include "memory/heap/Kheap.h"
-#include "memory/paging/Paging.h"
+#include "paging/Paging.h"
 #include "string/String.h"
 #include <stdbool.h>
 
@@ -182,7 +182,7 @@ out:
 
 int elf_load(const char* filename, struct ElfFile** file_out)
 {
-    struct ElfFile* elf_file = kzalloc(sizeof(struct ElfFile));
+    struct ElfFile* elf_file = kernel_zeroed_alloc(sizeof(struct ElfFile));
     int fd = 0;
     int res = fopen(filename, "r");
     if (res <= 0)
@@ -199,7 +199,7 @@ int elf_load(const char* filename, struct ElfFile** file_out)
         goto out;
     }
 
-    elf_file->elf_memory = kzalloc(stat.filesize);
+    elf_file->elf_memory = kernel_zeroed_alloc(stat.filesize);
     
     logAddress("elf_memory : ", (unsigned long)elf_file->elf_memory);
 
@@ -225,6 +225,6 @@ void elf_close(struct ElfFile* file)
 {
     if (!file) return;
 
-    kfree(file->elf_memory);
-    kfree(file);
+    kernel_free_alloc(file->elf_memory);
+    kernel_free_alloc(file);
 }

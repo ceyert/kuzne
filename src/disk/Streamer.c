@@ -12,7 +12,7 @@ struct DiskStream* diskstreamer_new(int disk_id)
         return 0;
     }
 
-    struct DiskStream* streamer = kzalloc(sizeof(struct DiskStream));
+    struct DiskStream* streamer = kernel_zeroed_alloc(sizeof(struct DiskStream));
     streamer->position = 0;
     streamer->disk = disk;
     return streamer;
@@ -60,5 +60,5 @@ out:
 
 void diskstreamer_close(struct DiskStream* stream)
 {
-    kfree(stream);
+    kernel_free_alloc(stream);
 }

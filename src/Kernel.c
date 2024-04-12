@@ -11,7 +11,7 @@
 #include "keyboard/Keyboard.h"
 #include "memory/Memory.h"
 #include "memory/heap/Kheap.h"
-#include "memory/paging/Paging.h"
+#include "paging/Paging.h"
 #include "string/String.h"
 #include "process/Process.h"
 #include "process/Task.h"
@@ -26,32 +26,37 @@ void kernel_page()
     set_current_page_directory(KERNEL_PAGE_DIRECTORY_);
 }
 
-struct Tss Tss;
+struct Tss TSS_;
 
-struct Gdt gdt_real[TOTAL_GDT_SEGMENTS];
+struct Gdt GDT_REAL_[TOTAL_GDT_SEGMENTS];
 
-struct GdtStructured gdt_structured[TOTAL_GDT_SEGMENTS] = {
+struct GdtStructured GDT_STRUCTURED_[TOTAL_GDT_SEGMENTS] = {
     {.base = 0x00, .limit = 0x00, .type = GDT_NULL_SEGMENT},                 // NULL Segment
+
     {.base = 0x00, .limit = 0xffffffff, .type = GDT_KERNEL_CODE_SEGMENT},    // Kernel code segment
+
     {.base = 0x00, .limit = 0xffffffff, .type = GDT_KERNEL_DATA_SEGMENT},    // Kernel data segment
+
     {.base = 0x00, .limit = 0xffffffff, .type = GDT_USER_CODE_SEGMENT},      // User code segment
+
     {.base = 0x00, .limit = 0xffffffff, .type = GDT_USER_DATA_SEGMENT},      // User data segment
-    {.base = (uint32_t)&Tss, .limit = sizeof(Tss), .type = GDT_TSS_SEGMENT}  // TSS Segment
+
+    {.base = (uint32_t)&TSS_, .limit = sizeof(TSS_), .type = GDT_TSS_SEGMENT}  // TSS Segment
 };
 
 void kernel_main()
 {
     terminal_initialize();
 
-    memset(gdt_real, 0x00, sizeof(gdt_real));
+    memset(GDT_REAL_, 0x00, sizeof(GDT_REAL_));
 
-    gdt_structured_to_gdt(gdt_real, gdt_structured, TOTAL_GDT_SEGMENTS);
+    gdt_structured_to_gdt(GDT_REAL_, GDT_STRUCTURED_, TOTAL_GDT_SEGMENTS);
 
     // Load the gdt
-    gdt_load(gdt_real, sizeof(gdt_real));
+    gdt_load(GDT_REAL_, sizeof(GDT_REAL_));
 
     // Initialize the heap
-    kheap_init();
+    kernel_heap_init();
 
     // Initialize filesystems
     fs_init();
@@ -63,9 +68,9 @@ void kernel_main()
     idt_init();
 
     // Setup the TSS
-    memset(&Tss, 0x00, sizeof(Tss));
-    Tss.esp0 = 0x600000;
-    Tss.ss0 = KERNEL_DATA_SELECTOR;
+    memset(&TSS_, 0x00, sizeof(TSS_));
+    TSS_.esp0 = 0x600000;
+    TSS_.ss0 = KERNEL_DATA_SELECTOR;
 
     // Load the TSS
     tss_load(0x28);

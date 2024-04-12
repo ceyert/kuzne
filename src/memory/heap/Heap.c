@@ -5,16 +5,17 @@
 #include "vga/Vga.h"
 #include <stdbool.h>
 
-static int heap_validate_table(void* ptr, void* end, struct HeapTable* table)
+static int heap_validate_map(void* ptr, void* end, struct HeapMap* map)
 {
     int res = 0;
 
     size_t table_size = (size_t)(end - ptr);
     size_t total_blocks = table_size / HEAP_BLOCK_SIZE;
-    if (table->totalEntries != total_blocks)
+
+    if (map->totalEntries_ != total_blocks)
     {
         res = -EINVARG;
-        log("Error: heap_validate_table");
+        log("Error: heap_validate_map");
         goto out;
     }
 
@@ -27,7 +28,7 @@ static bool heap_validate_alignment(void* ptr)
     return ((unsigned int)ptr % HEAP_BLOCK_SIZE) == 0;
 }
 
-int heap_create(struct Heap* heap, void* heapBaseAddr, void* end, struct HeapTable* table)
+int heap_create(struct Heap* heap, void* heapBaseAddr, void* end, struct HeapMap* map)
 {
     int res = 0;
 
@@ -39,18 +40,18 @@ int heap_create(struct Heap* heap, void* heapBaseAddr, void* end, struct HeapTab
     }
 
     memset(heap, 0, sizeof(struct Heap));
-    heap->heapBaseAddr = heapBaseAddr;
-    heap->heapTable = table;
+    heap->heapBaseAddr_ = heapBaseAddr;
+    heap->heapMap_ = map;
 
-    res = heap_validate_table(heapBaseAddr, end, table);
+    res = heap_validate_map(heapBaseAddr, end, map);
     if (res < 0)
     {
-        logAddress("heap_validate_table", res);
+        logAddress("heap_validate_map", res);
         goto out;
     }
 
-    size_t table_size = sizeof(heap_table_entry_t) * table->totalEntries;
-    memset(table->tableEntries, HEAP_TABLE_ENTRY_FREE, table_size);
+    size_t table_size = sizeof(unsigned char) * map->totalEntries_;
+    memset(map->mapBaseAddress_, HEAP_MAP_ENTRY_FREE, table_size);
 
 out:
     return res;
@@ -68,20 +69,20 @@ static uint32_t heap_align_value_to_upper(uint32_t val)
     return val;
 }
 
-static int heap_get_entry_type(heap_table_entry_t entry)
+static int heap_get_entry_type(unsigned char entry)
 {
     return entry & 0x0f;
 }
 
 int heap_get_start_block(struct Heap* heap, uint32_t total_blocks)
 {
-    struct HeapTable* table = heap->heapTable;
+    struct HeapMap* map = heap->heapMap_;
     int bc = 0;
     int bs = -1;
 
-    for (size_t i = 0; i < table->totalEntries; i++)
+    for (size_t i = 0; i < map->totalEntries_; i++)
     {
-        if (heap_get_entry_type(table->tableEntries[i]) != HEAP_TABLE_ENTRY_FREE)
+        if (heap_get_entry_type(map->mapBaseAddress_[i]) != HEAP_MAP_ENTRY_FREE)
         {
             bc = 0;
             bs = -1;
@@ -111,26 +112,26 @@ int heap_get_start_block(struct Heap* heap, uint32_t total_blocks)
 
 void* heap_block_to_address(struct Heap* heap, int block)
 {
-    return heap->heapBaseAddr + (block * HEAP_BLOCK_SIZE);
+    return heap->heapBaseAddr_ + (block * HEAP_BLOCK_SIZE);
 }
 
 void heap_mark_blocks_taken(struct Heap* heap, int start_block, int total_blocks)
 {
     int end_block = (start_block + total_blocks) - 1;
 
-    heap_table_entry_t entry = HEAP_TABLE_ENTRY_TAKEN | HEAP_TABLE_ENTRY_IS_FIRST;
+    unsigned char entry = HEAP_MAP_ENTRY_TAKEN | HEAP_MAP_ENTRY_IS_FIRST;
     if (total_blocks > 1)
     {
-        entry |= HEAP_TABLE_ENTRY_HAS_NEXT;
+        entry |= HEAP_MAP_ENTRY_HAS_NEXT;
     }
 
     for (int i = start_block; i <= end_block; i++)
     {
-        heap->heapTable->tableEntries[i] = entry;
-        entry = HEAP_TABLE_ENTRY_TAKEN;
+        heap->heapMap_->mapBaseAddress_[i] = entry;
+        entry = HEAP_MAP_ENTRY_TAKEN;
         if (i != end_block - 1)
         {
-            entry |= HEAP_TABLE_ENTRY_HAS_NEXT;
+            entry |= HEAP_MAP_ENTRY_HAS_NEXT;
         }
     }
 }
@@ -156,12 +157,15 @@ out:
 
 void heap_mark_blocks_free(struct Heap* heap, int starting_block)
 {
-    struct HeapTable* table = heap->heapTable;
-    for (int i = starting_block; i < (int)table->totalEntries; i++)
+    struct HeapMap* map = heap->heapMap_;
+
+    for (int i = starting_block; i < (int)map->totalEntries_; i++)
     {
-        heap_table_entry_t entry = table->tableEntries[i];
-        table->tableEntries[i] = HEAP_TABLE_ENTRY_FREE;
-        if (!(entry & HEAP_TABLE_ENTRY_HAS_NEXT))
+        unsigned char entry = map->mapBaseAddress_[i];
+
+        map->mapBaseAddress_[i] = HEAP_MAP_ENTRY_FREE;
+        
+        if (!(entry & HEAP_MAP_ENTRY_HAS_NEXT))
         {
             break;
         }
@@ -170,7 +174,7 @@ void heap_mark_blocks_free(struct Heap* heap, int starting_block)
 
 int heap_address_to_block(struct Heap* heap, void* address)
 {
-    return ((int)(address - heap->heapBaseAddr)) / HEAP_BLOCK_SIZE;
+    return ((int)(address - heap->heapBaseAddr_)) / HEAP_BLOCK_SIZE;
 }
 
 void* heap_malloc(struct Heap* heap, size_t size)

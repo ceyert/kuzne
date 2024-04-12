@@ -6,7 +6,7 @@
 #include "loader/Elfloader.h"
 #include "memory/Memory.h"
 #include "memory/heap/Kheap.h"
-#include "memory/paging/Paging.h"
+#include "paging/Paging.h"
 #include "string/String.h"
 #include "process/Task.h"
 #include "vga/Vga.h"
@@ -65,7 +65,7 @@ static int process_find_free_allocation_index(struct Process* process)
 // Allocates memory of the specified size for a process, and maps it to the process's page directory
 void* process_malloc(struct Process* process, size_t size)
 {
-    void* ptr = kzalloc(size);
+    void* ptr = kernel_zeroed_alloc(size);
     if (!ptr)
     {
         goto out_err;
@@ -91,7 +91,7 @@ void* process_malloc(struct Process* process, size_t size)
 out_err:
     if (ptr)
     {
-        kfree(ptr);
+        kernel_free_alloc(ptr);
     }
     return 0;
 }
@@ -145,7 +145,7 @@ int process_terminate_allocations(struct Process* process)
 // Frees the memory allocated for a process's binary data
 int process_free_binary_data(struct Process* process)
 {
-    kfree(process->processBaseAddr);
+    kernel_free_alloc(process->processBaseAddr);
     return 0;
 }
 
@@ -181,17 +181,17 @@ void process_switch_to_any()
 {
     for (int i = 0; i < MAX_PROCESSES; i++)
     {
-        if (PROCESS_BUFFER_[i])
+        if (PROCESS_BUFFER_[i] != 0)
         {
             set_current_process(PROCESS_BUFFER_[i]);
             return;
         }
     }
 
-    panic("No processes to switch too\n");
+    panic("No process switch to!\n");
 }
 
-// Removes a process from the process array and switches to another process if necessary
+
 static void process_unlink(struct Process* process)
 {
     PROCESS_BUFFER_[process->processId] = 0x00;
@@ -220,7 +220,7 @@ int process_terminate(struct Process* process)
     }
 
     // Free the process stack memory.
-    kfree(process->stackPtr);
+    kernel_free_alloc(process->stackPtr);
 
     // Free the task
     task_free(process->task);
@@ -316,7 +316,7 @@ void process_free(struct Process* process, void* ptr)
     process_allocation_unjoin(process, ptr);
 
     // We can now free the memory.
-    kfree(ptr);
+    kernel_free_alloc(ptr);
 }
 
 // Loads a binary file into a process
@@ -338,7 +338,7 @@ static int load_binary_file(const char* filename, struct Process* process)
         goto out;
     }
 
-    program_data_ptr = kzalloc(stat.filesize);
+    program_data_ptr = kernel_zeroed_alloc(stat.filesize);
     if (!program_data_ptr)
     {
         res = -ENOMEM;
@@ -360,7 +360,7 @@ out:
     {
         if (program_data_ptr)
         {
-            kfree(program_data_ptr);
+            kernel_free_alloc(program_data_ptr);
         }
     }
     fclose(fd);
@@ -530,7 +530,7 @@ int process_load_for_slot(const char* filename, struct Process** process, int pr
         goto out;
     }
 
-    new_process_ = kzalloc(sizeof(struct Process));
+    new_process_ = kernel_zeroed_alloc(sizeof(struct Process));
     if (!new_process_)
     {
         res = -ENOMEM;
@@ -544,7 +544,7 @@ int process_load_for_slot(const char* filename, struct Process** process, int pr
         goto out;
     }
 
-    program_stack_ptr = kzalloc(USER_PROCESS_STACK_SIZE);
+    program_stack_ptr = kernel_zeroed_alloc(USER_PROCESS_STACK_SIZE);
     if (!program_stack_ptr)
     {
         res = -ENOMEM;

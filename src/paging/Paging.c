@@ -13,7 +13,7 @@ static uint32_t* CURRENT_PAGE_DIRECTORY_ = 0;
 struct Paging4GbChunk* enable_4gb_virtual_memory_addressing(uint8_t flags)
 {
     // 1024 page tables
-    uint32_t* newPageDirectory = kzalloc(sizeof(uint32_t) * TOTAL_PAGES_PER_TABLE);
+    uint32_t* newPageDirectory = kernel_zeroed_alloc(sizeof(uint32_t) * TOTAL_PAGES_PER_TABLE);
 
     int pagetable_offset_4_mb = 0;
 
@@ -21,7 +21,7 @@ struct Paging4GbChunk* enable_4gb_virtual_memory_addressing(uint8_t flags)
     for (int i = 0; i < TOTAL_PAGES_PER_TABLE; i++)
     {
         // Allocate 1024 pages
-        uint32_t* page_table_ptr = kzalloc(sizeof(uint32_t) * TOTAL_PAGES_PER_TABLE);
+        uint32_t* page_table_ptr = kernel_zeroed_alloc(sizeof(uint32_t) * TOTAL_PAGES_PER_TABLE);
 
         // Maps page table with 4MB(1024 * 4KB) physical address offsets. 
         for (int page_idx = 0; page_idx < TOTAL_PAGES_PER_TABLE; page_idx++)
@@ -48,7 +48,7 @@ struct Paging4GbChunk* enable_4gb_virtual_memory_addressing(uint8_t flags)
     // 1024 iterations
     // 1024 * 4096 = 4MB memory allocations
 
-    struct Paging4GbChunk* chunk_4gb = kzalloc(sizeof(struct Paging4GbChunk));
+    struct Paging4GbChunk* chunk_4gb = kernel_zeroed_alloc(sizeof(struct Paging4GbChunk));
     chunk_4gb->directory_entry = newPageDirectory;
     return chunk_4gb;
 }
@@ -65,11 +65,11 @@ void paging_free_4gb(struct Paging4GbChunk* chunk)
     {
         uint32_t entry = chunk->directory_entry[i];
         uint32_t* table = (uint32_t*)(entry & 0xfffff000);
-        kfree(table);
+        kernel_free_alloc(table);
     }
 
-    kfree(chunk->directory_entry);
-    kfree(chunk);
+    kernel_free_alloc(chunk->directory_entry);
+    kernel_free_alloc(chunk);
 }
 
 uint32_t* paging_4gb_chunk_get_directory(struct Paging4GbChunk* chunk)

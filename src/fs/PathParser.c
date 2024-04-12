@@ -27,7 +27,7 @@ static int pathparser_get_drive_by_path(const char** path)
 
 static struct PathRoot* pathparser_create_root(int drive_number)
 {
-    struct PathRoot* path_r = kzalloc(sizeof(struct PathRoot));
+    struct PathRoot* path_r = kernel_zeroed_alloc(sizeof(struct PathRoot));
     path_r->driveNo = drive_number;
     path_r->first = 0;
     return path_r;
@@ -35,7 +35,7 @@ static struct PathRoot* pathparser_create_root(int drive_number)
 
 static const char* pathparser_get_path_part(const char** path)
 {
-    char* result_path_part = kzalloc(PEACHOS_MAX_PATH);
+    char* result_path_part = kernel_zeroed_alloc(PEACHOS_MAX_PATH);
     int i = 0;
     while (**path != '/' && **path != 0x00)
     {
@@ -52,7 +52,7 @@ static const char* pathparser_get_path_part(const char** path)
 
     if (i == 0)
     {
-        kfree(result_path_part);
+        kernel_free_alloc(result_path_part);
         result_path_part = 0;
     }
 
@@ -67,7 +67,7 @@ struct PathPart* pathparser_parse_path_part(struct PathPart* last_part, const ch
         return 0;
     }
 
-    struct PathPart* part = kzalloc(sizeof(struct PathPart));
+    struct PathPart* part = kernel_zeroed_alloc(sizeof(struct PathPart));
     part->part = path_part_str;
     part->next = 0x00;
 
@@ -85,12 +85,12 @@ void pathparser_free(struct PathRoot* root)
     while (part)
     {
         struct PathPart* next_part = part->next;
-        kfree((void*)part->part);
-        kfree(part);
+        kernel_free_alloc((void*)part->part);
+        kernel_free_alloc(part);
         part = next_part;
     }
 
-    kfree(root);
+    kernel_free_alloc(root);
 }
 
 struct PathRoot* pathparser_parse(const char* path, const char* current_directory_path)

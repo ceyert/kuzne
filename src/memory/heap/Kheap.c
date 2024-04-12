@@ -4,37 +4,37 @@
 #include "memory/Memory.h"
 #include "vga/Vga.h"
 
-struct Heap kernel_heap;
-struct HeapTable kernel_heap_table;
+struct Heap KERNEL_HEAP_;
+struct HeapMap KERNEL_HEAP_MAP_;
 
-void kheap_init()
+void kernel_heap_init()
 {
-    kernel_heap_table.tableEntries = (heap_table_entry_t*)(HEAP_MAP_BASE_ADDRESS);
-    kernel_heap_table.totalEntries = TOTAL_HEAP_MAP_BLOCKS;
+    KERNEL_HEAP_MAP_.mapBaseAddress_ = (unsigned char*)(HEAP_MAP_BASE_ADDRESS);
+    KERNEL_HEAP_MAP_.totalEntries_ = TOTAL_HEAP_MAP_BLOCKS;
 
     void* end = (void*)(HEAP_BASE_ADDRESS + TOTAL_HEAP_SIZE);
-    int res = heap_create(&kernel_heap, (void*)(HEAP_BASE_ADDRESS), end, &kernel_heap_table);
+    int res = heap_create(&KERNEL_HEAP_, (void*)(HEAP_BASE_ADDRESS), end, &KERNEL_HEAP_MAP_);
     if (res < 0)
     {
-        panic("Error: kheap_init");
+        panic("Error: kernel_heap_init");
     }
 }
 
-void* kmalloc(size_t size)
+void* kernel_malloc(size_t size)
 {
-    return heap_malloc(&kernel_heap, size);
+    return heap_malloc(&KERNEL_HEAP_, size);
 }
 
-void* kzalloc(size_t size)
+void* kernel_zeroed_alloc(size_t size)
 {
-    void* ptr = kmalloc(size);
+    void* ptr = kernel_malloc(size);
     if (!ptr) return 0;
 
     memset(ptr, 0x00, size);
     return ptr;
 }
 
-void kfree(void* ptr)
+void kernel_free_alloc(void* ptr)
 {
-    heap_free(&kernel_heap, ptr);
+    heap_free(&KERNEL_HEAP_, ptr);
 }
