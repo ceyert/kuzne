@@ -5,18 +5,20 @@
 #include <stdint.h>
 
 uint16_t* video_mem = 0;
+
 uint16_t terminal_row = 0;
 uint16_t terminal_col = 0;
+
 bool isOverride = false;
 
-uint16_t terminal_make_char(char c, char colour)
+uint16_t terminal_make_char(char character, char colour)
 {
-    return (colour << 8) | c;
+    return (colour << 8) | character;
 }
 
-void terminal_putchar(int x, int y, char c, char colour)
+void terminal_putchar(int col_pos, int row_pos, char character, char colour)
 {
-    video_mem[(y * VGA_COL) + x] = terminal_make_char(c, colour);
+    video_mem[(row_pos * VGA_COL) + col_pos] = terminal_make_char(character, colour);
 }
 
 void terminal_backspace()
@@ -26,10 +28,9 @@ void terminal_backspace()
         return;
     }
 
-    if (terminal_col == 0)
+    if (terminal_col == 1)
     {
-        terminal_row -= 1;
-        terminal_col = VGA_COL;
+        return;
     }
 
     terminal_col -= 1;
@@ -39,37 +40,39 @@ void terminal_backspace()
 
 static void cleanScreen(int col, int row)
 {
-    for (int y = row; y < VGA_ROW; y++)
+    for (int row_pos = row; row_pos <= VGA_ROW; row_pos++)
     {
-        for (int x = col; x < VGA_COL; x++)
+        for (int col_pos = col; col_pos <= VGA_COL; col_pos++)
         {
-            terminal_putchar(x, y, ' ', 0);
+            terminal_putchar(col_pos, row_pos, ' ', 0);
         }
     }
 }
 
-void terminal_writechar(char c, char colour)
+void terminal_writechar(char character, char colour)
 {
     if (isOverride)
     {
+        terminal_row = 0;
+        terminal_col = 0;
         cleanScreen(terminal_col, terminal_row);
         isOverride = false;
     }
 
-    if (c == '\n')
+    if (character == '\n')
     {
         terminal_row += 1;
         terminal_col = 0;
         return;
     }
 
-    if (c == 0x08)
+    if (character == 0x08)
     {
         terminal_backspace();
         return;
     }
 
-    terminal_putchar(terminal_col, terminal_row, c, colour);
+    terminal_putchar(terminal_col, terminal_row, character, colour);
 
     terminal_col += 1;
 

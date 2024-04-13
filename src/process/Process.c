@@ -176,8 +176,8 @@ int process_free_program_data(struct Process* process)
     return res;
 }
 
-// Switches to any available process. If no processes are available, triggers a panic
-void process_switch_to_any()
+
+void get_next_not_free_process()
 {
     for (int i = 0; i < MAX_PROCESSES; i++)
     {
@@ -194,11 +194,11 @@ void process_switch_to_any()
 
 static void process_unlink(struct Process* process)
 {
-    PROCESS_BUFFER_[process->processId] = 0x00;
+    PROCESS_BUFFER_[process->processId] = 0x00; // free current process 
 
     if (CURRENT_PROCESS_ == process)
     {
-        process_switch_to_any();
+        get_next_not_free_process();
     }
 }
 
@@ -505,12 +505,15 @@ static int load_program_file(const char* filename, struct Process* process)
     return res;
 }
 
-// Finds a free slot in the process array
-int get_free_process_from_buffer()
+
+int get_free_process_idx_from_buffer()
 {
     for (int i = 0; i < MAX_PROCESSES; i++)
     {
-        if (PROCESS_BUFFER_[i] == 0) return i;
+        if (PROCESS_BUFFER_[i] == 0) 
+        {
+            return i;
+        }
     }
 
     return -EISTKN;
@@ -595,7 +598,7 @@ out:
 int process_load(const char* filename, struct Process** process)
 {
     int res = 0;
-    int process_slot = get_free_process_from_buffer();
+    int process_slot = get_free_process_idx_from_buffer();
     if (process_slot < 0)
     {
         res = -EISTKN;
