@@ -15,8 +15,9 @@ _start:
     mov gs, ax
     mov ss, ax
 
-    ; Set kernel SP and BP 0x00300000 (3MB offset)
-    mov ebp, 0x00300000
+    ; Set kernel SP and BP address: 0x00200000 (2MB offset)
+    ; Make sure that, address is well aligned (power of two alignment)
+    mov ebp, 0x00200000
     mov esp, ebp
 
     ; Enable the A20 line
