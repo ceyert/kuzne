@@ -12,7 +12,7 @@
 #include "memory/Memory.h"
 #include "malloc/Kheap.h"
 #include "paging/Paging.h"
-#include "string/String.h"
+#include "memory/Memory.h"
 #include "process/Process.h"
 #include "process/Task.h"
 #include "process/Tss.h"

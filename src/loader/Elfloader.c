@@ -7,7 +7,6 @@
 #include "memory/Memory.h"
 #include "malloc/Kheap.h"
 #include "paging/Paging.h"
-#include "string/String.h"
 #include <stdbool.h>
 
 const char elf_signature[] = {0x7f, 'E', 'L', 'F'};

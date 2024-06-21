@@ -1,4 +1,4 @@
-#include "syscalls.h"
+#include "../../include/syscalls.h"
 
 extern int main(int argc, char** argv);
 

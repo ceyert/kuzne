@@ -3,7 +3,6 @@
 #include "Status.h"
 #include "memory/Memory.h"
 #include "malloc/Kheap.h"
-#include "string/String.h"
 
 static int pathparser_path_valid_format(const char* filename)
 {

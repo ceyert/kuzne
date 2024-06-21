@@ -7,7 +7,6 @@
 #include "memory/Memory.h"
 #include "malloc/Kheap.h"
 #include "paging/Paging.h"
-#include "string/String.h"
 #include "vga/Vga.h"
 
 struct Task* CURRENT_TASK_ = 0;

@@ -2,7 +2,7 @@
 #include "Kernel.h"
 #include "Process_isr.h"
 #include "Status.h"
-#include "string/String.h"
+#include "memory/Memory.h"
 #include "process/Process.h"
 #include "process/Task.h"
 

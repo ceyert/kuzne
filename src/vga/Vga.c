@@ -1,5 +1,5 @@
 #include "Vga.h"
-#include "string/String.h"
+#include "memory/Memory.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

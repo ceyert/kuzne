@@ -6,7 +6,6 @@
 #include "fat/Fat16.h"
 #include "memory/Memory.h"
 #include "malloc/Kheap.h"
-#include "string/String.h"
 #include "vga/Vga.h"
 
 struct Filesystem* filesystems[MAX_FILESYSTEMS];

@@ -1,12 +1,14 @@
 #include "shell.h"
 #include "stdio.h"
-#include "string.h"
+#include "memory.h"
 #include "stdlib.h"
 #include "syscalls.h"
 
 int main(int argc, char** argv)
 {
-    print("Shell v1.0.0\n");
+    println("Shell v1.0.0");
+
+    int RESULT = 0;
 
     while (1)
     {
@@ -22,12 +24,15 @@ int main(int argc, char** argv)
             break;
         }
 
-        print("\n");
-
-        kuzne_system_run(buffer);
+        if (strncmp(buffer, "run ", 4) == 0)
+        {
+            print("\n");
+            char temp[1024];
+            RESULT = kuzne_system_run(substr(buffer, 4, strlen(buffer) - 4, temp));
+        }
 
         print("\n");
     }
 
-    return 0;
+    return RESULT; // return to kernel
 }

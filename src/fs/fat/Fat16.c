@@ -5,7 +5,6 @@
 #include "disk/Streamer.h"
 #include "memory/Memory.h"
 #include "malloc/Kheap.h"
-#include "string/String.h"
 #include <stdint.h>
 
 #define FAT16_SIGNATURE 0x29

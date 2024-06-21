@@ -1,5 +1,5 @@
-#include "string.h"
-#include "syscalls.h"
+#include "../../include/memory.h"
+#include "../../include/syscalls.h"
 
 struct CommandArgument* kuzne_parse_command(const char* command, int max)
 {
@@ -52,10 +52,13 @@ out:
 int kuzne_getkeyblock()
 {
     int val = 0;
+    
     do
     {
         val = kuzne_syscall_getkey();
-    } while (val == 0);
+    } 
+    while (val == 0);
+
     return val;
 }
 
@@ -96,8 +99,11 @@ void kuzne_terminal_readline(char* out, int max, bool output_while_typing)
 int kuzne_system_run(const char* command)
 {
     char buf[1024];
+
     strncpy(buf, command, sizeof(buf));
+
     struct CommandArgument* root_command_argument = kuzne_parse_command(buf, sizeof(buf));
+
     if (!root_command_argument)
     {
         return -1;

@@ -8,5 +8,5 @@ section .asm
 
 _start:
     call c_start
-    call kuzne_syscall_exit     ; isr80h_command9_exit terminate process & run next task (shell)
+    call kuzne_syscall_exit     ; isr80h_command9_exit terminate current process & run next task
     ret

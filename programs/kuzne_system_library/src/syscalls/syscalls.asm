@@ -2,7 +2,7 @@
 
 section .asm
 
-global print:function
+global kuzne_syscall_print:function
 global kuzne_syscall_getkey:function
 global kuzne_syscall_malloc:function
 global kuzne_syscall_free:function
@@ -12,12 +12,12 @@ global kuzne_syscall_process_get_arguments:function
 global kuzne_syscall_system:function
 global kuzne_syscall_exit:function
 
-; void print(const char* filename)
-print:
+; void kuzne_syscall_print(const char* filename)
+kuzne_syscall_print:
     push ebp
     mov ebp, esp
     push dword[ebp+8]
-    mov eax, 1 ; Command print
+    mov eax, 1 ; Command kuzne_syscall_print
     int 0x80    ; trigger interrupt 0x80
     add esp, 4
     pop ebp

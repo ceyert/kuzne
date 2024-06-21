@@ -1,5 +1,5 @@
-#include "stdlib.h"
-#include "syscalls.h"
+#include "../../include/stdlib.h"
+#include "../../include/syscalls.h"
 
 char* itoa(int i)
 {
@@ -55,16 +55,16 @@ char* ptr_to_hex(const unsigned long ptr)
 
     static const char hexDigits[] = "0123456789ABCDEF";
 
-    unsigned long addr = ptr;  
+    unsigned long addr = ptr;
 
     int loc = 16;
 
-    text[loc] = '\0';  
+    text[loc] = '\0';
 
     // Initialize buffer with zeros
     for (int i = 0; i < 16; ++i)
     {
-        text[i] = '0';  
+        text[i] = '0';
     }
 
     if (addr == 0)
