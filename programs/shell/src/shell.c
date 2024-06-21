@@ -1,18 +1,38 @@
 #include "shell.h"
 #include "stdio.h"
+#include "memory.h"
 #include "stdlib.h"
-#include "peachos.h"
+#include "syscalls.h"
 
-int main(int argc, char **argv) {
-    print("Shell v1.0.0\n");
-    while (1) {
-        print("> ");
-        char buf[1024];
-        peachos_terminal_readline(buf, sizeof(buf), true);
-        print("\n");
-        peachos_system_run(buf);
+int main(int argc, char** argv)
+{
+    println("Shell v1.0.0");
+
+    int RESULT = 0;
+
+    while (1)
+    {
+        print("$ ");
+
+        char buffer[1024];
+
+        kuzne_terminal_readline(buffer, sizeof(buffer), true);
+
+        if (strncmp(buffer, "exit", 4) == 0)
+        {
+            print("\n");
+            break;
+        }
+
+        if (strncmp(buffer, "run ", 4) == 0)
+        {
+            print("\n");
+            char temp[1024];
+            RESULT = kuzne_system_run(substr(buffer, 4, strlen(buffer) - 4, temp));
+        }
 
         print("\n");
     }
-    return 0;
+
+    return RESULT; // return to kernel
 }

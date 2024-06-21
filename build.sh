@@ -5,30 +5,33 @@ mkdir ./build
 
 mkdir ./mount_point
 
-mkdir ./build/idt
+mkdir ./build/interrupt_descriptor_table
+mkdir ./build/interrupt_service_routines
 mkdir ./build/memory
-mkdir ./build/memory/heap
-mkdir ./build/memory/paging
+mkdir ./build/malloc
+mkdir ./build/paging
 mkdir ./build/io
 mkdir ./build/disk
 mkdir ./build/fs
-mkdir ./build/string
 mkdir ./build/fs/fat
-mkdir ./build/gdt
-mkdir ./build/task
-mkdir ./build/isr80h
+mkdir ./build/global_descriptor_table
+mkdir ./build/process
 mkdir ./build/keyboard
 mkdir ./build/loader
-mkdir ./build/loader/formats
 mkdir ./build/vga
 
+mkdir ./programs/kuzne_system_library/build
 mkdir ./programs/blank/build
 mkdir ./programs/shell/build
-mkdir ./programs/stdlib/build
-
 
 export PREFIX="$HOME/opt/cross"
 export TARGET=i686-elf
 export PATH="$PREFIX/bin:$PATH"
+
 make clean
+
+echo "***** Compiling Kernel *****"
 make all
+
+echo "***** Compiling Programs *****"
+make compile_user_programs

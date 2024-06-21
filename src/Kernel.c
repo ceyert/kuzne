@@ -1,57 +1,62 @@
-#include "Kernel.h"
-#include "vga/Vga.h"
-#include "idt/Idt.h"
-#include "memory/heap/Kheap.h"
-#include "memory/paging/Paging.h"
-#include "memory/Memory.h"
-#include "keyboard/Keyboard.h"
-#include "string/String.h"
-#include "isr80h/Isr80h.h"
-#include "task/Task.h"
-#include "task/Process.h"
-#include "fs/File.h"
-#include "disk/Disk.h"
-#include "fs/Pparser.h"
-#include "disk/Streamer.h"
-#include "task/Tss.h"
-#include "gdt/Gdt.h"
 #include "Config.h"
+#include "Kernel.h"
 #include "Status.h"
+#include "disk/Disk.h"
+#include "disk/Streamer.h"
+#include "fs/File.h"
+#include "fs/PathParser.h"
+#include "global_descriptor_table/Gdt.h"
+#include "interrupt_descriptor_table/Idt.h"
+#include "interrupt_service_routines/interrupt_service_routines.h"
+#include "keyboard/Keyboard.h"
+#include "memory/Memory.h"
+#include "malloc/Kheap.h"
+#include "paging/Paging.h"
+#include "memory/Memory.h"
+#include "process/Process.h"
+#include "process/Task.h"
+#include "process/Tss.h"
+#include "vga/Vga.h"
 
+static struct Paging4GbChunk* KERNEL_PAGE_DIRECTORY_ = 0;
 
-static struct Paging4GbChunk *kernel_chunk = 0;
-
-void kernel_page() {
+void kernel_page()
+{
     kernel_registers();
-    paging_switch(kernel_chunk);
+    set_current_page_directory(KERNEL_PAGE_DIRECTORY_);
 }
 
-struct Tss Tss;
+struct Tss TSS_;
 
-struct Gdt gdt_real[TOTAL_GDT_SEGMENTS];
+struct Gdt GDT_REAL_[TOTAL_GDT_SEGMENTS];
 
-struct GdtStructured gdt_structured[TOTAL_GDT_SEGMENTS] = {
-        {.base = 0x00, .limit = 0x00, .type = 0x00},                // NULL Segment
-        {.base = 0x00, .limit = 0xffffffff, .type = 0x9a},           // Kernel code segment
-        {.base = 0x00, .limit = 0xffffffff, .type = 0x92},            // Kernel data segment
-        {.base = 0x00, .limit = 0xffffffff, .type = 0xf8},              // User code segment
-        {.base = 0x00, .limit = 0xffffffff, .type = 0xf2},             // User data segment
-        {.base = (uint32_t) & Tss, .limit=sizeof(Tss), .type = 0xE9}      // TSS Segment
+struct GdtStructured GDT_STRUCTURED_[TOTAL_GDT_SEGMENTS] = {
+    {.base = 0x00, .limit = 0x00, .type = GDT_NULL_SEGMENT},                 // NULL Segment
+
+    {.base = 0x00, .limit = 0xffffffff, .type = GDT_KERNEL_CODE_SEGMENT},    // Kernel code segment
+
+    {.base = 0x00, .limit = 0xffffffff, .type = GDT_KERNEL_DATA_SEGMENT},    // Kernel data segment
+
+    {.base = 0x00, .limit = 0xffffffff, .type = GDT_USER_CODE_SEGMENT},      // User code segment
+
+    {.base = 0x00, .limit = 0xffffffff, .type = GDT_USER_DATA_SEGMENT},      // User data segment
+
+    {.base = (uint32_t)&TSS_, .limit = sizeof(TSS_), .type = GDT_TSS_SEGMENT}  // TSS Segment
 };
 
-void kernel_main() {
-
+void kernel_main()
+{
     terminal_initialize();
 
-    memset(gdt_real, 0x00, sizeof(gdt_real));
+    memset(GDT_REAL_, 0x00, sizeof(GDT_REAL_));
 
-    gdt_structured_to_gdt(gdt_real, gdt_structured, TOTAL_GDT_SEGMENTS);
+    gdt_structured_to_gdt(GDT_REAL_, GDT_STRUCTURED_, TOTAL_GDT_SEGMENTS);
 
     // Load the gdt
-    gdt_load(gdt_real, sizeof(gdt_real));
+    gdt_load(GDT_REAL_, sizeof(GDT_REAL_));
 
     // Initialize the heap
-    kheap_init();
+    kernel_heap_init();
 
     // Initialize filesystems
     fs_init();
@@ -63,18 +68,18 @@ void kernel_main() {
     idt_init();
 
     // Setup the TSS
-    memset(&Tss, 0x00, sizeof(Tss));
-    Tss.esp0 = 0x600000;
-    Tss.ss0 = KERNEL_DATA_SELECTOR;
+    memset(&TSS_, 0x00, sizeof(TSS_));
+    TSS_.esp0 = 0x600000;
+    TSS_.ss0 = KERNEL_DATA_SELECTOR;
 
     // Load the TSS
     tss_load(0x28);
 
     // Setup paging
-    kernel_chunk = paging_new_4gb(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    KERNEL_PAGE_DIRECTORY_ = enable_4gb_virtual_memory_addressing(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
 
     // Switch to kernel paging chunk
-    paging_switch(kernel_chunk);
+    set_current_page_directory(KERNEL_PAGE_DIRECTORY_);
 
     // Enable paging
     enable_paging();
@@ -85,13 +90,16 @@ void kernel_main() {
     // Initialize all the system keyboards
     keyboard_init();
 
-    struct Process *process = 0;
+    struct Process* process = 0;
     int res = process_load_switch("0:/shell.elf", &process);
-    if (res != PEACHOS_ALL_OK) {
+    if (res != ALL_OK)
+    {
         panic("Failed to load shell.elf\n");
     }
 
-    task_run_first_ever_task();
+    run_first_task();
 
-    while (1) {}
+    while (1)
+    {
+    }
 }
