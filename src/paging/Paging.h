@@ -20,6 +20,10 @@
 #define PAGING_IS_WRITEABLE    0b00000010 ///< Page is writable.
 #define PAGING_IS_PRESENT      0b00000001 ///< Page is present in memory.
 
+// Mask the lower 12 bits of a 32-bit address as offset. 
+// These lower 12 bits are used for the offset within a page. 
+// Using this mask with a bitwise AND operation (&) clears the lower 12 bits of an address.
+#define MASK_12_BITS_PAGE 0xFFFFF000    // 11111111111111111111000000000000
 
 /**
  * @struct PageDirectory
