@@ -461,7 +461,7 @@ int process_map_memory(struct Process* process)
                 PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITEABLE);
 
     logAddress("stack: ", (unsigned long)process->stackPtr);
-    logAddress("mapped with pre-defined stack base: ", USER_PROCESS_STACK_VIRTUAL_ADDRESS_BASE);
+    logAddress("process stack base (pre-defined): ", USER_PROCESS_STACK_VIRTUAL_ADDRESS_BASE);
 
 out:
     return res;

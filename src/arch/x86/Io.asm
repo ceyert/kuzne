@@ -4,6 +4,8 @@ section .asm
 ; Low-level input/output operations between the CPU and peripheral devices. 
 ; These operations use the in and out instructions for reading from and writing to device ports. 
 
+; /usr/include/x86_64-linux-gnu/sys/io.h
+
 global insb
 global insw
 global outb

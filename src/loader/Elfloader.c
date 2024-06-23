@@ -1,12 +1,12 @@
 #include "Config.h"
-#include "vga/Vga.h"
 #include "Elfloader.h"
 #include "Kernel.h"
 #include "Status.h"
 #include "fs/File.h"
-#include "memory/Memory.h"
 #include "malloc/Kheap.h"
+#include "memory/Memory.h"
 #include "paging/Paging.h"
+#include "vga/Vga.h"
 #include <stdbool.h>
 
 const char elf_signature[] = {0x7f, 'E', 'L', 'F'};
@@ -141,7 +141,7 @@ int elf_process_pheader(struct ElfFile* elf_file, struct Elf32Phdr* phdr)
     int res = 0;
     switch (phdr->p_type)
     {
-        // All necessary sections are part of loadable segments PT_LOAD type.
+        // All loadable sections are part of PT_LOAD segment.
         case PT_LOAD:
             // load sections into memory (.TEXT, .DATA, .BSS, .RODATA)
             res = elf_process_phdr_pt_load(elf_file, phdr);
@@ -149,7 +149,6 @@ int elf_process_pheader(struct ElfFile* elf_file, struct Elf32Phdr* phdr)
     }
     return res;
 }
-
 
 int elf_process_pheaders(struct ElfFile* elf_file)
 {
@@ -207,7 +206,7 @@ int elf_load(const char* filename, struct ElfFile** file_out)
     }
 
     elf_file->elf_memory = kernel_zeroed_alloc(stat.filesize);
-    
+
     logAddress("elf_memory : ", (unsigned long)elf_file->elf_memory);
 
     res = fread(elf_file->elf_memory, stat.filesize, 1, fd);

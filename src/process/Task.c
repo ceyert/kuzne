@@ -15,13 +15,11 @@ struct Task* CURRENT_TASK_ = 0;
 struct Task* TASK_FRONT_ = 0;
 struct Task* TASK_TAIL_ = 0;
 
-int task_init(struct Task* task, struct Process* process);
-
 
 // Function to convert a virtual address in a task's address space to a physical address
 void* task_virtual_address_to_physical(struct Task* task, void* virtual_address)
 {
-    return paging_get_physical_address(task->page_directory->directory_entry, virtual_address);
+    return paging_get_physical_address(task->page_directory->directory_entry_ptr, virtual_address);
 }
 
 
@@ -96,7 +94,7 @@ int copy_string_from_task(struct Task* task, void* virtual, void* phys, int max)
         goto out;
     }
 
-    uint32_t* task_directory = task->page_directory->directory_entry;
+    uint32_t* task_directory = task->page_directory->directory_entry_ptr;
     uint32_t old_entry = paging_get(task_directory, tmp);
     map_virtual_address_to_physical_address(task->page_directory, tmp, tmp, PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     set_current_page_directory(task->page_directory);
@@ -213,12 +211,13 @@ void run_first_task()
     task_return(&TASK_FRONT_->registers);
 }
 
+// Each task has own addressing spaces
 int task_init(struct Task* task, struct Process* process)
 {
     memset(task, 0, sizeof(struct Task));
 
-    // Enable 4GB memory regions
-    task->page_directory = enable_4gb_virtual_memory_addressing(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    // allocate page directory for the task
+    task->page_directory = new_page_directory_allocation(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
 
     if (!task->page_directory)
     {
@@ -239,7 +238,7 @@ int task_init(struct Task* task, struct Process* process)
     task->process = process;
 
     logAddress("process IP: ", (unsigned long)task->registers.ip);
-    logAddress("process esp: ", (unsigned long)task->registers.esp);
+    logAddress("process esp (predefined): ", (unsigned long)task->registers.esp);
 
     return 0;
 }

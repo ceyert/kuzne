@@ -16,7 +16,7 @@ _start:
     mov ss, ax
 
     ; Set kernel SP and BP address: 0x00200000 (2MB offset)
-    ; Make sure that, address is well aligned (power of two alignment)
+    ; Make sure that address is well aligned (power of two alignment)
     mov ebp, 0x00200000
     mov esp, ebp
 
@@ -47,6 +47,8 @@ kernel_registers:
     mov gs, ax
     mov fs, ax
     ret
+
+
 
 
 times 512-($ - $$) db 0

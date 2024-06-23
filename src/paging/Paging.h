@@ -22,29 +22,30 @@
 
 
 /**
- * @struct Paging4GbChunk
+ * @struct PageDirectory
  * @brief Structure representing a 4GB chunk of memory managed by paging.
  *
  * This structure holds a pointer to the page directory entries used to manage a 4GB chunk of memory.
  */
-struct Paging4GbChunk {
-    uint32_t *directory_entry; ///< Pointer to the directory entries.
+ 
+struct PageDirectory {
+    uint32_t *directory_entry_ptr; ///< Pointer to the directory entries.
 };
 
 /**
- * @brief Enables 4GB virtual memory via paging.
+ * @brief Allocates page directory for 4GB address mapping.
  *
  * @param flags Flags to apply to each page in this chunk.
- * @return struct Paging4GbChunk* Pointer to the new 4GB chunk.
+ * @return struct PageDirectory* Pointer to the new 4GB chunk.
  */
-extern struct Paging4GbChunk *enable_4gb_virtual_memory_addressing(uint8_t flags);
+extern struct PageDirectory *new_page_directory_allocation(uint8_t flags);
 
 /**
  * @brief Switches the current page directory to the one specified by the 4GB chunk.
  *
  * @param directory Pointer to the paging chunk whose directory to switch to.
  */
-extern void set_current_page_directory(struct Paging4GbChunk *directory);
+extern void set_current_page_directory(struct PageDirectory *directory);
 
 /**
  * @brief Enables paging on the system.
@@ -75,14 +76,14 @@ extern bool paging_is_aligned(void *addr);
  * @param chunk Pointer to the 4GB chunk.
  * @return uint32_t* Pointer to the page directory.
  */
-extern uint32_t *paging_4gb_chunk_get_directory(struct Paging4GbChunk *chunk);
+extern uint32_t *paging_4gb_chunk_get_directory(struct PageDirectory *chunk);
 
 /**
  * @brief Frees a 4GB chunk of memory.
  *
  * @param chunk Pointer to the 4GB chunk to free.
  */
-extern void paging_free_4gb(struct Paging4GbChunk *chunk);
+extern void paging_free_4gb(struct PageDirectory *chunk);
 
 /**
  * @brief Maps a physical address to a virtual address within a specified directory.
@@ -94,7 +95,7 @@ extern void paging_free_4gb(struct Paging4GbChunk *chunk);
  * @param flags Flags for the mapping.
  * @return int Success or failure of the operation.
  */
-extern int paging_map_to(struct Paging4GbChunk *directory, void *virt, void *phys, void *phys_end, int flags);
+extern int paging_map_to(struct PageDirectory *directory, void *virt, void *phys, void *phys_end, int flags);
 
 /**
  * @brief Maps a range of physical addresses to virtual addresses.
@@ -106,7 +107,7 @@ extern int paging_map_to(struct Paging4GbChunk *directory, void *virt, void *phy
  * @param flags Flags for the mapping.
  * @return int Success or failure of the operation.
  */
-extern int paging_map_range(struct Paging4GbChunk *directory, void *virt, void *phys, int count, int flags);
+extern int paging_map_range(struct PageDirectory *directory, void *virt, void *phys, int count, int flags);
 
 /**
  * @brief Maps a single physical address to a virtual address.
@@ -117,7 +118,7 @@ extern int paging_map_range(struct Paging4GbChunk *directory, void *virt, void *
  * @param flags Flags for the mapping.
  * @return int Success or failure of the operation.
  */
-extern int map_virtual_address_to_physical_address(struct Paging4GbChunk *directory, void *virt, void *phys, int flags);
+extern int map_virtual_address_to_physical_address(struct PageDirectory *directory, void *virt, void *phys, int flags);
 
 /**
  * @brief Aligns an address to the nearest lower page boundary.

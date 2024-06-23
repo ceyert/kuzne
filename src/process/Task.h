@@ -36,14 +36,16 @@ struct Registers {
  * page directory for memory management, and linkage to other tasks in a doubly linked list.
  */
 struct Task {
-    struct Paging4GbChunk *page_directory; ///< Page directory for task's virtual memory.
+    struct PageDirectory *page_directory; ///< Page directory for task's virtual memory.
     struct Registers registers; ///< Saved register state for the task.
     struct Process *process; ///< Associated process.
     struct Task *next; ///< Next task in the task list.
     struct Task *prev; ///< Previous task in the task list.
 };
 
-// Task management functions
+
+extern int task_init(struct Task* task, struct Process* process);
+
 extern struct Task *task_new(struct Process *process);
 
 extern struct Task *task_current();
