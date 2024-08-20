@@ -155,7 +155,7 @@ int process_free_elf_data(struct Process* process)
     return 0;
 }
 
-// Frees the memory allocated for a process's program data, depending on its file type
+// Frees the memory allocated for a process's data, depending on its file type
 int process_free_program_data(struct Process* process)
 {
     int res = 0;
@@ -318,7 +318,7 @@ void process_free(struct Process* process, void* ptr)
     kernel_free_alloc(ptr);
 }
 
-// Loads a binary file into a process
+// Loads a binary file into memory
 static int load_binary_file(const char* filename, struct Process* process)
 {
     void* program_data_ptr = 0x00;
