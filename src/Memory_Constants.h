@@ -92,6 +92,7 @@ After ELF allocated into memory, kernel must map virtual regions to physical reg
 */
 
 // program linker.ld 
+// may consider implementing ASLR instead
 #define USER_PROCESS_VIRTUAL_BASE_ADDRESS_NON_ELF 0x400000
 
 // 0x400000 - 0x3FF000 = 4096 (4KB) GAP between process base address and stack end.
