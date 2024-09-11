@@ -96,7 +96,8 @@ After ELF allocated into memory, kernel must map virtual regions to physical reg
 #define USER_PROCESS_VIRTUAL_BASE_ADDRESS_NON_ELF 0x400000
 
 // 0x400000 - 0x3FF000 = 4096 (4KB) GAP between process base address and stack end.
-// This 4KB GAP between process's code/data base address and the end of the stack, guard region (PAGE_FAULT) to prevent stack overflow from corrupting the process's code/data.
+// This 4KB GAP between process's code/data base address and the end of the stack, guard region (PAGE_FAULT) to prevent stack overflow from corrupting the process's code/data
+// may consider implementing ASLR instead
 #define USER_PROCESS_STACK_VIRTUAL_ADDRESS_END 0x3FF000    
 
 #define USER_PROCESS_STACK_SIZE 1024 * 16 // 16 KB stack size
