@@ -1,29 +1,25 @@
-ENTRY(_start)
+ENTRY(_start)                       /* Specify entry point */
 OUTPUT_FORMAT(binary)
 SECTIONS
 {
-    . = 1M; # 0x00100000 1MB offset
-    .text : ALIGN(4096)
+    . = 1M;                         /* Start at 1MB (0x00100000) */
+    .text : ALIGN(4096)             /* Kernel text section */
     {
-        *(.text)
+        _start = .;                 /* Entry point */
+        *(.text)                    /* General text code */
     }
 
-    .asm : ALIGN(4096)
-    {
-        *(.asm)
-    }
-
-    .rodata : ALIGN(4096)
+    .rodata : ALIGN(4096)           /* Read-only data */
     {
         *(.rodata)
     }
 
-    .data : ALIGN(4096)
+    .data : ALIGN(4096)             /* Writable data */
     {
         *(.data)
     }
 
-    .bss : ALIGN(4096)
+    .bss : ALIGN(4096)              /* Uninitialized data */
     {
         *(COMMON)
         *(.bss)

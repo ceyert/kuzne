@@ -1,33 +1,43 @@
-#/bin/bash
+#!/bin/bash
 
-mkdir ./bin
-mkdir ./build
+# Create necessary directories
+mkdir -p ./bin
+mkdir -p ./build
+mkdir -p ./mount_point
 
-mkdir ./mount_point
+# Create subdirectories
+SUBDIRS=(
+    interrupt_descriptor_table
+    interrupt_service_routines
+    memory
+    malloc
+    paging
+    io
+    disk
+    fs
+    fs/fat
+    global_descriptor_table
+    process
+    keyboard
+    loader
+    vga
+)
 
-mkdir ./build/interrupt_descriptor_table
-mkdir ./build/interrupt_service_routines
-mkdir ./build/memory
-mkdir ./build/malloc
-mkdir ./build/paging
-mkdir ./build/io
-mkdir ./build/disk
-mkdir ./build/fs
-mkdir ./build/fs/fat
-mkdir ./build/global_descriptor_table
-mkdir ./build/process
-mkdir ./build/keyboard
-mkdir ./build/loader
-mkdir ./build/vga
+for subdir in "${SUBDIRS[@]}"; do
+    mkdir -p "./build/$subdir"
+done
 
-mkdir ./programs/kuzne_system_library/build
-mkdir ./programs/blank/build
-mkdir ./programs/shell/build
+# Create program-specific directories
+mkdir -p ./programs/kuzne_system_library/build
+mkdir -p ./programs/blank/build
+mkdir -p ./programs/shell/build
 
+# Set environment variables
 export PREFIX="$HOME/opt/cross"
 export TARGET=i686-elf
 export PATH="$PREFIX/bin:$PATH"
 
+# Clean and build
 make clean
 
 echo "***** Compiling Kernel *****"

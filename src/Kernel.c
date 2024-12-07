@@ -17,6 +17,7 @@
 #include "process/Task.h"
 #include "process/Tss.h"
 #include "vga/Vga.h"
+#include <stdint.h>
 
 /*
 https://wiki.osdev.org/Detecting_Memory_(x86)
